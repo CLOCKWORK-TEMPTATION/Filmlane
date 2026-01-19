@@ -1,4 +1,3 @@
-// src/lib/logger.ts
 const LOG_LEVELS = {
   info: 1,
   warning: 2,
@@ -8,7 +7,7 @@ const LOG_LEVELS = {
 
 type LogLevel = keyof typeof LOG_LEVELS;
 
-const CURRENT_LOG_LEVEL: LogLevel = 'info'; // Change this to control verbosity
+const CURRENT_LOG_LEVEL: LogLevel = 'info';
 
 class Logger {
   private log(level: LogLevel, component: string, message: string) {

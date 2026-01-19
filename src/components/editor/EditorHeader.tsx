@@ -29,7 +29,7 @@ export function EditorHeader({ onGenerateIdeas, isProcessingAI }: EditorHeaderPr
             setIdeaTheme('');
         }
     };
-    
+
     return (
         <header className="flex-shrink-0 px-4 pt-2 pb-1 shadow-sm z-30 bg-card border-b">
             <div className="flex items-center justify-between">

@@ -11,8 +11,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import { screenplayFormats, fonts, textSizes, colors } from '@/lib/screenplay-config';
-import type { ScreenplayFormat } from '@/lib/screenplay-config';
+import { screenplayFormats, fonts, textSizes, colors } from '@/constants';
+import type { ScreenplayFormat } from '@/types/screenplay';
 
 interface EditorToolbarProps {
     currentFormat: string;
@@ -32,7 +32,7 @@ export function EditorToolbar({
 }: EditorToolbarProps) {
     const handleFormatChange = (formatId: string) => {
         if (!formatId) return;
-        
+
         const selection = window.getSelection();
         if (!selection || selection.rangeCount === 0) return;
         const range = selection.getRangeAt(0);
@@ -125,7 +125,7 @@ export function EditorToolbar({
                          </TooltipTrigger><TooltipContent><p>لون النص</p></TooltipContent></Tooltip>
 
                         <Separator orientation="vertical" className="h-6" />
-                        
+
                         <ToggleGroup type="single" defaultValue="right" aria-label="Text alignment">
                            <Tooltip><TooltipTrigger asChild><ToggleGroupItem value="right" aria-label="Align right" onClick={() => onFormatCommand('justifyRight')}><AlignRight size={16}/></ToggleGroupItem></TooltipTrigger><TooltipContent><p>محاذاة لليمين</p></TooltipContent></Tooltip>
                            <Tooltip><TooltipTrigger asChild><ToggleGroupItem value="center" aria-label="Align center" onClick={() => onFormatCommand('justifyCenter')}><AlignCenter size={16}/></ToggleGroupItem></TooltipTrigger><TooltipContent><p>توسيط</p></TooltipContent></Tooltip>

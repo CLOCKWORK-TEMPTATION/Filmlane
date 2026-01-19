@@ -2,9 +2,8 @@ import React from 'react';
 import { logger } from './logger';
 import {
   ContextMemoryManager,
-  ContextMemory,
-  ClassificationRecord,
 } from './context-memory-manager';
+import type { ContextMemory, LineContext } from '@/types/screenplay';
 import { getFormatStyles } from './editor-styles';
 
 /**
@@ -44,62 +43,52 @@ const getSpacingMarginTop = (
   previousFormat: string,
   currentFormat: string,
 ): string => {
-  // بعد basmala: لا يوجد سطر فارغ
   if (previousFormat === 'basmala') {
     return '0';
   }
 
-  // بعد character وقبل dialogue/parenthetical: لا يوجد سطر فارغ (ممنوع!)
   if (previousFormat === 'character') {
     if (currentFormat === 'dialogue' || currentFormat === 'parenthetical') {
       return '0';
     }
   }
 
-  // بعد parenthetical وقبل dialogue: لا يوجد سطر فارغ
   if (previousFormat === 'parenthetical' && currentFormat === 'dialogue') {
     return '0';
   }
 
-  // بعد scene-header-2 وقبل scene-header-3: سطر فارغ
   if (previousFormat === 'scene-header-2' && currentFormat === 'scene-header-3') {
     return '14pt';
   }
 
-  // بعد scene-header-3 وقبل action: سطر فارغ
   if (previousFormat === 'scene-header-3' && currentFormat === 'action') {
     return '14pt';
   }
 
-  // بعد action وقبل action/character/transition: سطر فارغ
   if (previousFormat === 'action') {
     if (currentFormat === 'action' || currentFormat === 'character' || currentFormat === 'transition') {
       return '14pt';
     }
   }
 
-  // بعد dialogue وقبل character/action/transition: سطر فارغ
   if (previousFormat === 'dialogue') {
     if (currentFormat === 'character' || currentFormat === 'action' || currentFormat === 'transition') {
       return '14pt';
     }
   }
 
-  // بعد parenthetical (يتبع نفس قواعد dialogue) وقبل character/action/transition: سطر فارغ
   if (previousFormat === 'parenthetical') {
     if (currentFormat === 'character' || currentFormat === 'action' || currentFormat === 'transition') {
       return '14pt';
     }
   }
 
-  // بعد transition وقبل scene-header-1/scene-header-top-line: سطر فارغ
   if (previousFormat === 'transition') {
     if (currentFormat === 'scene-header-1' || currentFormat === 'scene-header-top-line') {
       return '14pt';
     }
   }
 
-  // القيمة الافتراضية: لا تغيير (نترك CSS يتحكم)
   return '';
 };
 
@@ -124,27 +113,21 @@ const buildLineDivHTML = (
 
 const stripLeadingBullets = (input: string): string => {
   return input.replace(
-    /^[\s\u200E\u200F\u061C\ufeFF]*[•·∙⋅●○◦■□▪▫◆◇–—−‒―‣⁃*+\-]+\s*/,
+    /^[\s\u200E\u200F\u061C\ufeFF]*[•·∙⋅●○◦■□▪▫◆◇–—−‒―‣⁃*+\-]+\s*/,
     '',
   );
 };
 
 const normalizeLine = (input: string): string => {
   return input
-    .replace(/[\u064B-\u065F\u0670]/g, '') // إزالة التشكيل
+    .replace(/[\u064B-\u065F\u0670]/g, '')
     .replace(/[\u200f\u200e\ufeff\t]+/g, '')
-    .replace(/^[\s\u200E\u200F\u061C\ufeFF]*[•·∙⋅●○◦■□▪▫◆◇–—−‒―‣⁃*+\-]+/, '')
+    .replace(/^[\s\u200E\u200F\u061C\ufeFF]*[•·∙⋅●○◦■□▪▫◆◇–—−‒―‣⁃*+\-]+/, '')
     .trim();
 };
 
 const hasSentencePunctuation = (line: string): boolean => {
   return /[.!?،؛]/.test(line);
-};
-
-const isLikelyPlace = (line: string): boolean => {
-  const placeRe =
-    /^(مسجد|بيت|منزل|شارع|حديقة|مدرسة|جامعة|مكتب|محل|مستشفى|مطعم|فندق|سيارة|غرفة|صالة|حمام|مطبخ|شرفة|حديقة|ملعب|مقهى|سوق|ميدان)/i;
-  return placeRe.test(line);
 };
 
 /**
@@ -371,9 +354,6 @@ const isCharacterLine = (
     ]);
     if (tokens.some((t) => stopWords.has(t))) return false;
 
-    // This was removed as it was preventing names like "رجل 1"
-    // if (/[0-9٠-٩]/.test(normalized)) return false;
-
     return true;
   }
 
@@ -416,28 +396,6 @@ const isLikelyDialogue = (line: string, previousFormat: string): boolean => {
  * =========================
  */
 
-interface LineContext {
-  previousLines: string[];
-  currentLine: string;
-  nextLines: string[];
-  previousTypes: string[];
-  stats: {
-    wordCount: number;
-    charCount: number;
-    hasColon: boolean;
-    hasPunctuation: boolean;
-    startsWithBullet: boolean;
-    isShort: boolean;
-    isLong: boolean;
-  };
-  pattern: {
-    isInDialogueBlock: boolean;
-    isInSceneHeader: boolean;
-    lastSceneDistance: number;
-    lastCharacterDistance: number;
-  };
-}
-
 const buildContext = (
   lines: string[],
   currentIndex: number,
@@ -468,7 +426,7 @@ const buildContext = (
     hasColon: trimmedLine.includes(':') || trimmedLine.includes('：'),
     hasPunctuation: /[.!?،؛]/.test(trimmedLine),
     startsWithBullet:
-      /^[\s\u200E\u200F\u061C\uFEFF]*[•·∙⋅●○◦■□▪▫◆◇–—−‒―‣⁃*+]/.test(
+      /^[\s\u200E\u200F\u061C\uFEFF]*[•·∙⋅●○◦■□▪▫◆◇–—−‒―‣⁃*+]/.test(
         currentLine,
       ),
     isShort: trimmedLine.length < 30,
@@ -650,7 +608,7 @@ const classifyWithContext = (line: string, ctx: LineContext): string => {
   if (ctx.stats.startsWithBullet) {
     const parsed = parseInlineCharacterDialogue(
       line
-        .replace(/^[\s\u200E\u200F\u061C\uFEFF]*[•·∙⋅●○◦■□▪▫◆◇–—−‒―‣⁃*+]/, '')
+        .replace(/^[\s\u200E\u200F\u061C\uFEFF]*[•·∙⋅●○◦■□▪▫◆◇–—−‒―‣⁃*+]/, '')
         .trim(),
     );
     if (!parsed) {
@@ -815,7 +773,6 @@ export const handlePaste = async (
       const charStyles = getFormatStylesFn('character', '', '');
       const dialogueStyles = getFormatStylesFn('dialogue', '', '');
 
-      // تطبيق قواعد التباعد: spacing قبل character
       const charMarginTop = getSpacingMarginTop(previousFormatClass, 'character');
       const charHTML = buildLineDivHTML(
         'format-character',
@@ -823,12 +780,11 @@ export const handlePaste = async (
         characterName,
         charMarginTop,
       );
-      // character → dialogue: لا سطر فارغ (القاعدة تُطبق تلقائياً)
       const dialogueHTML = buildLineDivHTML(
         'format-dialogue',
         dialogueStyles,
         dialogueText,
-        '0', // لا سطر فارغ بعد character
+        '0',
       );
 
       formattedHTML += charHTML + dialogueHTML;
@@ -862,7 +818,6 @@ export const handlePaste = async (
           parts.description,
         );
 
-        // تطبيق قواعد التباعد: spacing قبل scene-header-top-line
         const topLevelMarginTop = getSpacingMarginTop(previousFormatClass, 'scene-header-top-line');
         const topLevelDiv = document.createElement('div');
         topLevelDiv.className = 'format-scene-header-top-line';
@@ -884,7 +839,6 @@ export const handlePaste = async (
     formatClass = classification;
     cleanLine = strippedLine;
 
-    // تطبيق قواعد التباعد
     const marginTop = getSpacingMarginTop(previousFormatClass, formatClass);
     const styles = getFormatStylesFn(formatClass, '', '');
     const lineHTML = buildLineDivHTML(

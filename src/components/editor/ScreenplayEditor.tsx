@@ -2,14 +2,15 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useTheme } from 'next-themes';
-import { screenplayFormats, formatClassMap, A4_PAGE_HEIGHT_PX, fonts, textSizes } from '@/lib/screenplay-config';
-import { EditorHeader } from './editor-header';
-import { EditorToolbar } from './editor-toolbar';
-import { EditorArea } from './editor-area';
-import { EditorFooter } from './editor-footer';
+import { screenplayFormats, formatClassMap, A4_PAGE_HEIGHT_PX } from '@/constants';
+import { EditorHeader } from './EditorHeader';
+import { EditorToolbar } from './EditorToolbar';
+import { EditorArea } from './EditorArea';
+import { EditorFooter } from './EditorFooter';
 import { generateSceneIdeas } from '@/ai/flows/generate-scene-ideas';
 import { autoFormatScreenplay } from '@/ai/flows/auto-format-screenplay';
 import { useToast } from '@/hooks/use-toast';
+import type { DocumentStats } from '@/types/screenplay';
 
 export const ScreenplayEditor = () => {
     const { theme, setTheme } = useTheme();
@@ -18,7 +19,7 @@ export const ScreenplayEditor = () => {
     const [currentFormat, setCurrentFormat] = useState('action');
     const [selectedFont, setSelectedFont] = useState('Amiri');
     const [selectedSize, setSelectedSize] = useState('14pt');
-    const [documentStats, setDocumentStats] = useState({ words: 0, characters: 0, pages: 1, scenes: 0 });
+    const [documentStats, setDocumentStats] = useState<DocumentStats>({ words: 0, characters: 0, pages: 1, scenes: 0 });
     const [isProcessingAI, setIsProcessingAI] = useState(false);
 
     const editorRef = useRef<HTMLDivElement>(null);
@@ -93,7 +94,7 @@ export const ScreenplayEditor = () => {
             setIsProcessingAI(false);
         }
     };
-    
+
     const handleAutoFormat = async () => {
         if(!editorRef.current) return;
         const rawText = editorRef.current.innerText;
@@ -108,28 +109,24 @@ export const ScreenplayEditor = () => {
         setIsProcessingAI(true);
         try {
             const result = await autoFormatScreenplay({ rawText });
-            
-            // Naive parsing of the formatted text. Assumes newlines separate blocks.
+
             const lines = result.formattedScreenplay.split('\n').filter(line => line.trim() !== '');
             let htmlToInsert = '';
 
             lines.forEach(line => {
-                // A very basic logic to assign format class.
-                // This could be improved significantly.
                 let formatClass = formatClassMap.action;
                 const upperCaseLine = line.toUpperCase();
                 if (upperCaseLine.startsWith('INT.') || upperCaseLine.startsWith('EXT.')) {
                     formatClass = formatClassMap['scene-header-1'];
                 } else if (line.trim().match(/^[A-Z\s]+$/) && line.length < 35 && !line.includes('(')) {
-                     // Potential character name
                      formatClass = formatClassMap.character;
                 } else if (line.startsWith('(') && line.endsWith(')')) {
                     formatClass = formatClassMap.parenthetical;
                 }
-                
+
                 htmlToInsert += `<div class="${formatClass}">${line}</div>`;
             });
-            
+
             editorRef.current.innerHTML = htmlToInsert;
             handleContentChange();
 

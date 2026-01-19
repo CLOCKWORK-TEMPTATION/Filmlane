@@ -1,21 +1,7 @@
 import { logger } from './logger';
+import type { ClassificationRecord, ContextMemory } from '@/types/screenplay';
 
-export interface ClassificationRecord {
-  line: string;
-  classification: string;
-  timestamp: number;
-}
-
-export interface ContextMemory {
-  sessionId: string;
-  lastModified: number;
-  data: {
-    commonCharacters: string[];
-    commonLocations: string[];
-    lastClassifications: string[];
-    characterDialogueMap: { [character: string]: number };
-  };
-}
+export type { ClassificationRecord, ContextMemory };
 
 /**
  * A simple in-memory implementation of the ContextMemoryManager.
@@ -31,7 +17,7 @@ export class ContextMemoryManager {
   async loadContext(sessionId: string): Promise<ContextMemory | null> {
     if (this.storage.has(sessionId)) {
       logger.info('MemoryManager', `Loading context for session: ${sessionId}`);
-      return JSON.parse(JSON.stringify(this.storage.get(sessionId)!)); // Deep copy
+      return JSON.parse(JSON.stringify(this.storage.get(sessionId)!));
     }
     logger.warning('MemoryManager', `No context found for session: ${sessionId}`);
     return null;
@@ -39,7 +25,7 @@ export class ContextMemoryManager {
 
   async saveContext(sessionId: string, memory: ContextMemory): Promise<void> {
     logger.info('MemoryManager', `Saving context for session: ${sessionId}`);
-    this.storage.set(sessionId, JSON.parse(JSON.stringify(memory))); // Deep copy
+    this.storage.set(sessionId, JSON.parse(JSON.stringify(memory)));
   }
 
   async updateMemory(sessionId: string, classifications: ClassificationRecord[]): Promise<void> {

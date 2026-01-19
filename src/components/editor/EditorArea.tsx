@@ -1,9 +1,7 @@
 'use client';
 import React, { forwardRef, useCallback, useRef } from 'react';
-import { formatClassMap, screenplayFormats } from '@/lib/screenplay-config';
-import { handlePaste as newHandlePaste } from '@/lib/paste-classifier';
-import { ContextMemoryManager } from '@/lib/context-memory-manager';
-import { getFormatStyles } from '@/lib/editor-styles';
+import { formatClassMap, screenplayFormats } from '@/constants';
+import { handlePaste as newHandlePaste, ContextMemoryManager, getFormatStyles } from '@/utils';
 
 interface EditorAreaProps {
     onContentChange: () => void;
@@ -29,7 +27,7 @@ export const EditorArea = forwardRef<HTMLDivElement, EditorAreaProps>(({ onConte
         if (!currentElement || (currentElement as HTMLElement).contentEditable === 'true') return true;
         return (currentElement.textContent || '').trim().length === 0;
     };
-    
+
     const getCurrentFormat = () => {
         const selection = window.getSelection();
         if (!selection || selection.rangeCount === 0) return 'action';
@@ -60,7 +58,6 @@ export const EditorArea = forwardRef<HTMLDivElement, EditorAreaProps>(({ onConte
         }
         if (!currentElement || (currentElement as HTMLElement).contentEditable === 'true') {
             document.execCommand('formatBlock', false, 'div');
-            // Re-select to get the new div
             const newSelection = window.getSelection();
             if(!newSelection || !newSelection.rangeCount) return;
             currentElement = newSelection.getRangeAt(0).commonAncestorContainer;
@@ -68,11 +65,9 @@ export const EditorArea = forwardRef<HTMLDivElement, EditorAreaProps>(({ onConte
                 currentElement = currentElement.parentNode!;
             }
         }
-        
+
         if (currentElement && currentElement instanceof HTMLElement) {
-             // Clear existing format classes
             Object.values(formatClassMap).forEach(cls => currentElement.classList.remove(cls));
-            // Add new format class
             currentElement.classList.add(formatClassMap[formatType]);
 
             const newRange = document.createRange();
@@ -83,13 +78,13 @@ export const EditorArea = forwardRef<HTMLDivElement, EditorAreaProps>(({ onConte
             onContentChange();
         }
     };
-    
+
     const getNextFormatOnTab = (currentFormat: string, isEmpty = false, shiftPressed = false) => {
         const mainSequence = ['scene-header-1', 'action', 'character', 'transition'];
         if (currentFormat === 'character' && isEmpty) return shiftPressed ? 'action' : 'transition';
         if (currentFormat === 'dialogue') return shiftPressed ? 'character' : 'parenthetical';
         if (currentFormat === 'parenthetical') return shiftPressed ? 'dialogue' : 'dialogue';
-        
+
         const currentIndex = mainSequence.indexOf(currentFormat);
         if (currentIndex !== -1) {
             if (shiftPressed) return mainSequence[(currentIndex - 1 + mainSequence.length) % mainSequence.length];
@@ -112,10 +107,9 @@ export const EditorArea = forwardRef<HTMLDivElement, EditorAreaProps>(({ onConte
             e.preventDefault();
             const currentFormat = getCurrentFormat();
             const nextFormat = getNextFormatOnEnter(currentFormat);
-            
+
             document.execCommand('insertParagraph');
 
-            // The new paragraph is now the current selection. We need to format it.
             const selection = window.getSelection();
             if(selection && selection.rangeCount > 0){
                 const range = selection.getRangeAt(0);
@@ -126,12 +120,9 @@ export const EditorArea = forwardRef<HTMLDivElement, EditorAreaProps>(({ onConte
                 }
 
                 if(parentElement && parentElement.tagName === "DIV"){
-                    // Clear existing format classes
                     Object.values(formatClassMap).forEach(cls => parentElement.classList.remove(cls));
-                    // Add new format class
                     parentElement.classList.add(formatClassMap[nextFormat]);
 
-                     // Ensure cursor is inside the newly formatted element
                     range.selectNodeContents(parentElement);
                     range.collapse(false);
                     selection.removeAllRanges();
@@ -197,7 +188,6 @@ export const EditorArea = forwardRef<HTMLDivElement, EditorAreaProps>(({ onConte
 EditorArea.displayName = "EditorArea";
 
 
-// Helper to get next format on Enter
 const getNextFormatOnEnter = (currentFormat: string): string => {
     const transitions: { [key: string]: string } = {
         'basmala': 'scene-header-1',

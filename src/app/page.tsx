@@ -1,4 +1,4 @@
-import { ScreenplayEditor } from '@/components/screenplay-editor';
+import { ScreenplayEditor } from '@/components/editor';
 
 export default function Home() {
   return <ScreenplayEditor />;

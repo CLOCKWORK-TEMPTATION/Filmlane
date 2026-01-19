@@ -1,12 +1,9 @@
 'use client';
 
+import type { DocumentStats } from '@/types/screenplay';
+
 interface EditorFooterProps {
-    stats: {
-        pages: number;
-        words: number;
-        characters: number;
-        scenes: number;
-    };
+    stats: DocumentStats;
     currentFormatLabel: string;
 }
 
