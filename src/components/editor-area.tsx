@@ -41,11 +41,8 @@ export const EditorArea = forwardRef<HTMLDivElement, EditorAreaProps>(({ onConte
               width: '100%',
             },
             'scene-header-1': {
-              display: 'flex',
-              justifyContent: 'space-between',
               fontWeight: 'bold',
               textTransform: 'uppercase',
-              width: '100%',
             },
             'scene-header-2': {
               flex: '0 0 auto',
