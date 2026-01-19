@@ -288,7 +288,7 @@ const isLikelyAction = (line: string): boolean => {
  */
 
 const CHARACTER_RE =
-  /^\s*(?:صوت\s+)?[\u0600-\u06FF\s0-9٠-٩]{1,30}:?\s*$/;
+  /^\s*(?:صوت\s+)?[\u0600-\u06FF][\u0600-\u06FF\s0-9٠-٩]{0,30}:?\s*$/;
 
 const isParenthetical = (line: string): boolean => {
   return /^[\(（].*?[\)）]$/.test(line.trim());
@@ -924,5 +924,3 @@ export const handlePaste = async (
 
   logger.info('Paste', '✅ تم إكمال عملية اللصق والتنسيق');
 };
-
-    
