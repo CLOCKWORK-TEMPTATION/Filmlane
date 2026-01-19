@@ -30,7 +30,7 @@ const buildLineDivHTML = (
   text: string,
 ): string => {
   const div = document.createElement('div');
-  div.className = className;
+  div.className = `format-${className}`;
   div.setAttribute('style', cssObjectToString(styles));
   div.textContent = text;
   return div.outerHTML;
@@ -655,7 +655,7 @@ const classifyWithContextAndMemory = async (
       }
     }
   } catch (error) {
-    logger.error('Memory', `خطأ في استخدام الذاكرة: ${String(error)}`);
+    logger.error('Memory', `خطأ في استخدام الذاكرة: ${error}`);
   }
 
   return classification;
@@ -716,7 +716,6 @@ export const handlePaste = async (
 
     let formatClass = 'action';
     let cleanLine = strippedLine;
-    let isHtml = false;
 
     const inlineParsed = parseInlineCharacterDialogue(strippedLine);
     if (inlineParsed) {
@@ -765,15 +764,15 @@ export const handlePaste = async (
   while (tempContainer.firstChild) {
     fragment.appendChild(tempContainer.firstChild);
   }
-  
-  const lastNode = fragment.lastChild;
-  range.insertNode(fragment);
 
-  if (lastNode) {
-    range.setStartAfter(lastNode);
-    range.collapse(true);
-    selection.removeAllRanges();
-    selection.addRange(range);
+  range.insertNode(fragment);
+  selection.removeAllRanges();
+
+  const newRange = document.createRange();
+  if (editorRef.current && editorRef.current.lastChild) {
+    newRange.selectNodeContents(editorRef.current.lastChild);
+    newRange.collapse(false);
+    selection.addRange(newRange);
   }
 
   updateContentFn();
