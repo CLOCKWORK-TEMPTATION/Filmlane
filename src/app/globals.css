@@ -888,7 +888,6 @@
 
   .content-editable > div {
     line-height: 14pt;
-    margin-bottom: 2pt;
     min-height: 14pt;
   }
 
@@ -899,7 +898,7 @@
     width: 100%;
     font-weight: normal;
     font-size: 16pt;
-    margin: 12px 0 24px 0;
+    margin-bottom: 24px;
   }
   .format-scene-header-top-line {
       display: flex;
@@ -939,6 +938,49 @@
     text-align: center;
     margin: 0 auto;
   }
+  
+  /* Screenplay Spacing Rules (Enter key behavior) */
+  .content-editable > div {
+    margin-bottom: 0; /* Reset default bottom margin */
+  }
+
+  /* Default top margin for block elements */
+  .format-scene-header-top-line,
+  .format-action,
+  .format-character,
+  .format-dialogue,
+  .format-parenthetical,
+  .format-transition {
+    margin-top: 14pt;
+  }
+
+  /* Rule: NO space between character/parenthetical and dialogue */
+  .format-character + .format-dialogue,
+  .format-parenthetical + .format-dialogue {
+    margin-top: 0;
+  }
+
+  /* Rule: NO space between character and parenthetical */
+  .format-character + .format-parenthetical {
+    margin-top: 0;
+  }
+  
+  /* Rule: NO space between consecutive actions */
+  .format-action + .format-action {
+    margin-top: 0;
+  }
+
+  /* Rule: NO space after Basmala */
+  .format-basmala + .format-scene-header-top-line {
+      margin-top: 0;
+  }
+
+  /* Special case for first element */
+  .content-editable > div:first-child,
+  .content-editable > .format-basmala:first-child {
+      margin-top: 0;
+  }
+
 }
 
 /* === Utility Classes === */

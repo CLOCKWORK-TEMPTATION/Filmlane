@@ -119,9 +119,23 @@ export const EditorArea = forwardRef<HTMLDivElement, EditorAreaProps>(({ onConte
             const selection = window.getSelection();
             if(selection && selection.rangeCount > 0){
                 const range = selection.getRangeAt(0);
-                const parentElement = range.startContainer.parentElement;
+                let parentElement = range.startContainer.parentElement;
+
+                if (parentElement && parentElement.tagName !== 'DIV') {
+                    parentElement = parentElement.parentElement;
+                }
+
                 if(parentElement && parentElement.tagName === "DIV"){
-                    parentElement.className = formatClassMap[nextFormat];
+                    // Clear existing format classes
+                    Object.values(formatClassMap).forEach(cls => parentElement.classList.remove(cls));
+                    // Add new format class
+                    parentElement.classList.add(formatClassMap[nextFormat]);
+
+                     // Ensure cursor is inside the newly formatted element
+                    range.selectNodeContents(parentElement);
+                    range.collapse(false);
+                    selection.removeAllRanges();
+                    selection.addRange(range);
                 }
             }
             onContentChange();
@@ -187,6 +201,7 @@ EditorArea.displayName = "EditorArea";
 const getNextFormatOnEnter = (currentFormat: string): string => {
     const transitions: { [key: string]: string } = {
         'basmala': 'scene-header-1',
+        'scene-header-top-line': 'action',
         'scene-header-1': 'action',
         'scene-header-2': 'action',
         'scene-header-3': 'action',
@@ -196,3 +211,5 @@ const getNextFormatOnEnter = (currentFormat: string): string => {
         'dialogue': 'character',
         'transition': 'scene-header-1'
     };
+    return transitions[currentFormat] || 'action';
+};
