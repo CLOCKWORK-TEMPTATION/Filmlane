@@ -1,6 +1,8 @@
 'use client';
-import React, { forwardRef, useCallback } from 'react';
+import React, { forwardRef, useCallback, useRef } from 'react';
 import { formatClassMap, screenplayFormats } from '@/lib/screenplay-config';
+import { handlePaste as newHandlePaste } from '@/lib/paste-classifier';
+import { ContextMemoryManager } from '@/lib/context-memory-manager';
 
 interface EditorAreaProps {
     onContentChange: () => void;
@@ -10,7 +12,76 @@ interface EditorAreaProps {
 }
 
 export const EditorArea = forwardRef<HTMLDivElement, EditorAreaProps>(({ onContentChange, font, size, pageCount }, ref) => {
-    
+    const memoryManager = useRef(new ContextMemoryManager()).current;
+
+    const getFormatStyles = useCallback(
+        (formatType: string): React.CSSProperties => {
+          const baseStyles: React.CSSProperties = {
+            fontFamily: font,
+            fontSize: size,
+            direction: 'rtl',
+            lineHeight: '14pt',
+            marginBottom: '2pt',
+            minHeight: '14pt',
+          };
+      
+          const formatStyles: { [key: string]: React.CSSProperties } = {
+            basmala: {
+              textAlign: 'left',
+              direction: 'ltr',
+              width: '100%',
+              fontWeight: 'normal',
+              fontSize: '16pt',
+              margin: '12px 0 24px 0',
+            },
+            'scene-header-top-line': {
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'baseline',
+              width: '100%',
+            },
+            'scene-header-1': {
+              display: 'flex',
+              justifyContent: 'space-between',
+              fontWeight: 'bold',
+              textTransform: 'uppercase',
+              width: '100%',
+            },
+            'scene-header-2': {
+              flex: '0 0 auto',
+            },
+            'scene-header-3': {
+              textAlign: 'center',
+            },
+            action: {
+              textAlign: 'right',
+              width: '100%',
+              margin: '0',
+            },
+            character: {
+              textAlign: 'center',
+              margin: '0 auto',
+            },
+            parenthetical: {
+              textAlign: 'center',
+              margin: '0 auto',
+            },
+            dialogue: {
+              width: '2.5in',
+              textAlign: 'center',
+              margin: '0 auto',
+            },
+            transition: {
+              textAlign: 'center',
+              margin: '0 auto',
+            },
+          };
+      
+          return { ...baseStyles, ...(formatStyles[formatType] || {}) };
+        },
+        [font, size],
+      );
+
     const isCurrentElementEmpty = () => {
         const selection = window.getSelection();
         if (!selection || !selection.rangeCount) return true;
@@ -94,104 +165,13 @@ export const EditorArea = forwardRef<HTMLDivElement, EditorAreaProps>(({ onConte
         return currentFormat;
     };
 
-    const handlePaste = (e: React.ClipboardEvent<HTMLDivElement>) => {
-        e.preventDefault();
-        const textData = e.clipboardData.getData('text/plain');
-        if (!textData) return;
-
-        const selection = window.getSelection();
-        if (!selection || !selection.rangeCount) return;
-
-        const lines = textData.split('\n').filter(line => line.trim());
-        let formattedHTML = '';
-        let previousFormatClass = 'action';
-
-        for (const line of lines) {
-            const trimmedLine = line.trim();
-            if (!trimmedLine) continue;
-
-            let formatClass = 'action'; // Default
-            let cleanLine = trimmedLine;
-            let isHtml = false;
-            let processed = false;
-
-            if (trimmedLine.match(/^([•o■□])/)) {
-                let lineContent = trimmedLine.substring(1).trim();
-                const colonIndex = lineContent.indexOf(':');
-
-                if (colonIndex > -1) {
-                    const characterName = lineContent.substring(0, colonIndex).trim();
-                    const dialogueText = lineContent.substring(colonIndex + 1).trim();
-
-                    formattedHTML += `<div class="${formatClassMap.character}">${characterName} :</div>`;
-
-                    if (dialogueText) {
-                        formattedHTML += `<div class="${formatClassMap.dialogue}">${dialogueText}</div>`;
-                    }
-
-                    previousFormatClass = 'dialogue';
-                    processed = true;
-                } else {
-                    formatClass = 'character';
-                    cleanLine = lineContent;
-                }
-            } else if (trimmedLine.startsWith('-') || trimmedLine.startsWith('–')) {
-                formatClass = 'action';
-                cleanLine = trimmedLine.substring(1).trim();
-            } else if (trimmedLine.match(/^بسم الله الرحمن الرحيم/i)) {
-                formatClass = 'basmala';
-            } else if (trimmedLine.match(/^مشهد\s*\d+/i) && trimmedLine.match(/(ليل|نهار|صباح|مساء|داخلي|خارجي)/i)) {
-                formatClass = 'scene-header-1';
-                const match = trimmedLine.match(/^(مشهد\s*\d+)(.*)/i);
-                if (match) {
-                    const sceneNumber = match[1].trim();
-                    const sceneDescription = match[2].replace(/^\s*-\s*/, '').trim();
-                    cleanLine = `<span>${sceneNumber}</span><span>${sceneDescription}</span>`;
-                    isHtml = true;
-                } else { cleanLine = trimmedLine; }
-            } else if (trimmedLine.match(/^(مسجد|بيت|منزل|شارع|حديقة|مدرسة|جامعة|مكتب|محل|مستشفى|مطعم|فندق|سيارة)/i)) {
-                formatClass = 'scene-header-2';
-            } else if (trimmedLine.match(/^[\(（].*?[\)）]$/) && trimmedLine.length < 50) {
-                formatClass = (previousFormatClass === 'character' || previousFormatClass === 'dialogue') ? 'parenthetical' : 'action';
-            } else if (trimmedLine.match(/^[A-Z\u0600-\u06FF\u0621-\u064A\s]+[:：]?\s*$/) && trimmedLine.length < 30 && !trimmedLine.match(/^(قطع|اختفاء|انتقال|تحول)/i)) {
-                formatClass = 'character';
-                const tempLine = trimmedLine.trim();
-                if (!tempLine.endsWith(':') && !tempLine.endsWith('：')) {
-                    cleanLine = tempLine + ' :';
-                } else {
-                    cleanLine = tempLine;
-                }
-            } else if (trimmedLine.match(/^(قطع|اختفاء|تحول|انتقال)/i)) {
-                formatClass = 'transition';
-            } else if (previousFormatClass === 'character' || previousFormatClass === 'parenthetical') {
-                formatClass = 'dialogue';
-            }
-
-            if (!processed) {
-                const div = document.createElement('div');
-                div.className = formatClassMap[formatClass as keyof typeof formatClassMap] || formatClassMap.action;
-                if (isHtml) { div.innerHTML = cleanLine; } else { div.textContent = cleanLine; }
-                formattedHTML += div.outerHTML;
-                previousFormatClass = formatClass;
-            }
-        }
-
-        const range = selection.getRangeAt(0);
-        range.deleteContents();
-        const fragment = range.createContextualFragment(formattedHTML);
-        const lastNode = fragment.lastChild;
-        range.insertNode(fragment);
-
-        if (lastNode) {
-            const newRange = document.createRange();
-            newRange.setStartAfter(lastNode);
-            newRange.collapse(true);
-            selection.removeAllRanges();
-            selection.addRange(newRange);
-        }
-
-        onContentChange();
-    };
+    const handlePaste = useCallback(
+        async (e: React.ClipboardEvent<HTMLDivElement>) => {
+          if (typeof ref === 'function' || !ref) return;
+          await newHandlePaste(e, ref, getFormatStyles, onContentChange, memoryManager);
+        },
+        [ref, getFormatStyles, onContentChange, memoryManager],
+      );
 
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
