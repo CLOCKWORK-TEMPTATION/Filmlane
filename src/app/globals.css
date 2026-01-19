@@ -91,17 +91,59 @@
   }
 
   .content-editable > div {
-    @apply min-h-[1.2em];
+    line-height: 14pt;
+    margin-bottom: 2pt;
+    min-height: 14pt;
   }
 
   /* Screenplay format classes */
-  .format-basmala { @apply text-center text-xl font-headline; margin: 12px 0 24px 0; }
-  .format-scene-header-1 { @apply font-bold uppercase flex justify-between font-body; margin: 24px 0 12px 0; }
-  .format-scene-header-2 { @apply font-bold text-center font-body; margin: 12px 0; }
-  .format-scene-header-3 { @apply italic font-body; margin: 12px 0 24px 0; text-align: left;}
-  .format-action { @apply font-body; margin: 12px 0; text-align: right; }
-  .format-character { @apply font-bold uppercase text-center font-body; margin: 24px 25% 6px 25%; }
-  .format-parenthetical { @apply italic text-center font-body; margin: 0 30% 6px 30%; }
-  .format-dialogue { @apply text-center font-body; margin: 6px 20% 12px 20%; line-height: 1.6; }
-  .format-transition { @apply font-bold uppercase font-body; margin: 24px 0 12px 0; text-align: left; }
+  .format-basmala {
+    text-align: left;
+    direction: ltr;
+    width: 100%;
+    font-weight: normal;
+    font-size: 16pt;
+    margin: 12px 0 24px 0;
+  }
+  .format-scene-header-top-line {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      width: 100%;
+  }
+  .format-scene-header-1 {
+    display: flex;
+    justify-content: space-between;
+    font-weight: bold;
+    text-transform: uppercase;
+    width: 100%;
+  }
+  .format-scene-header-2 {
+    flex: 0 0 auto;
+  }
+  .format-scene-header-3 {
+    text-align: center;
+  }
+  .format-action {
+    text-align: right;
+    width: 100%;
+    margin: 0;
+  }
+  .format-character {
+    text-align: center;
+    margin: 0 auto;
+  }
+  .format-parenthetical {
+    text-align: center;
+    margin: 0 auto;
+  }
+  .format-dialogue {
+    width: 2.5in;
+    text-align: center;
+    margin: 0 auto;
+  }
+  .format-transition {
+    text-align: center;
+    margin: 0 auto;
+  }
 }

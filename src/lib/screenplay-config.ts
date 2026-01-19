@@ -1,4 +1,4 @@
-import { BookHeart, Film, MapPin, Camera, Feather, UserSquare, Parentheses, MessageCircle, FastForward } from 'lucide-react';
+import { BookHeart, Film, MapPin, Camera, Feather, UserSquare, Parentheses, MessageCircle, FastForward, SeparatorHorizontal } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 
 export interface ScreenplayFormat {
@@ -11,6 +11,7 @@ export interface ScreenplayFormat {
 
 export const screenplayFormats: ScreenplayFormat[] = [
     { id: 'basmala', label: 'بسملة', shortcut: '', color: 'bg-purple-200/50 dark:bg-purple-800/50', icon: BookHeart },
+    { id: 'scene-header-top-line', label: 'عنوان المشهد (سطر علوي)', shortcut: '', color: 'bg-blue-200/50 dark:bg-blue-800/50', icon: SeparatorHorizontal },
     { id: 'scene-header-1', label: 'عنوان المشهد (1)', shortcut: 'Ctrl+1', color: 'bg-blue-200/50 dark:bg-blue-800/50', icon: Film },
     { id: 'scene-header-2', label: 'عنوان المشهد (2)', shortcut: 'Tab', color: 'bg-sky-200/50 dark:bg-sky-800/50', icon: MapPin },
     { id: 'scene-header-3', label: 'عنوان المشهد (3)', shortcut: 'Tab', color: 'bg-cyan-200/50 dark:bg-cyan-800/50', icon: Camera },
