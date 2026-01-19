@@ -38,7 +38,7 @@ const buildLineDivHTML = (
 
 const stripLeadingBullets = (input: string): string => {
   return input.replace(
-    /^[\s\u200E\u200F\u061C\ufeFF]*[•·∙⋅●○◦■□▪▫◆◇–—−‒―‣⁃*+\-]+\s*/,
+    /^[\s\u200E\u200F\u061C\ufeFF]*[•·∙⋅●○◦■□▪▫◆◇–—−‒―‣⁃*+\-]+\s*/,
     '',
   );
 };
@@ -381,7 +381,7 @@ const buildContext = (
     hasColon: trimmedLine.includes(':') || trimmedLine.includes('：'),
     hasPunctuation: /[.!?،؛]/.test(trimmedLine),
     startsWithBullet:
-      /^[\s\u200E\u200F\u061C\uFEFF]*[•·∙⋅●○◦■□▪▫◆◇–—−‒―‣⁃*+]/.test(
+      /^[\s\u200E\u200F\u061C\uFEFF]*[•·∙⋅●○◦■□▪▫◆◇–—−‒―‣⁃*+]/.test(
         currentLine,
       ),
     isShort: trimmedLine.length < 30,
@@ -563,7 +563,7 @@ const classifyWithContext = (line: string, ctx: LineContext): string => {
   if (ctx.stats.startsWithBullet) {
     const parsed = parseInlineCharacterDialogue(
       line
-        .replace(/^[\s\u200E\u200F\u061C\uFEFF]*[•·∙⋅●○◦■□▪▫◆◇–—−‒―‣⁃*+]/, '')
+        .replace(/^[\s\u200E\u200F\u061C\uFEFF]*[•·∙⋅●○◦■□▪▫◆◇–—−‒―‣⁃*+]/, '')
         .trim(),
     );
     if (!parsed) {
