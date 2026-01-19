@@ -94,6 +94,105 @@ export const EditorArea = forwardRef<HTMLDivElement, EditorAreaProps>(({ onConte
         return currentFormat;
     };
 
+    const handlePaste = (e: React.ClipboardEvent<HTMLDivElement>) => {
+        e.preventDefault();
+        const textData = e.clipboardData.getData('text/plain');
+        if (!textData) return;
+
+        const selection = window.getSelection();
+        if (!selection || !selection.rangeCount) return;
+
+        const lines = textData.split('\n').filter(line => line.trim());
+        let formattedHTML = '';
+        let previousFormatClass = 'action';
+
+        for (const line of lines) {
+            const trimmedLine = line.trim();
+            if (!trimmedLine) continue;
+
+            let formatClass = 'action'; // Default
+            let cleanLine = trimmedLine;
+            let isHtml = false;
+            let processed = false;
+
+            if (trimmedLine.match(/^([•o■□])/)) {
+                let lineContent = trimmedLine.substring(1).trim();
+                const colonIndex = lineContent.indexOf(':');
+
+                if (colonIndex > -1) {
+                    const characterName = lineContent.substring(0, colonIndex).trim();
+                    const dialogueText = lineContent.substring(colonIndex + 1).trim();
+
+                    formattedHTML += `<div class="${formatClassMap.character}">${characterName} :</div>`;
+
+                    if (dialogueText) {
+                        formattedHTML += `<div class="${formatClassMap.dialogue}">${dialogueText}</div>`;
+                    }
+
+                    previousFormatClass = 'dialogue';
+                    processed = true;
+                } else {
+                    formatClass = 'character';
+                    cleanLine = lineContent;
+                }
+            } else if (trimmedLine.startsWith('-') || trimmedLine.startsWith('–')) {
+                formatClass = 'action';
+                cleanLine = trimmedLine.substring(1).trim();
+            } else if (trimmedLine.match(/^بسم الله الرحمن الرحيم/i)) {
+                formatClass = 'basmala';
+            } else if (trimmedLine.match(/^مشهد\s*\d+/i) && trimmedLine.match(/(ليل|نهار|صباح|مساء|داخلي|خارجي)/i)) {
+                formatClass = 'scene-header-1';
+                const match = trimmedLine.match(/^(مشهد\s*\d+)(.*)/i);
+                if (match) {
+                    const sceneNumber = match[1].trim();
+                    const sceneDescription = match[2].replace(/^\s*-\s*/, '').trim();
+                    cleanLine = `<span>${sceneNumber}</span><span>${sceneDescription}</span>`;
+                    isHtml = true;
+                } else { cleanLine = trimmedLine; }
+            } else if (trimmedLine.match(/^(مسجد|بيت|منزل|شارع|حديقة|مدرسة|جامعة|مكتب|محل|مستشفى|مطعم|فندق|سيارة)/i)) {
+                formatClass = 'scene-header-2';
+            } else if (trimmedLine.match(/^[\(（].*?[\)）]$/) && trimmedLine.length < 50) {
+                formatClass = (previousFormatClass === 'character' || previousFormatClass === 'dialogue') ? 'parenthetical' : 'action';
+            } else if (trimmedLine.match(/^[A-Z\u0600-\u06FF\u0621-\u064A\s]+[:：]?\s*$/) && trimmedLine.length < 30 && !trimmedLine.match(/^(قطع|اختفاء|انتقال|تحول)/i)) {
+                formatClass = 'character';
+                const tempLine = trimmedLine.trim();
+                if (!tempLine.endsWith(':') && !tempLine.endsWith('：')) {
+                    cleanLine = tempLine + ' :';
+                } else {
+                    cleanLine = tempLine;
+                }
+            } else if (trimmedLine.match(/^(قطع|اختفاء|تحول|انتقال)/i)) {
+                formatClass = 'transition';
+            } else if (previousFormatClass === 'character' || previousFormatClass === 'parenthetical') {
+                formatClass = 'dialogue';
+            }
+
+            if (!processed) {
+                const div = document.createElement('div');
+                div.className = formatClassMap[formatClass as keyof typeof formatClassMap] || formatClassMap.action;
+                if (isHtml) { div.innerHTML = cleanLine; } else { div.textContent = cleanLine; }
+                formattedHTML += div.outerHTML;
+                previousFormatClass = formatClass;
+            }
+        }
+
+        const range = selection.getRangeAt(0);
+        range.deleteContents();
+        const fragment = range.createContextualFragment(formattedHTML);
+        const lastNode = fragment.lastChild;
+        range.insertNode(fragment);
+
+        if (lastNode) {
+            const newRange = document.createRange();
+            newRange.setStartAfter(lastNode);
+            newRange.collapse(true);
+            selection.removeAllRanges();
+            selection.addRange(newRange);
+        }
+
+        onContentChange();
+    };
+
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
         if (e.key === 'Enter' && !e.shiftKey) {
@@ -149,6 +248,7 @@ export const EditorArea = forwardRef<HTMLDivElement, EditorAreaProps>(({ onConte
                     onKeyUp={onContentChange}
                     onMouseUp={onContentChange}
                     onKeyDown={handleKeyDown}
+                    onPaste={handlePaste}
                     style={{
                         fontFamily: `${font}, 'PT Sans', sans-serif`,
                         fontSize: size,
