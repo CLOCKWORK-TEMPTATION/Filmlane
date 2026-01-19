@@ -604,15 +604,6 @@
     animation: skeleton-loading 1.5s ease-in-out infinite;
   }
 
-  @keyframes skeleton-loading {
-    0% {
-      background-position: 200% 0;
-    }
-    100% {
-      background-position: -200% 0;
-    }
-  }
-
   /* Station Progress Ring */
   .progress-ring {
     transform: rotate(-90deg);
@@ -946,6 +937,7 @@
 
   /* Default top margin for block elements */
   .format-scene-header-top-line,
+  .format-scene-header-3,
   .format-action,
   .format-character,
   .format-dialogue,
@@ -965,11 +957,6 @@
     margin-top: 0;
   }
   
-  /* Rule: NO space between consecutive actions */
-  .format-action + .format-action {
-    margin-top: 0;
-  }
-
   /* Rule: NO space after Basmala */
   .format-basmala + .format-scene-header-top-line {
       margin-top: 0;
