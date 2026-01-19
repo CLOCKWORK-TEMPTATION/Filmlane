@@ -5,6 +5,7 @@ import {
   ContextMemory,
   ClassificationRecord,
 } from './context-memory-manager';
+import { getFormatStyles } from './editor-styles';
 
 /**
  * =========================
@@ -30,7 +31,7 @@ const buildLineDivHTML = (
   text: string,
 ): string => {
   const div = document.createElement('div');
-  div.className = `format-${className}`;
+  div.className = className;
   div.setAttribute('style', cssObjectToString(styles));
   div.textContent = text;
   return div.outerHTML;
@@ -38,7 +39,7 @@ const buildLineDivHTML = (
 
 const stripLeadingBullets = (input: string): string => {
   return input.replace(
-    /^[\s\u200E\u200F\u061C\ufeFF]*[•·∙⋅●○◦■□▪▫◆◇–—−‒―‣⁃*+\-]+\s*/,
+    /^[\s\u200E\u200F\u061C\ufeFF]*[•·∙⋅●○◦■□▪▫◆◇–—−‒―‣⁃*+\-]+\s*/,
     '',
   );
 };
@@ -563,7 +564,7 @@ const classifyWithContext = (line: string, ctx: LineContext): string => {
   if (ctx.stats.startsWithBullet) {
     const parsed = parseInlineCharacterDialogue(
       line
-        .replace(/^[\s\u200E\u200F\u061C\uFEFF]*[•·∙⋅●○◦■□▪▫◆◇–—−‒―‣⁃*+]/, '')
+        .replace(/^[\s\u200E\u200F\u061C\uFEFF]*[•·∙⋅●○◦■□▪▫◆◇–—−‒―‣⁃*+]/, '')
         .trim(),
     );
     if (!parsed) {
@@ -670,7 +671,11 @@ const classifyWithContextAndMemory = async (
 export const handlePaste = async (
   e: React.ClipboardEvent,
   editorRef: React.RefObject<HTMLDivElement | null>,
-  getFormatStylesFn: (formatType: string) => React.CSSProperties,
+  getFormatStylesFn: (
+    formatType: string,
+    size: string,
+    font: string,
+  ) => React.CSSProperties,
   updateContentFn: () => void,
   memoryManager: ContextMemoryManager | null = null,
   sessionId: string = `session-${Date.now()}`,
@@ -724,9 +729,13 @@ export const handlePaste = async (
       const charStyles = getFormatStylesFn('character');
       const dialogueStyles = getFormatStylesFn('dialogue');
 
-      const charHTML = buildLineDivHTML('character', charStyles, characterName);
+      const charHTML = buildLineDivHTML(
+        'format-character',
+        charStyles,
+        characterName,
+      );
       const dialogueHTML = buildLineDivHTML(
-        'dialogue',
+        'format-dialogue',
         dialogueStyles,
         dialogueText,
       );
@@ -743,22 +752,30 @@ export const handlePaste = async (
       memoryManager,
       sessionId,
     );
-    
+
     if (classification === 'scene-header-top-line') {
       const parts = splitSceneHeader(strippedLine);
       if (parts) {
         const topLevelStyles = getFormatStylesFn('scene-header-top-line');
         const part1Styles = getFormatStylesFn('scene-header-1');
         const part2Styles = getFormatStylesFn('scene-header-2');
-        
-        const part1HTML = buildLineDivHTML('scene-header-1', part1Styles, parts.number);
-        const part2HTML = buildLineDivHTML('scene-header-2', part2Styles, parts.description);
+
+        const part1HTML = buildLineDivHTML(
+          'format-scene-header-1',
+          part1Styles,
+          parts.number,
+        );
+        const part2HTML = buildLineDivHTML(
+          'format-scene-header-2',
+          part2Styles,
+          parts.description,
+        );
 
         const topLevelDiv = document.createElement('div');
         topLevelDiv.className = 'format-scene-header-top-line';
         topLevelDiv.setAttribute('style', cssObjectToString(topLevelStyles));
         topLevelDiv.innerHTML = part1HTML + part2HTML;
-        
+
         formattedHTML += topLevelDiv.outerHTML;
 
         classifiedTypes.push('scene-header-top-line');
@@ -771,7 +788,11 @@ export const handlePaste = async (
     cleanLine = strippedLine;
 
     const styles = getFormatStylesFn(formatClass);
-    const lineHTML = buildLineDivHTML(formatClass, styles, cleanLine);
+    const lineHTML = buildLineDivHTML(
+      `format-${formatClass}`,
+      styles,
+      cleanLine,
+    );
     formattedHTML += lineHTML;
 
     classifiedTypes.push(formatClass);

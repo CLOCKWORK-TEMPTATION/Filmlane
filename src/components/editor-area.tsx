@@ -3,6 +3,7 @@ import React, { forwardRef, useCallback, useRef } from 'react';
 import { formatClassMap, screenplayFormats } from '@/lib/screenplay-config';
 import { handlePaste as newHandlePaste } from '@/lib/paste-classifier';
 import { ContextMemoryManager } from '@/lib/context-memory-manager';
+import { getFormatStyles } from '@/lib/editor-styles';
 
 interface EditorAreaProps {
     onContentChange: () => void;
@@ -13,71 +14,6 @@ interface EditorAreaProps {
 
 export const EditorArea = forwardRef<HTMLDivElement, EditorAreaProps>(({ onContentChange, font, size, pageCount }, ref) => {
     const memoryManager = useRef(new ContextMemoryManager()).current;
-
-    const getFormatStyles = useCallback(
-        (formatType: string): React.CSSProperties => {
-          const baseStyles: React.CSSProperties = {
-            fontFamily: font,
-            fontSize: size,
-            direction: 'rtl',
-            lineHeight: '14pt',
-            marginBottom: '2pt',
-            minHeight: '14pt',
-          };
-      
-          const formatStyles: { [key: string]: React.CSSProperties } = {
-            basmala: {
-              textAlign: 'left',
-              direction: 'ltr',
-              width: '100%',
-              fontWeight: 'normal',
-              fontSize: '16pt',
-              margin: '12px 0 24px 0',
-            },
-            'scene-header-top-line': {
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'baseline',
-              width: '100%',
-            },
-            'scene-header-1': {
-              fontWeight: 'bold',
-              textTransform: 'uppercase',
-            },
-            'scene-header-2': {
-              flex: '0 0 auto',
-            },
-            'scene-header-3': {
-              textAlign: 'center',
-            },
-            action: {
-              textAlign: 'right',
-              width: '100%',
-              margin: '0',
-            },
-            character: {
-              textAlign: 'center',
-              margin: '0 auto',
-            },
-            parenthetical: {
-              textAlign: 'center',
-              margin: '0 auto',
-            },
-            dialogue: {
-              width: '2.5in',
-              textAlign: 'center',
-              margin: '0 auto',
-            },
-            transition: {
-              textAlign: 'center',
-              margin: '0 auto',
-            },
-          };
-      
-          return { ...baseStyles, ...(formatStyles[formatType] || {}) };
-        },
-        [font, size],
-      );
 
     const isCurrentElementEmpty = () => {
         const selection = window.getSelection();
@@ -165,9 +101,9 @@ export const EditorArea = forwardRef<HTMLDivElement, EditorAreaProps>(({ onConte
     const handlePaste = useCallback(
         async (e: React.ClipboardEvent<HTMLDivElement>) => {
           if (typeof ref === 'function' || !ref) return;
-          await newHandlePaste(e, ref, getFormatStyles, onContentChange, memoryManager);
+          await newHandlePaste(e, ref, (formatType) => getFormatStyles(formatType, size, font), onContentChange, memoryManager);
         },
-        [ref, getFormatStyles, onContentChange, memoryManager],
+        [ref, size, font, onContentChange, memoryManager],
       );
 
 
@@ -260,5 +196,3 @@ const getNextFormatOnEnter = (currentFormat: string): string => {
         'dialogue': 'character',
         'transition': 'scene-header-1'
     };
-    return transitions[currentFormat] || 'action';
-};
