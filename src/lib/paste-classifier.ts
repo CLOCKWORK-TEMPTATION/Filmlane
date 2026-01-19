@@ -25,14 +25,99 @@ const cssObjectToString = (styles: React.CSSProperties): string => {
     .join('; ');
 };
 
+/**
+ * =========================
+ *  Spacing Rules (قواعد التباعد بين العناصر)
+ * =========================
+ *
+ * القواعد:
+ * - basmala → أي عنصر: لا سطر فارغ
+ * - scene-header-2 → scene-header-3: سطر فارغ
+ * - scene-header-3 → action: سطر فارغ
+ * - action → action/character/transition: سطر فارغ
+ * - character → dialogue/parenthetical: لا سطر فارغ (ممنوع!)
+ * - dialogue → character/action/transition: سطر فارغ
+ * - parenthetical → يتبع نفس قواعد dialogue
+ * - transition → scene-header-1/scene-header-top-line: سطر فارغ
+ */
+const getSpacingMarginTop = (
+  previousFormat: string,
+  currentFormat: string,
+): string => {
+  // بعد basmala: لا يوجد سطر فارغ
+  if (previousFormat === 'basmala') {
+    return '0';
+  }
+
+  // بعد character وقبل dialogue/parenthetical: لا يوجد سطر فارغ (ممنوع!)
+  if (previousFormat === 'character') {
+    if (currentFormat === 'dialogue' || currentFormat === 'parenthetical') {
+      return '0';
+    }
+  }
+
+  // بعد parenthetical وقبل dialogue: لا يوجد سطر فارغ
+  if (previousFormat === 'parenthetical' && currentFormat === 'dialogue') {
+    return '0';
+  }
+
+  // بعد scene-header-2 وقبل scene-header-3: سطر فارغ
+  if (previousFormat === 'scene-header-2' && currentFormat === 'scene-header-3') {
+    return '14pt';
+  }
+
+  // بعد scene-header-3 وقبل action: سطر فارغ
+  if (previousFormat === 'scene-header-3' && currentFormat === 'action') {
+    return '14pt';
+  }
+
+  // بعد action وقبل action/character/transition: سطر فارغ
+  if (previousFormat === 'action') {
+    if (currentFormat === 'action' || currentFormat === 'character' || currentFormat === 'transition') {
+      return '14pt';
+    }
+  }
+
+  // بعد dialogue وقبل character/action/transition: سطر فارغ
+  if (previousFormat === 'dialogue') {
+    if (currentFormat === 'character' || currentFormat === 'action' || currentFormat === 'transition') {
+      return '14pt';
+    }
+  }
+
+  // بعد parenthetical (يتبع نفس قواعد dialogue) وقبل character/action/transition: سطر فارغ
+  if (previousFormat === 'parenthetical') {
+    if (currentFormat === 'character' || currentFormat === 'action' || currentFormat === 'transition') {
+      return '14pt';
+    }
+  }
+
+  // بعد transition وقبل scene-header-1/scene-header-top-line: سطر فارغ
+  if (previousFormat === 'transition') {
+    if (currentFormat === 'scene-header-1' || currentFormat === 'scene-header-top-line') {
+      return '14pt';
+    }
+  }
+
+  // القيمة الافتراضية: لا تغيير (نترك CSS يتحكم)
+  return '';
+};
+
 const buildLineDivHTML = (
   className: string,
   styles: React.CSSProperties,
   text: string,
+  marginTop?: string,
 ): string => {
   const div = document.createElement('div');
   div.className = className;
-  div.setAttribute('style', cssObjectToString(styles));
+
+  const finalStyles = { ...styles };
+  if (marginTop) {
+    finalStyles.marginTop = marginTop;
+  }
+
+  div.setAttribute('style', cssObjectToString(finalStyles));
   div.textContent = text;
   return div.outerHTML;
 };
@@ -178,7 +263,7 @@ const matchesActionStartPattern = (line: string): boolean => {
 
   const actionStartPatterns = [
     /^\s*(?:ثم\s+)?(?:و(?:هو|هي)\s+)?[يت][\u0600-\u06FF]{2,}(?:\s+\S|$)/,
-    /^\s*(?:و|ف)?(?:نرى|نسمع|نلاحظ|نقترب|نبتعد|ننتقل)(?:\s+\S|$)/,
+    /^\s*(?:و|ف|ل)?(?:نرى|نسمع|نلاحظ|نقترب|نبتعد|ننتقل)(?:\s+\S|$)/,
     /^\s*(?:رأينا|سمعنا|لاحظنا|شاهدنا)(?:\s+\S|$)/,
   ];
 
@@ -203,7 +288,7 @@ const isLikelyAction = (line: string): boolean => {
  */
 
 const CHARACTER_RE =
-  /^\s*(?:صوت\s+)?[\u0600-\u06FF][\u0600-\u06FF\s]{0,30}:?\s*$/;
+  /^\s*(?:صوت\s+)?[\u0600-\u06FF\s0-9٠-٩]{1,30}:?\s*$/;
 
 const isParenthetical = (line: string): boolean => {
   return /^[\(（].*?[\)）]$/.test(line.trim());
@@ -252,12 +337,12 @@ const isCharacterLine = (
   if (hasColon && (trimmed.endsWith(':') || trimmed.endsWith('：')))
     return true;
 
-  const arabicOnly =
-    /^[\s\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]+$/.test(
+  const arabicOnlyWithNumbers =
+    /^[\s\u0600-\u06FF\d٠-٩\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]+$/.test(
       normalized,
     );
 
-  if (!hasColon && arabicOnly) {
+  if (!hasColon && arabicOnlyWithNumbers) {
     const tokens = normalized.split(/\s+/).filter(Boolean);
     if (tokens.length === 0 || tokens.length > 3) return false;
 
@@ -286,7 +371,8 @@ const isCharacterLine = (
     ]);
     if (tokens.some((t) => stopWords.has(t))) return false;
 
-    if (/[0-9٠-٩]/.test(normalized)) return false;
+    // This was removed as it was preventing names like "رجل 1"
+    // if (/[0-9٠-٩]/.test(normalized)) return false;
 
     return true;
   }
@@ -510,6 +596,10 @@ const classifyWithContext = (line: string, ctx: LineContext): string => {
     }
   }
 
+  if (isLikelyAction(line)) {
+    return 'action';
+  }
+
   if (ctx.pattern.isInSceneHeader) {
     if (isSceneHeader3(line, ctx)) {
       return 'scene-header-3';
@@ -554,10 +644,6 @@ const classifyWithContext = (line: string, ctx: LineContext): string => {
   }
 
   if (ctx.stats.isLong && ctx.stats.hasPunctuation) {
-    return 'action';
-  }
-
-  if (isLikelyAction(line)) {
     return 'action';
   }
 
@@ -726,18 +812,23 @@ export const handlePaste = async (
     if (inlineParsed) {
       const { characterName, dialogueText } = inlineParsed;
 
-      const charStyles = getFormatStylesFn('character');
-      const dialogueStyles = getFormatStylesFn('dialogue');
+      const charStyles = getFormatStylesFn('character', '', '');
+      const dialogueStyles = getFormatStylesFn('dialogue', '', '');
 
+      // تطبيق قواعد التباعد: spacing قبل character
+      const charMarginTop = getSpacingMarginTop(previousFormatClass, 'character');
       const charHTML = buildLineDivHTML(
         'format-character',
         charStyles,
         characterName,
+        charMarginTop,
       );
+      // character → dialogue: لا سطر فارغ (القاعدة تُطبق تلقائياً)
       const dialogueHTML = buildLineDivHTML(
         'format-dialogue',
         dialogueStyles,
         dialogueText,
+        '0', // لا سطر فارغ بعد character
       );
 
       formattedHTML += charHTML + dialogueHTML;
@@ -756,9 +847,9 @@ export const handlePaste = async (
     if (classification === 'scene-header-top-line') {
       const parts = splitSceneHeader(strippedLine);
       if (parts) {
-        const topLevelStyles = getFormatStylesFn('scene-header-top-line');
-        const part1Styles = getFormatStylesFn('scene-header-1');
-        const part2Styles = getFormatStylesFn('scene-header-2');
+        const topLevelStyles = getFormatStylesFn('scene-header-top-line', '', '');
+        const part1Styles = getFormatStylesFn('scene-header-1', '', '');
+        const part2Styles = getFormatStylesFn('scene-header-2', '', '');
 
         const part1HTML = buildLineDivHTML(
           'format-scene-header-1',
@@ -771,9 +862,15 @@ export const handlePaste = async (
           parts.description,
         );
 
+        // تطبيق قواعد التباعد: spacing قبل scene-header-top-line
+        const topLevelMarginTop = getSpacingMarginTop(previousFormatClass, 'scene-header-top-line');
         const topLevelDiv = document.createElement('div');
         topLevelDiv.className = 'format-scene-header-top-line';
-        topLevelDiv.setAttribute('style', cssObjectToString(topLevelStyles));
+        const topLevelStylesWithSpacing = { ...topLevelStyles };
+        if (topLevelMarginTop) {
+          topLevelStylesWithSpacing.marginTop = topLevelMarginTop;
+        }
+        topLevelDiv.setAttribute('style', cssObjectToString(topLevelStylesWithSpacing));
         topLevelDiv.innerHTML = part1HTML + part2HTML;
 
         formattedHTML += topLevelDiv.outerHTML;
@@ -787,11 +884,14 @@ export const handlePaste = async (
     formatClass = classification;
     cleanLine = strippedLine;
 
-    const styles = getFormatStylesFn(formatClass);
+    // تطبيق قواعد التباعد
+    const marginTop = getSpacingMarginTop(previousFormatClass, formatClass);
+    const styles = getFormatStylesFn(formatClass, '', '');
     const lineHTML = buildLineDivHTML(
       `format-${formatClass}`,
       styles,
       cleanLine,
+      marginTop,
     );
     formattedHTML += lineHTML;
 
@@ -824,3 +924,5 @@ export const handlePaste = async (
 
   logger.info('Paste', '✅ تم إكمال عملية اللصق والتنسيق');
 };
+
+    

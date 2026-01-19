@@ -956,7 +956,7 @@
   .format-character + .format-parenthetical {
     margin-top: 0;
   }
-  
+
   /* Rule: NO space after Basmala */
   .format-basmala + .format-scene-header-top-line {
       margin-top: 0;
