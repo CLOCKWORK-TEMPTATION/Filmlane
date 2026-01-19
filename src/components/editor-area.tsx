@@ -1,6 +1,6 @@
 'use client';
 import React, { forwardRef, useCallback } from 'react';
-import { formatClassMap, getNextFormatOnEnter, screenplayFormats } from '@/lib/screenplay-config';
+import { formatClassMap, screenplayFormats } from '@/lib/screenplay-config';
 
 interface EditorAreaProps {
     onContentChange: () => void;
@@ -84,7 +84,7 @@ export const EditorArea = forwardRef<HTMLDivElement, EditorAreaProps>(({ onConte
         const mainSequence = ['scene-header-1', 'action', 'character', 'transition'];
         if (currentFormat === 'character' && isEmpty) return shiftPressed ? 'action' : 'transition';
         if (currentFormat === 'dialogue') return shiftPressed ? 'character' : 'parenthetical';
-        if (currentElement === 'parenthetical') return shiftPressed ? 'dialogue' : 'dialogue';
+        if (currentFormat === 'parenthetical') return shiftPressed ? 'dialogue' : 'dialogue';
         
         const currentIndex = mainSequence.indexOf(currentFormat);
         if (currentIndex !== -1) {
