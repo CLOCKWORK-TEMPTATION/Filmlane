@@ -1,8 +1,13 @@
 'use client';
-import React, { forwardRef, useCallback, useRef, useMemo } from 'react';
+import React, { forwardRef, useCallback, useRef, useMemo, useImperativeHandle } from 'react';
 import { formatClassMap, screenplayFormats, A4_PAGE_HEIGHT_PX } from '@/constants';
 import { handlePaste as newHandlePaste, ContextMemoryManager, getFormatStyles, getNextFormatOnTab, getNextFormatOnEnter } from '@/utils';
 import type { DocumentStats } from '@/types/screenplay';
+
+export interface EditorHandle {
+    insertContent: (content: string, mode?: 'insert' | 'replace') => void;
+    getElement: () => HTMLDivElement | null;
+}
 
 interface EditorAreaProps {
     onContentChange: () => void;
@@ -10,10 +15,28 @@ interface EditorAreaProps {
     onFormatChange: (format: string) => void;
     font: string;
     size: string;
+    pageCount: number;
 }
 
-export const EditorArea = forwardRef<HTMLDivElement, EditorAreaProps>(({ onContentChange, onStatsChange, onFormatChange, font, size }, ref) => {
+export const EditorArea = forwardRef<EditorHandle, EditorAreaProps>(({ onContentChange, onStatsChange, onFormatChange, font, size, pageCount }, ref) => {
     const memoryManager = useMemo(() => new ContextMemoryManager(), []);
+    const internalRef = useRef<HTMLDivElement>(null);
+
+    useImperativeHandle(ref, () => ({
+        insertContent: (content: string, mode: 'insert' | 'replace' = 'insert') => {
+            if (!internalRef.current) return;
+            
+            if (mode === 'replace') {
+                internalRef.current.innerHTML = content;
+                onContentChange();
+            } else {
+                internalRef.current.focus();
+                document.execCommand('insertHTML', false, content);
+                onContentChange();
+            }
+        },
+        getElement: () => internalRef.current
+    }));
 
     const isCurrentElementEmpty = () => {
         const selection = window.getSelection();
@@ -84,27 +107,25 @@ export const EditorArea = forwardRef<HTMLDivElement, EditorAreaProps>(({ onConte
     const handleInteraction = useCallback(() => {
         onContentChange();
         
-        // Update Stats
-        if (ref && typeof ref !== 'function' && ref.current) {
-            const text = ref.current.innerText || '';
+        if (internalRef.current) {
+            const text = internalRef.current.innerText || '';
             const words = text.trim().split(/\s+/).filter(Boolean).length;
             const characters = text.length;
-            const scenes = ref.current.querySelectorAll('.format-scene-header-1').length;
-            const pages = Math.max(1, Math.ceil(ref.current.scrollHeight / A4_PAGE_HEIGHT_PX));
+            const scenes = internalRef.current.querySelectorAll('.format-scene-header-1').length;
+            const pages = Math.max(1, Math.ceil(internalRef.current.scrollHeight / A4_PAGE_HEIGHT_PX));
             onStatsChange({ words, characters, pages, scenes });
         }
 
-        // Update Format
         const format = getCurrentFormat();
         onFormatChange(format);
-    }, [onContentChange, onStatsChange, onFormatChange, ref]);
+    }, [onContentChange, onStatsChange, onFormatChange]);
 
     const handlePaste = useCallback(
         async (e: React.ClipboardEvent<HTMLDivElement>) => {
-          if (typeof ref === 'function' || !ref) return;
-          await newHandlePaste(e, ref, (formatType) => getFormatStyles(formatType, size, font), handleInteraction, memoryManager);
+          if (!internalRef.current) return;
+          await newHandlePaste(e, internalRef, (formatType) => getFormatStyles(formatType, size, font), handleInteraction, memoryManager);
         },
-        [ref, size, font, handleInteraction, memoryManager],
+        [size, font, handleInteraction, memoryManager],
       );
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
@@ -164,7 +185,7 @@ export const EditorArea = forwardRef<HTMLDivElement, EditorAreaProps>(({ onConte
             <div className="flex justify-center py-8">
                 <div className="relative w-full max-w-[calc(21cm+4rem)]">
                     <div
-                        ref={ref}
+                        ref={internalRef}
                         contentEditable={true}
                         suppressContentEditableWarning={true}
                         className="screenplay-page focus:outline-none relative z-10"
