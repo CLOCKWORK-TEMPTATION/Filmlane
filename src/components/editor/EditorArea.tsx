@@ -1,7 +1,12 @@
 'use client';
-import React, { forwardRef, useCallback, useRef, useMemo } from 'react';
+import React, { forwardRef, useCallback, useRef, useMemo, useImperativeHandle } from 'react';
 import { formatClassMap, screenplayFormats } from '@/constants';
-import { handlePaste as newHandlePaste, ContextMemoryManager, getFormatStyles } from '@/utils';
+import { handlePaste as newHandlePaste, ContextMemoryManager, getFormatStyles, getNextFormatOnTab, getNextFormatOnEnter } from '@/utils';
+
+export interface EditorHandle {
+    insertContent: (content: string, mode?: 'insert' | 'replace') => void;
+    getElement: () => HTMLDivElement | null;
+}
 
 interface EditorAreaProps {
     onContentChange: () => void;
@@ -10,8 +15,26 @@ interface EditorAreaProps {
     pageCount: number;
 }
 
-export const EditorArea = forwardRef<HTMLDivElement, EditorAreaProps>(({ onContentChange, font, size, pageCount }, ref) => {
+export const EditorArea = forwardRef<EditorHandle, EditorAreaProps>(({ onContentChange, font, size, pageCount }, ref) => {
     const memoryManager = useMemo(() => new ContextMemoryManager(), []);
+    const internalRef = useRef<HTMLDivElement>(null);
+
+    useImperativeHandle(ref, () => ({
+        insertContent: (content: string, mode: 'insert' | 'replace' = 'insert') => {
+            if (!internalRef.current) return;
+            
+            if (mode === 'replace') {
+                internalRef.current.innerHTML = content;
+                onContentChange();
+            } else {
+                internalRef.current.focus();
+                document.execCommand('insertHTML', false, content);
+                // execCommand triggers input events normally, but we ensure stats update
+                onContentChange();
+            }
+        },
+        getElement: () => internalRef.current
+    }));
 
     const isCurrentElementEmpty = () => {
         const selection = window.getSelection();
@@ -21,7 +44,7 @@ export const EditorArea = forwardRef<HTMLDivElement, EditorAreaProps>(({ onConte
         while (currentElement && currentElement.nodeType !== Node.ELEMENT_NODE) {
             currentElement = currentElement.parentNode!;
         }
-        while (currentElement && currentElement.tagName !== 'DIV' && (currentElement as HTMLElement).contentEditable !== 'true') {
+        while (currentElement && (currentElement as HTMLElement).tagName !== 'DIV' && (currentElement as HTMLElement).contentEditable !== 'true') {
             currentElement = currentElement.parentNode!;
         }
         if (!currentElement || (currentElement as HTMLElement).contentEditable === 'true') return true;
@@ -53,7 +76,7 @@ export const EditorArea = forwardRef<HTMLDivElement, EditorAreaProps>(({ onConte
          while (currentElement && currentElement.nodeType !== Node.ELEMENT_NODE) {
             currentElement = currentElement.parentNode!;
         }
-        while (currentElement && currentElement.tagName !== 'DIV' && (currentElement as HTMLElement).contentEditable !== 'true') {
+        while (currentElement && (currentElement as HTMLElement).tagName !== 'DIV' && (currentElement as HTMLElement).contentEditable !== 'true') {
             currentElement = currentElement.parentNode!;
         }
         if (!currentElement || (currentElement as HTMLElement).contentEditable === 'true') {
@@ -79,26 +102,13 @@ export const EditorArea = forwardRef<HTMLDivElement, EditorAreaProps>(({ onConte
         }
     };
 
-    const getNextFormatOnTab = (currentFormat: string, isEmpty = false, shiftPressed = false) => {
-        const mainSequence = ['scene-header-1', 'action', 'character', 'transition'];
-        if (currentFormat === 'character' && isEmpty) return shiftPressed ? 'action' : 'transition';
-        if (currentFormat === 'dialogue') return shiftPressed ? 'character' : 'parenthetical';
-        if (currentFormat === 'parenthetical') return shiftPressed ? 'dialogue' : 'dialogue';
-
-        const currentIndex = mainSequence.indexOf(currentFormat);
-        if (currentIndex !== -1) {
-            if (shiftPressed) return mainSequence[(currentIndex - 1 + mainSequence.length) % mainSequence.length];
-            else return mainSequence[(currentIndex + 1) % mainSequence.length];
-        }
-        return currentFormat;
-    };
 
     const handlePaste = useCallback(
         async (e: React.ClipboardEvent<HTMLDivElement>) => {
-          if (typeof ref === 'function' || !ref) return;
-          await newHandlePaste(e, ref, (formatType) => getFormatStyles(formatType, size, font), onContentChange, memoryManager);
+          if (!internalRef.current) return;
+          await newHandlePaste(e, internalRef, (formatType) => getFormatStyles(formatType, size, font), onContentChange, memoryManager);
         },
-        [ref, size, font, onContentChange, memoryManager],
+        [size, font, onContentChange, memoryManager],
       );
 
 
@@ -159,7 +169,7 @@ export const EditorArea = forwardRef<HTMLDivElement, EditorAreaProps>(({ onConte
             <div className="flex justify-center py-8">
                 <div className="relative w-full max-w-[calc(21cm+4rem)]">
                     <div
-                        ref={ref}
+                        ref={internalRef}
                         contentEditable={true}
                         suppressContentEditableWarning={true}
                         className="screenplay-page focus:outline-none relative z-10"
@@ -196,19 +206,3 @@ export const EditorArea = forwardRef<HTMLDivElement, EditorAreaProps>(({ onConte
 
 EditorArea.displayName = "EditorArea";
 
-
-const getNextFormatOnEnter = (currentFormat: string): string => {
-    const transitions: { [key: string]: string } = {
-        'basmala': 'scene-header-1',
-        'scene-header-top-line': 'action',
-        'scene-header-1': 'action',
-        'scene-header-2': 'action',
-        'scene-header-3': 'action',
-        'action': 'action',
-        'character': 'dialogue',
-        'parenthetical': 'dialogue',
-        'dialogue': 'character',
-        'transition': 'scene-header-1'
-    };
-    return transitions[currentFormat] || 'action';
-};

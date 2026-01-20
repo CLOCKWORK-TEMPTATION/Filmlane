@@ -5,7 +5,7 @@ import { useTheme } from 'next-themes';
 import { screenplayFormats, formatClassMap, A4_PAGE_HEIGHT_PX } from '@/constants';
 import { EditorHeader } from './EditorHeader';
 import { EditorToolbar } from './EditorToolbar';
-import { EditorArea } from './EditorArea';
+import { EditorArea, EditorHandle } from './EditorArea';
 import { EditorFooter } from './EditorFooter';
 import { EditorSidebar } from './EditorSidebar';
 import { generateSceneIdeas } from '@/ai/flows/generate-scene-ideas';
@@ -23,7 +23,7 @@ export const ScreenplayEditor = () => {
     const [documentStats, setDocumentStats] = useState<DocumentStats>({ words: 0, characters: 0, pages: 1, scenes: 0 });
     const [isProcessingAI, setIsProcessingAI] = useState(false);
 
-    const editorRef = useRef<HTMLDivElement>(null);
+    const editorRef = useRef<EditorHandle>(null);
     const { toast } = useToast();
 
     const handleSave = () => {
@@ -76,23 +76,25 @@ export const ScreenplayEditor = () => {
     };
 
     const updateStats = useCallback(() => {
-        if (!editorRef.current) return;
-        const text = editorRef.current.innerText || '';
+        const editorElement = editorRef.current?.getElement();
+        if (!editorElement) return;
+        const text = editorElement.innerText || '';
         const words = text.trim().split(/\s+/).filter(Boolean).length;
         const characters = text.length;
-        const scenes = editorRef.current.querySelectorAll('.format-scene-header-1').length;
-        const pages = Math.max(1, Math.ceil(editorRef.current.scrollHeight / A4_PAGE_HEIGHT_PX));
+        const scenes = editorElement.querySelectorAll('.format-scene-header-1').length;
+        const pages = Math.max(1, Math.ceil(editorElement.scrollHeight / A4_PAGE_HEIGHT_PX));
         setDocumentStats({ words, characters, pages, scenes });
     }, []);
 
     const updateCurrentFormat = useCallback(() => {
+        const editorElement = editorRef.current?.getElement();
         const selection = window.getSelection();
-        if (!selection || selection.rangeCount === 0) return;
+        if (!selection || selection.rangeCount === 0 || !editorElement) return;
         let node = selection.getRangeAt(0).startContainer;
         if (node.nodeType === Node.TEXT_NODE) {
             node = node.parentNode!;
         }
-        while (node && node.parentNode && node.parentNode !== editorRef.current) {
+        while (node && node.parentNode && node.parentNode !== editorElement) {
             node = node.parentNode;
         }
         if (node && node instanceof HTMLElement && node.className) {
@@ -104,26 +106,28 @@ export const ScreenplayEditor = () => {
     }, []);
 
     const handleContentChange = useCallback(() => {
-        if (editorRef.current) {
-            setContent(editorRef.current.innerHTML);
+        const editorElement = editorRef.current?.getElement();
+        if (editorElement) {
+            setContent(editorElement.innerHTML);
             updateStats();
             updateCurrentFormat();
         }
     }, [updateStats, updateCurrentFormat]);
 
     useEffect(() => {
-        if (editorRef.current && editorRef.current.innerHTML === '') {
+        const editorElement = editorRef.current?.getElement();
+        if (editorElement && editorElement.innerHTML === '') {
             const initialDiv = document.createElement('div');
             initialDiv.className = formatClassMap.action;
             initialDiv.innerHTML = '<br>';
-            editorRef.current.appendChild(initialDiv);
+            editorElement.appendChild(initialDiv);
             handleContentChange();
         }
     }, [handleContentChange]);
 
     const handleFormatCommand = (command: string, value?: string) => {
         document.execCommand(command, false, value);
-        editorRef.current?.focus();
+        editorRef.current?.getElement()?.focus();
         handleContentChange();
     };
 
@@ -132,7 +136,7 @@ export const ScreenplayEditor = () => {
         try {
             const result = await generateSceneIdeas({ theme });
             const ideasHtml = result.sceneIdeas.map(idea => `<div class="${formatClassMap.action}">${idea}</div>`).join('');
-            document.execCommand('insertHTML', false, ideasHtml);
+            editorRef.current?.insertContent(ideasHtml, 'insert');
         } catch (error) {
             console.error(error);
             toast({
@@ -146,8 +150,9 @@ export const ScreenplayEditor = () => {
     };
 
     const handleAutoFormat = async () => {
-        if(!editorRef.current) return;
-        const rawText = editorRef.current.innerText;
+        const editorElement = editorRef.current?.getElement();
+        if(!editorElement) return;
+        const rawText = editorElement.innerText;
         if (!rawText.trim()) {
             toast({
                 title: "لا يوجد نص للتنسيق",
@@ -177,7 +182,7 @@ export const ScreenplayEditor = () => {
                 htmlToInsert += `<div class="${formatClass}">${line}</div>`;
             });
 
-            editorRef.current.innerHTML = htmlToInsert;
+            editorRef.current?.insertContent(htmlToInsert, 'replace');
             handleContentChange();
 
             toast({
