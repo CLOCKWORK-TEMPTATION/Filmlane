@@ -49,7 +49,7 @@ export const exportToPDF = async (element: HTMLElement, filename: string) => {
   const styles = `
     <style>
       @page { margin: 1in; }
-      body { font-family: 'Courier New', monospace; font-size: 12pt; }
+      body { font-family: 'Courier New', monospace; font-size: 12pt; line-height: 14pt; }
       .scene-heading { text-transform: uppercase; font-weight: bold; margin: 2em 0 1em; }
       .character { text-transform: uppercase; margin: 1em 0 0 2in; }
       .dialogue { margin: 0 1.5in 1em 1in; }

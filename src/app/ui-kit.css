@@ -195,10 +195,49 @@
 }
 
 @layer components {
-  .screenplay-page,
+  .screenplay-page {
+    font-family: var(--font-family-editor);
+    font-size: 12pt;
+    line-height: 14pt;
+  }
+
+  .screenplay-page::before {
+    content: "";
+    position: absolute;
+    inset: 1in 1.5in 1in 1in;
+    border: 1px solid #000;
+    pointer-events: none;
+  }
+
   .screenplay-page * {
     font-family: var(--font-family-editor);
+    font-size: inherit;
     line-height: inherit;
+  }
+
+  /* تموضع رقم الصفحة (Page Number Positioning) */
+  .page-number {
+    position: absolute;
+    left: 1in;
+    font-size: 12pt;
+    font-family: var(--font-family-editor);
+    pointer-events: none;
+    color: #000;
+    z-index: 20;
+    user-select: none;
+  }
+
+  .page-gap {
+    position: absolute;
+    left: 0;
+    right: 0;
+    background: #1f2937;
+    pointer-events: none;
+    z-index: 15;
+  }
+
+  .dark .page-gap {
+    background: #0f172a;
   }
 
   .hero-animation-root {

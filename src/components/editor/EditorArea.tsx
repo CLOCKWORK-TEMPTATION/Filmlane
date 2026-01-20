@@ -1,5 +1,13 @@
 'use client';
-import React, { forwardRef, useCallback, useRef, useMemo, useImperativeHandle } from 'react';
+import React, {
+    forwardRef,
+    useCallback,
+    useEffect,
+    useMemo,
+    useRef,
+    useState,
+    useImperativeHandle,
+} from 'react';
 import { formatClassMap, screenplayFormats, A4_PAGE_HEIGHT_PX } from '@/constants';
 import { handlePaste as newHandlePaste, ContextMemoryManager, getFormatStyles, getNextFormatOnTab, getNextFormatOnEnter } from '@/utils';
 import type { DocumentStats } from '@/types/screenplay';
@@ -24,6 +32,44 @@ export const EditorArea = forwardRef<EditorHandle, EditorAreaProps>(({ onContent
     const fixedLineHeight = '14pt';
     const memoryManager = useMemo(() => new ContextMemoryManager(), []);
     const internalRef = useRef<HTMLDivElement>(null);
+    const [pageHeightPx, setPageHeightPx] = useState(A4_PAGE_HEIGHT_PX);
+    const [pageNumberOffsetPx, setPageNumberOffsetPx] = useState(48);
+    const totalPages = Math.max(1, pageCount || 1);
+    const pageGapPx = 28;
+
+    const measurePageMetrics = useCallback(() => {
+        if (typeof window === 'undefined') return;
+
+        const pageProbe = document.createElement('div');
+        pageProbe.style.position = 'absolute';
+        pageProbe.style.visibility = 'hidden';
+        pageProbe.style.height = '297mm';
+        pageProbe.style.width = '1px';
+
+        const marginProbe = document.createElement('div');
+        marginProbe.style.position = 'absolute';
+        marginProbe.style.visibility = 'hidden';
+        marginProbe.style.height = '0.5in';
+        marginProbe.style.width = '1px';
+
+        document.body.appendChild(pageProbe);
+        document.body.appendChild(marginProbe);
+
+        const measuredPageHeight = pageProbe.getBoundingClientRect().height;
+        const measuredMargin = marginProbe.getBoundingClientRect().height;
+
+        document.body.removeChild(pageProbe);
+        document.body.removeChild(marginProbe);
+
+        if (measuredPageHeight) setPageHeightPx(measuredPageHeight);
+        if (measuredMargin) setPageNumberOffsetPx(measuredMargin);
+    }, []);
+
+    useEffect(() => {
+        measurePageMetrics();
+        window.addEventListener('resize', measurePageMetrics);
+        return () => window.removeEventListener('resize', measurePageMetrics);
+    }, [measurePageMetrics]);
 
     useImperativeHandle(ref, () => ({
         insertContent: (content: string, mode: 'insert' | 'replace' = 'insert') => {
@@ -115,7 +161,8 @@ export const EditorArea = forwardRef<EditorHandle, EditorAreaProps>(({ onContent
             const words = text.trim().split(/\s+/).filter(Boolean).length;
             const characters = text.length;
             const scenes = internalRef.current.querySelectorAll('.format-scene-header-1').length;
-            const pages = Math.max(1, Math.ceil(internalRef.current.scrollHeight / A4_PAGE_HEIGHT_PX));
+            const divisor = pageHeightPx || A4_PAGE_HEIGHT_PX;
+            const pages = Math.max(1, Math.ceil(internalRef.current.scrollHeight / divisor));
             onStatsChange({ words, characters, pages, scenes });
         }
 
@@ -207,16 +254,49 @@ export const EditorArea = forwardRef<EditorHandle, EditorAreaProps>(({ onContent
                             minHeight: '297mm',
                             margin: '0 auto',
                             paddingTop: '1in',
-                            paddingBottom: '0.5in',
+                            paddingBottom: '1in',
                             paddingRight: '1.5in',
                             paddingLeft: '1in',
                             backgroundColor: 'white',
                             color: 'black',
-                            borderRadius: '16px',
-                            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.05) inset',
-                            border: '1px solid rgba(255, 255, 255, 0.1)',
+                            borderRadius: '0',
+                            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)',
+                            border: 'none',
+                            outline: 'none',
                         }}
                     />
+                    <div className="pointer-events-none absolute inset-0 z-30" aria-hidden="true">
+                        {Array.from({ length: Math.max(0, totalPages - 1) }).map((_, index) => (
+                            <div
+                                key={`page-gap-${index + 1}`}
+                                className="page-gap"
+                                style={{
+                                    top: `${(index + 1) * pageHeightPx - pageGapPx / 2}px`,
+                                    height: `${pageGapPx}px`,
+                                }}
+                            />
+                        ))}
+                        {Array.from({ length: totalPages }).map((_, index) => (
+                            <div
+                                key={`page-number-${index + 1}`}
+                                style={{
+                                    position: 'absolute',
+                                    top: `${index * pageHeightPx}px`,
+                                    left: '50%',
+                                    transform: 'translateX(-50%)',
+                                    width: '210mm',
+                                    height: `${pageHeightPx}px`,
+                                }}
+                            >
+                                <div
+                                    className="page-number"
+                                    style={{ bottom: `${pageNumberOffsetPx}px` }}
+                                >
+                                    {index + 1}
+                                </div>
+                            </div>
+                        ))}
+                    </div>
                 </div>
             </div>
         </div>

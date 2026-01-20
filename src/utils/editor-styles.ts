@@ -12,13 +12,15 @@ export const getFormatStyles = (
   selectedSize: string = '12pt',
   selectedFont: string = 'AzarMehrMonospaced-San',
 ): React.CSSProperties => {
+  const normalizedSize = selectedSize === '12pt' ? selectedSize : '12pt';
+  const normalizedLineHeight = '14pt';
   const baseStyles: React.CSSProperties = {
     fontFamily: selectedFont,
-    fontSize: selectedSize,
+    fontSize: normalizedSize,
     direction: 'rtl',
-    lineHeight: '14pt',
+    lineHeight: normalizedLineHeight,
     marginBottom: '2pt',
-    minHeight: '14pt',
+    minHeight: normalizedLineHeight,
     fontWeight: 'bold',
   };
 
@@ -70,8 +72,10 @@ export const getFormatStyles = (
       margin: '0 auto',
       fontWeight: 'bold',
       paddingLeft: '1.5em',
-      paddingRight: '1.5em',
-     },
+      paddingRight: '1em',
+      paddingTop: '0.25em',
+      paddingBottom: '0',
+    },
     transition: {
       textAlign: 'center',
       margin: '0 auto',
