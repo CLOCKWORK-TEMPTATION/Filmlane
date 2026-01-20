@@ -1,7 +1,8 @@
 'use client';
 import React, { forwardRef, useCallback, useRef, useMemo, useImperativeHandle } from 'react';
-import { formatClassMap, screenplayFormats } from '@/constants';
+import { formatClassMap, screenplayFormats, A4_PAGE_HEIGHT_PX } from '@/constants';
 import { handlePaste as newHandlePaste, ContextMemoryManager, getFormatStyles, getNextFormatOnTab, getNextFormatOnEnter } from '@/utils';
+import type { DocumentStats } from '@/types/screenplay';
 
 export interface EditorHandle {
     insertContent: (content: string, mode?: 'insert' | 'replace') => void;
@@ -10,12 +11,14 @@ export interface EditorHandle {
 
 interface EditorAreaProps {
     onContentChange: () => void;
+    onStatsChange: (stats: DocumentStats) => void;
+    onFormatChange: (format: string) => void;
     font: string;
     size: string;
     pageCount: number;
 }
 
-export const EditorArea = forwardRef<EditorHandle, EditorAreaProps>(({ onContentChange, font, size, pageCount }, ref) => {
+export const EditorArea = forwardRef<EditorHandle, EditorAreaProps>(({ onContentChange, onStatsChange, onFormatChange, font, size, pageCount }, ref) => {
     const memoryManager = useMemo(() => new ContextMemoryManager(), []);
     const internalRef = useRef<HTMLDivElement>(null);
 
@@ -29,7 +32,6 @@ export const EditorArea = forwardRef<EditorHandle, EditorAreaProps>(({ onContent
             } else {
                 internalRef.current.focus();
                 document.execCommand('insertHTML', false, content);
-                // execCommand triggers input events normally, but we ensure stats update
                 onContentChange();
             }
         },
@@ -102,15 +104,29 @@ export const EditorArea = forwardRef<EditorHandle, EditorAreaProps>(({ onContent
         }
     };
 
+    const handleInteraction = useCallback(() => {
+        onContentChange();
+        
+        if (internalRef.current) {
+            const text = internalRef.current.innerText || '';
+            const words = text.trim().split(/\s+/).filter(Boolean).length;
+            const characters = text.length;
+            const scenes = internalRef.current.querySelectorAll('.format-scene-header-1').length;
+            const pages = Math.max(1, Math.ceil(internalRef.current.scrollHeight / A4_PAGE_HEIGHT_PX));
+            onStatsChange({ words, characters, pages, scenes });
+        }
+
+        const format = getCurrentFormat();
+        onFormatChange(format);
+    }, [onContentChange, onStatsChange, onFormatChange]);
 
     const handlePaste = useCallback(
         async (e: React.ClipboardEvent<HTMLDivElement>) => {
           if (!internalRef.current) return;
-          await newHandlePaste(e, internalRef, (formatType) => getFormatStyles(formatType, size, font), onContentChange, memoryManager);
+          await newHandlePaste(e, internalRef, (formatType) => getFormatStyles(formatType, size, font), handleInteraction, memoryManager);
         },
-        [size, font, onContentChange, memoryManager],
+        [size, font, handleInteraction, memoryManager],
       );
-
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
         if (e.key === 'Enter' && !e.shiftKey) {
@@ -139,7 +155,7 @@ export const EditorArea = forwardRef<EditorHandle, EditorAreaProps>(({ onContent
                     selection.addRange(range);
                 }
             }
-            onContentChange();
+            handleInteraction();
             return;
         }
 
@@ -173,9 +189,9 @@ export const EditorArea = forwardRef<EditorHandle, EditorAreaProps>(({ onContent
                         contentEditable={true}
                         suppressContentEditableWarning={true}
                         className="screenplay-page focus:outline-none relative z-10"
-                        onInput={onContentChange}
-                        onKeyUp={onContentChange}
-                        onMouseUp={onContentChange}
+                        onInput={handleInteraction}
+                        onKeyUp={handleInteraction}
+                        onMouseUp={handleInteraction}
                         onKeyDown={handleKeyDown}
                         onPaste={handlePaste}
                         style={{
@@ -205,4 +221,3 @@ export const EditorArea = forwardRef<EditorHandle, EditorAreaProps>(({ onContent
 });
 
 EditorArea.displayName = "EditorArea";
-

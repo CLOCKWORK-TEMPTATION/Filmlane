@@ -48,3 +48,4 @@ export const getNextFormatOnEnter = (currentFormat: string): string => {
     };
     return transitions[currentFormat] || 'action';
 };
+
