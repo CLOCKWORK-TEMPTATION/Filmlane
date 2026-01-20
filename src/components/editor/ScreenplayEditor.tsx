@@ -17,8 +17,8 @@ export const ScreenplayEditor = () => {
     const { theme, setTheme } = useTheme();
     const isDarkMode = theme === 'dark';
     const [currentFormat, setCurrentFormat] = useState('action');
-    const [selectedFont, setSelectedFont] = useState('Amiri');
-    const [selectedSize, setSelectedSize] = useState('14pt');
+    const [selectedFont, setSelectedFont] = useState('AzarMehrMonospaced-San');
+    const [selectedSize, setSelectedSize] = useState('12pt');
     const [documentStats, setDocumentStats] = useState<DocumentStats>({ words: 0, characters: 0, pages: 1, scenes: 0 });
     const [isProcessingAI, setIsProcessingAI] = useState(false);
 

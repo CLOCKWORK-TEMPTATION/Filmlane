@@ -19,6 +19,7 @@ export const getFormatStyles = (
     lineHeight: '14pt',
     marginBottom: '2pt',
     minHeight: '14pt',
+    fontWeight: 'bold',
   };
 
   const formatStyles: { [key: string]: React.CSSProperties } = {
@@ -26,8 +27,7 @@ export const getFormatStyles = (
       textAlign: 'left',
       direction: 'ltr',
       width: '100%',
-      fontWeight: 'normal',
-      fontSize: '16pt',
+      fontWeight: 'bold',
       margin: '12px 0 24px 0',
     },
     'scene-header-top-line': {
@@ -35,19 +35,24 @@ export const getFormatStyles = (
       justifyContent: 'space-between',
       alignItems: 'baseline',
       width: '100%',
+      fontWeight: 'normal',
     },
     'scene-header-1': {
-      fontWeight: 'bold',
+      fontWeight: 'normal',
       textTransform: 'uppercase',
     },
     'scene-header-2': {
       flex: '0 0 auto',
+      fontWeight: 'normal',
     },
     'scene-header-3': {
       textAlign: 'center',
+      fontWeight: 'normal',
     },
     action: {
-      textAlign: 'right',
+      textAlign: 'justify',
+      textAlignLast: 'right',
+      textJustify: 'inter-word',
       width: '100%',
       margin: '0',
     },
@@ -60,10 +65,13 @@ export const getFormatStyles = (
       margin: '0 auto',
     },
     dialogue: {
-      width: '2.5in',
+      width: '4.1in',
       textAlign: 'center',
       margin: '0 auto',
-    },
+      fontWeight: 'bold',
+      paddingLeft: '1.5em',
+      paddingRight: '1.5em',
+     },
     transition: {
       textAlign: 'center',
       margin: '0 auto',

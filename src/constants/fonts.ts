@@ -1,18 +1,7 @@
 import type { FontOption, TextSizeOption } from '@/types/screenplay';
 
 export const fonts: FontOption[] = [
-  { value: 'Amiri', label: 'أميري' },
-  { value: 'Noto Sans Arabic', label: 'نوتو سانس عربي' },
-  { value: 'Cairo', label: 'القاهرة' },
-  { value: 'Tajawal', label: 'تجوّل' },
-  { value: 'Almarai', label: 'المراي' },
-  { value: 'Markazi Text', label: 'مركزي' },
-  { value: 'Reem Kufi', label: 'ريم كوفي' },
-  { value: 'Scheherazade New', label: 'شهرزاد الجديد' },
-  { value: 'Lateef', label: 'لطيف' },
-  { value: 'Aref Ruqaa', label: 'عارف رقعة' },
-  { value: 'Arial', label: 'Arial' },
-  { value: 'Tahoma', label: 'Tahoma' }
+  { value: 'AzarMehrMonospaced-San', label: 'أزار مهر أحادي' }
 ];
 
 export const textSizes: TextSizeOption[] = [

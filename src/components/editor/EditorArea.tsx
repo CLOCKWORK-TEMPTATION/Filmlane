@@ -19,6 +19,9 @@ interface EditorAreaProps {
 }
 
 export const EditorArea = forwardRef<EditorHandle, EditorAreaProps>(({ onContentChange, onStatsChange, onFormatChange, font, size, pageCount }, ref) => {
+    const fixedFont = 'AzarMehrMonospaced-San';
+    const fixedSize = '12pt';
+    const fixedLineHeight = '14pt';
     const memoryManager = useMemo(() => new ContextMemoryManager(), []);
     const internalRef = useRef<HTMLDivElement>(null);
 
@@ -123,9 +126,9 @@ export const EditorArea = forwardRef<EditorHandle, EditorAreaProps>(({ onContent
     const handlePaste = useCallback(
         async (e: React.ClipboardEvent<HTMLDivElement>) => {
           if (!internalRef.current) return;
-          await newHandlePaste(e, internalRef, (formatType) => getFormatStyles(formatType, size, font), handleInteraction, memoryManager);
+                    await newHandlePaste(e, internalRef, (formatType) => getFormatStyles(formatType, fixedSize, fixedFont), handleInteraction, memoryManager);
         },
-        [size, font, handleInteraction, memoryManager],
+                [handleInteraction, memoryManager],
       );
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
@@ -196,10 +199,10 @@ export const EditorArea = forwardRef<EditorHandle, EditorAreaProps>(({ onContent
                         onPaste={handlePaste}
                         style={{
                             boxSizing: 'border-box',
-                            fontFamily: `${font}, 'PT Sans', sans-serif`,
-                            fontSize: size,
+                            fontFamily: `${fixedFont}, monospace`,
+                            fontSize: fixedSize,
                             direction: 'rtl',
-                            lineHeight: '14pt',
+                            lineHeight: fixedLineHeight,
                             width: '210mm',
                             minHeight: '297mm',
                             margin: '0 auto',

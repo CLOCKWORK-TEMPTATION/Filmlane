@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import './globals.css';
+import './ui-kit.css';
 import { ThemeProvider } from '@/providers';
 import { Toaster } from '@/components/ui/toaster';
 

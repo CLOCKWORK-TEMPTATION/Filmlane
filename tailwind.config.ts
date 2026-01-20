@@ -9,7 +9,9 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        'arabic': ['Cairo', 'Amiri', 'Tajawal', 'Noto Sans Arabic', 'Arial', 'sans-serif'],
+        sans: ['Cairo', 'sans-serif'],
+        arabic: ['Cairo', 'sans-serif'],
+        editor: ['AzarMehrMonospaced-San', 'monospace'],
       },
     },
   },
