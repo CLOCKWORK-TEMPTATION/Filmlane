@@ -32,10 +32,14 @@ export const EditorArea = forwardRef<EditorHandle, EditorAreaProps>(({ onContent
     const fixedLineHeight = '14pt';
     const memoryManager = useMemo(() => new ContextMemoryManager(), []);
     const internalRef = useRef<HTMLDivElement>(null);
+    const isPaginatingRef = useRef(false);
     const [pageHeightPx, setPageHeightPx] = useState(A4_PAGE_HEIGHT_PX);
-    const [pageNumberOffsetPx, setPageNumberOffsetPx] = useState(48);
+    const [headerPx, setHeaderPx] = useState(96);
+    const [footerPx, setFooterPx] = useState(96);
+    const [halfInchPx, setHalfInchPx] = useState(48);
     const totalPages = Math.max(1, pageCount || 1);
     const pageGapPx = 28;
+    const pageStridePx = pageHeightPx + pageGapPx;
 
     const measurePageMetrics = useCallback(() => {
         if (typeof window === 'undefined') return;
@@ -46,23 +50,36 @@ export const EditorArea = forwardRef<EditorHandle, EditorAreaProps>(({ onContent
         pageProbe.style.height = '297mm';
         pageProbe.style.width = '1px';
 
-        const marginProbe = document.createElement('div');
-        marginProbe.style.position = 'absolute';
-        marginProbe.style.visibility = 'hidden';
-        marginProbe.style.height = '0.5in';
-        marginProbe.style.width = '1px';
+        const inchProbe = document.createElement('div');
+        inchProbe.style.position = 'absolute';
+        inchProbe.style.visibility = 'hidden';
+        inchProbe.style.height = '1in';
+        inchProbe.style.width = '1px';
+
+        const halfInchProbe = document.createElement('div');
+        halfInchProbe.style.position = 'absolute';
+        halfInchProbe.style.visibility = 'hidden';
+        halfInchProbe.style.height = '0.5in';
+        halfInchProbe.style.width = '1px';
 
         document.body.appendChild(pageProbe);
-        document.body.appendChild(marginProbe);
+        document.body.appendChild(inchProbe);
+        document.body.appendChild(halfInchProbe);
 
         const measuredPageHeight = pageProbe.getBoundingClientRect().height;
-        const measuredMargin = marginProbe.getBoundingClientRect().height;
+        const measuredInch = inchProbe.getBoundingClientRect().height;
+        const measuredHalfInch = halfInchProbe.getBoundingClientRect().height;
 
         document.body.removeChild(pageProbe);
-        document.body.removeChild(marginProbe);
+        document.body.removeChild(inchProbe);
+        document.body.removeChild(halfInchProbe);
 
         if (measuredPageHeight) setPageHeightPx(measuredPageHeight);
-        if (measuredMargin) setPageNumberOffsetPx(measuredMargin);
+        if (measuredInch) {
+            setHeaderPx(measuredInch);
+            setFooterPx(measuredInch);
+        }
+        if (measuredHalfInch) setHalfInchPx(measuredHalfInch);
     }, []);
 
     useEffect(() => {
@@ -70,6 +87,150 @@ export const EditorArea = forwardRef<EditorHandle, EditorAreaProps>(({ onContent
         window.addEventListener('resize', measurePageMetrics);
         return () => window.removeEventListener('resize', measurePageMetrics);
     }, [measurePageMetrics]);
+
+    const applyPagination = useCallback(() => {
+        if (isPaginatingRef.current) return;
+        const editor = internalRef.current;
+        if (!editor || typeof window === 'undefined') return;
+
+        isPaginatingRef.current = true;
+
+        const selection = window.getSelection();
+        const range = selection && selection.rangeCount > 0 ? selection.getRangeAt(0) : null;
+
+        editor.querySelectorAll('.page-break-spacer').forEach((node) => node.remove());
+
+        const headerSpacer = document.createElement('div');
+        headerSpacer.className = 'page-break-spacer page-break-spacer--header';
+        headerSpacer.setAttribute('contenteditable', 'false');
+        headerSpacer.style.height = `${headerPx}px`;
+        editor.prepend(headerSpacer);
+
+        const contentHeight = pageHeightPx - headerPx - footerPx;
+        let cursor = 0;
+
+        const getNodeHeight = (node: HTMLElement) => {
+            const rect = node.getBoundingClientRect();
+            const computed = window.getComputedStyle(node);
+            const marginTop = parseFloat(computed.marginTop) || 0;
+            const marginBottom = parseFloat(computed.marginBottom) || 0;
+            return rect.height + marginTop + marginBottom;
+        };
+
+        const splitNodeToFit = (node: HTMLElement, availablePx: number): boolean => {
+            if (node.childNodes.length !== 1 || node.firstChild?.nodeType !== Node.TEXT_NODE) return false;
+            const originalText = node.textContent ?? '';
+            if (!originalText.trim()) return false;
+
+            let low = 0;
+            let high = originalText.length;
+            let best = 0;
+
+            while (low <= high) {
+                const mid = Math.floor((low + high) / 2);
+                node.textContent = originalText.slice(0, mid);
+                const height = getNodeHeight(node);
+                if (height <= availablePx) {
+                    best = mid;
+                    low = mid + 1;
+                } else {
+                    high = mid - 1;
+                }
+            }
+
+            let cut = best;
+            if (cut <= 0 || cut >= originalText.length) {
+                node.textContent = originalText;
+                return false;
+            }
+
+            const whitespaceIndex = originalText.lastIndexOf(' ', cut);
+            if (whitespaceIndex > 0) cut = whitespaceIndex;
+
+            if (cut <= 0 || cut >= originalText.length) {
+                node.textContent = originalText;
+                return false;
+            }
+
+            const headText = originalText.slice(0, cut).trimEnd();
+            const tailText = originalText.slice(cut).trimStart();
+
+            if (!headText || !tailText) {
+                node.textContent = originalText;
+                return false;
+            }
+
+            node.textContent = headText;
+            const tailNode = node.cloneNode(true) as HTMLElement;
+            tailNode.textContent = tailText;
+            node.after(tailNode);
+            return true;
+        };
+
+        let index = 0;
+        while (index < editor.children.length) {
+            const node = editor.children[index] as HTMLElement;
+            if (node.classList.contains('page-break-spacer')) {
+                index += 1;
+                continue;
+            }
+
+            let lineHeight = getNodeHeight(node);
+
+            if (lineHeight > contentHeight) {
+                if (cursor > 0) {
+                    const spacer = document.createElement('div');
+                    spacer.className = 'page-break-spacer';
+                    spacer.setAttribute('contenteditable', 'false');
+                    const remaining = Math.max(0, contentHeight - cursor);
+                    spacer.style.height = `${remaining + footerPx + pageGapPx + headerPx}px`;
+                    editor.insertBefore(spacer, node);
+                    cursor = 0;
+                    continue;
+                }
+
+                const didSplit = splitNodeToFit(node, contentHeight);
+                if (didSplit) {
+                    lineHeight = getNodeHeight(node);
+                    cursor += lineHeight;
+                    index += 1;
+                    continue;
+                }
+
+                // منع حلقة لا نهائية عندما يكون العنصر أطول من الصفحة ولا يمكن تقسيمه
+                cursor = contentHeight;
+                index += 1;
+                continue;
+            }
+
+            if (cursor + lineHeight > contentHeight) {
+                const spacer = document.createElement('div');
+                spacer.className = 'page-break-spacer';
+                spacer.setAttribute('contenteditable', 'false');
+                const remaining = Math.max(0, contentHeight - cursor);
+                spacer.style.height = `${remaining + footerPx + pageGapPx + headerPx}px`;
+                editor.insertBefore(spacer, node);
+                cursor = 0;
+                continue;
+            }
+
+            cursor += lineHeight;
+            index += 1;
+        }
+
+        const footerSpacer = document.createElement('div');
+        footerSpacer.className = 'page-break-spacer page-break-spacer--footer';
+        footerSpacer.setAttribute('contenteditable', 'false');
+        footerSpacer.style.height = `${footerPx}px`;
+        editor.appendChild(footerSpacer);
+
+        if (range && selection && editor.contains(range.startContainer)) {
+            selection.removeAllRanges();
+            selection.addRange(range);
+        }
+
+        isPaginatingRef.current = false;
+    }, [footerPx, headerPx, pageHeightPx, pageGapPx]);
 
     useImperativeHandle(ref, () => ({
         insertContent: (content: string, mode: 'insert' | 'replace' = 'insert') => {
@@ -161,14 +322,16 @@ export const EditorArea = forwardRef<EditorHandle, EditorAreaProps>(({ onContent
             const words = text.trim().split(/\s+/).filter(Boolean).length;
             const characters = text.length;
             const scenes = internalRef.current.querySelectorAll('.format-scene-header-1').length;
-            const divisor = pageHeightPx || A4_PAGE_HEIGHT_PX;
-            const pages = Math.max(1, Math.ceil(internalRef.current.scrollHeight / divisor));
+            const divisor = pageStridePx || (A4_PAGE_HEIGHT_PX + pageGapPx);
+            const pages = Math.max(1, Math.ceil((internalRef.current.scrollHeight + pageGapPx) / divisor));
             onStatsChange({ words, characters, pages, scenes });
         }
 
         const format = getCurrentFormat();
         onFormatChange(format);
-    }, [onContentChange, onStatsChange, onFormatChange]);
+
+        requestAnimationFrame(() => applyPagination());
+    }, [applyPagination, onContentChange, onFormatChange, onStatsChange, pageGapPx, pageStridePx]);
 
     const handlePaste = useCallback(
         async (e: React.ClipboardEvent<HTMLDivElement>) => {
@@ -253,8 +416,8 @@ export const EditorArea = forwardRef<EditorHandle, EditorAreaProps>(({ onContent
                             width: '210mm',
                             minHeight: '297mm',
                             margin: '0 auto',
-                            paddingTop: '1in',
-                            paddingBottom: '1in',
+                            paddingTop: '0',
+                            paddingBottom: '0',
                             paddingRight: '1.5in',
                             paddingLeft: '1in',
                             backgroundColor: 'white',
@@ -265,32 +428,45 @@ export const EditorArea = forwardRef<EditorHandle, EditorAreaProps>(({ onContent
                             outline: 'none',
                         }}
                     />
-                    <div className="pointer-events-none absolute inset-0 z-30" aria-hidden="true">
+                    <div className="pointer-events-none absolute inset-0 z-0" aria-hidden="true">
+                        {Array.from({ length: totalPages }).map((_, index) => (
+                            <div
+                                key={`page-frame-${index + 1}`}
+                                className="page-frame"
+                                style={{
+                                    top: `${index * pageStridePx}px`,
+                                    height: `${pageHeightPx}px`,
+                                }}
+                            >
+                                <div className="page-frame__inner" />
+                            </div>
+                        ))}
+                    </div>
+                    <div className="pointer-events-none absolute inset-0 z-5" aria-hidden="true">
                         {Array.from({ length: Math.max(0, totalPages - 1) }).map((_, index) => (
                             <div
                                 key={`page-gap-${index + 1}`}
                                 className="page-gap"
                                 style={{
-                                    top: `${(index + 1) * pageHeightPx - pageGapPx / 2}px`,
+                                    top: `${(index + 1) * pageStridePx - pageGapPx / 2}px`,
                                     height: `${pageGapPx}px`,
                                 }}
                             />
                         ))}
+                    </div>
+                    <div className="pointer-events-none absolute inset-0 z-20" aria-hidden="true">
                         {Array.from({ length: totalPages }).map((_, index) => (
                             <div
                                 key={`page-number-${index + 1}`}
+                                className="page-frame"
                                 style={{
-                                    position: 'absolute',
-                                    top: `${index * pageHeightPx}px`,
-                                    left: '50%',
-                                    transform: 'translateX(-50%)',
-                                    width: '210mm',
+                                    top: `${index * pageStridePx}px`,
                                     height: `${pageHeightPx}px`,
                                 }}
                             >
                                 <div
                                     className="page-number"
-                                    style={{ bottom: `${pageNumberOffsetPx}px` }}
+                                    style={{ bottom: `${halfInchPx}px` }}
                                 >
                                     {index + 1}
                                 </div>

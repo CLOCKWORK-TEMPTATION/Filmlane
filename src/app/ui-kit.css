@@ -201,14 +201,6 @@
     line-height: 14pt;
   }
 
-  .screenplay-page::before {
-    content: "";
-    position: absolute;
-    inset: 1in 1.5in 1in 1in;
-    border: 1px solid #000;
-    pointer-events: none;
-  }
-
   .screenplay-page * {
     font-family: var(--font-family-editor);
     font-size: inherit;
@@ -225,6 +217,31 @@
     color: #000;
     z-index: 20;
     user-select: none;
+  }
+
+  .page-frame {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 210mm;
+    pointer-events: none;
+    z-index: 5;
+  }
+
+  .page-frame__inner {
+    position: absolute;
+    inset: 1in 1.5in 1in 1in;
+    border: 1px solid #000;
+    pointer-events: none;
+  }
+
+  .page-break-spacer {
+    width: 100%;
+    pointer-events: none;
+    user-select: none;
+    display: block;
+    background: transparent;
+    margin: 0;
   }
 
   .page-gap {
