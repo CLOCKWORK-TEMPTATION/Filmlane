@@ -3,34 +3,20 @@ import './globals.css';
 import { ThemeProvider } from '@/providers';
 import { Toaster } from '@/components/ui/toaster';
 
+
 export const metadata: Metadata = {
-  title: 'Filmlane',
-  description: 'محرر السيناريو العربي',
+  title: 'محرر السيناريو العربي',
+  description: 'محرر سيناريو متقدم للكتابة العربية',
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
-    <html lang="ar" dir="rtl" suppressHydrationWarning>
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@200..1000&display=swap" rel="stylesheet" />
-      </head>
-      <body className="antialiased">
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          {children}
-          <Toaster />
-        </ThemeProvider>
-      </body>
+    <html lang="ar" dir="rtl">
+      <body className="font-sans antialiased">{children}</body>
     </html>
   );
 }

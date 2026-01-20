@@ -1,145 +1,112 @@
 'use client';
 import {
-    Bold, Italic, Underline, Palette, AlignRight, AlignCenter, AlignLeft, ChevronDown, Bot
+    Info, Undo2, Bold, Italic, AlignRight, AlignCenter,
+    Film, Camera, Play, Pause, Scissors, Upload, FileText
 } from 'lucide-react';
-import {
-    DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger
-} from "@/components/ui/dropdown-menu";
 import {
     Tooltip, TooltipContent, TooltipProvider, TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import { screenplayFormats, fonts, textSizes, colors } from '@/constants';
-import type { ScreenplayFormat } from '@/types/screenplay';
 
 interface EditorToolbarProps {
-    currentFormat: string;
-    setCurrentFormat: (format: string) => void;
-    selectedFont: string;
-    setSelectedFont: (font: string) => void;
-    selectedSize: string;
-    setSelectedSize: (size: string) => void;
     onFormatCommand: (command: string, value?: string) => void;
-    onAutoFormat: () => void;
-    isProcessingAI: boolean;
 }
 
-export function EditorToolbar({
-    currentFormat, setCurrentFormat, selectedFont, setSelectedFont,
-    selectedSize, setSelectedSize, onFormatCommand, onAutoFormat, isProcessingAI
-}: EditorToolbarProps) {
-    const handleFormatChange = (formatId: string) => {
-        if (!formatId) return;
-
-        const selection = window.getSelection();
-        if (!selection || selection.rangeCount === 0) return;
-        const range = selection.getRangeAt(0);
-        let element = range.startContainer;
-        if(element.nodeType === Node.TEXT_NODE) element = element.parentElement!;
-
-        while(element && element.parentElement && element.tagName !== 'DIV' && element.parentElement.contentEditable !== 'true') {
-            element = element.parentElement!;
-        }
-
-        if(element && element instanceof HTMLElement && element.tagName === 'DIV') {
-            element.className = `format-${formatId}`;
-            setCurrentFormat(formatId);
-        }
-    };
-
+export function EditorToolbar({ onFormatCommand }: EditorToolbarProps) {
     return (
         <div className="sticky top-0 z-20 bg-background/80 backdrop-blur-sm border-b p-2">
-            <div className="w-full max-w-[calc(21cm+4rem)] mx-auto space-y-2">
-                 <div className="p-1 rounded-md border bg-card flex items-center gap-1 overflow-x-auto" style={{direction: 'ltr'}}>
+            <div className="w-full max-w-[calc(21cm+4rem)] mx-auto">
+                <div className="p-2 rounded-md border bg-card flex items-center justify-center gap-3 overflow-x-auto" style={{direction: 'ltr'}}>
                     <TooltipProvider>
-                        {screenplayFormats.map((format: ScreenplayFormat) => (
-                            <Tooltip key={format.id}>
-                                <TooltipTrigger asChild>
-                                    <Button
-                                        variant="ghost"
-                                        size="icon"
-                                        onClick={() => handleFormatChange(format.id)}
-                                        className={`transition-all duration-200 ${currentFormat === format.id ? 'bg-secondary text-secondary-foreground' : ''}`}
-                                    >
-                                        <format.icon size={18} />
-                                    </Button>
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                    <p>{format.label} ({format.shortcut || 'Tab/Enter'})</p>
-                                </TooltipContent>
-                            </Tooltip>
-                        ))}
-                    </TooltipProvider>
-                </div>
-                <div className="p-1 rounded-md border bg-card flex items-center flex-wrap gap-x-2 gap-y-2" style={{direction: 'ltr'}}>
-                    <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" className="min-w-[120px] justify-between">
-                                <span style={{ fontFamily: selectedFont }}>{fonts.find(f => f.value === selectedFont)?.label}</span>
-                                <ChevronDown size={16} />
-                            </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent>
-                            {fonts.map(font => (
-                                <DropdownMenuItem key={font.value} onSelect={() => setSelectedFont(font.value)} style={{ fontFamily: font.value }}>
-                                    {font.label}
-                                </DropdownMenuItem>
-                            ))}
-                        </DropdownMenuContent>
-                    </DropdownMenu>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <button className="group p-2 rounded-lg hover:bg-white/10 transition-all" title="Info">
+                                    <Info className="w-5 h-5 text-sky-400 group-hover:text-sky-300" />
+                                </button>
+                            </TooltipTrigger>
+                            <TooltipContent><p>معلومات</p></TooltipContent>
+                        </Tooltip>
 
-                    <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" className="w-[70px] justify-between">{selectedSize.replace('pt', '')}<ChevronDown size={16} /></Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent>
-                            {textSizes.map(size => (
-                                <DropdownMenuItem key={size.value} onSelect={() => setSelectedSize(size.value)}>
-                                    {size.label}
-                                </DropdownMenuItem>
-                            ))}
-                        </DropdownMenuContent>
-                    </DropdownMenu>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <button className="group p-2 rounded-lg hover:bg-white/10 transition-all" title="Undo">
+                                    <Undo2 className="w-5 h-5 text-slate-400 group-hover:text-slate-300" />
+                                </button>
+                            </TooltipTrigger>
+                            <TooltipContent><p>تراجع</p></TooltipContent>
+                        </Tooltip>
 
-                    <Separator orientation="vertical" className="h-6" />
+                        <Separator orientation="vertical" className="h-6 bg-white/10" />
 
-                    <TooltipProvider>
-                        <ToggleGroup type="multiple" aria-label="Text formatting">
-                           <Tooltip><TooltipTrigger asChild><ToggleGroupItem value="bold" aria-label="Toggle bold" onClick={() => onFormatCommand('bold')}><Bold size={16}/></ToggleGroupItem></TooltipTrigger><TooltipContent><p>عريض</p></TooltipContent></Tooltip>
-                           <Tooltip><TooltipTrigger asChild><ToggleGroupItem value="italic" aria-label="Toggle italic" onClick={() => onFormatCommand('italic')}><Italic size={16}/></ToggleGroupItem></TooltipTrigger><TooltipContent><p>مائل</p></TooltipContent></Tooltip>
-                           <Tooltip><TooltipTrigger asChild><ToggleGroupItem value="underline" aria-label="Toggle underline" onClick={() => onFormatCommand('underline')}><Underline size={16}/></ToggleGroupItem></TooltipTrigger><TooltipContent><p>تسطير</p></TooltipContent></Tooltip>
-                        </ToggleGroup>
-                         <Tooltip><TooltipTrigger asChild>
-                            <DropdownMenu>
-                                <DropdownMenuTrigger asChild><Button variant="ghost" size="icon"><Palette size={16}/></Button></DropdownMenuTrigger>
-                                <DropdownMenuContent className="grid grid-cols-5 gap-1 p-2">
-                                    {colors.map(color => (
-                                        <DropdownMenuItem key={color} className="p-0" onSelect={() => onFormatCommand('foreColor', color)}>
-                                            <div className="w-6 h-6 rounded-full cursor-pointer" style={{ backgroundColor: color }} />
-                                        </DropdownMenuItem>
-                                    ))}
-                                </DropdownMenuContent>
-                            </DropdownMenu>
-                         </TooltipTrigger><TooltipContent><p>لون النص</p></TooltipContent></Tooltip>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <button
+                                    onClick={() => onFormatCommand('bold')}
+                                    className="group p-2 rounded-lg bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 hover:text-blue-300 transition-all"
+                                    title="عريض"
+                                >
+                                    <Bold size={18} />
+                                </button>
+                            </TooltipTrigger>
+                            <TooltipContent><p>عريض</p></TooltipContent>
+                        </Tooltip>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <button
+                                    onClick={() => onFormatCommand('italic')}
+                                    className="group p-2 rounded-lg bg-violet-500/10 hover:bg-violet-500/20 text-violet-400 hover:text-violet-300 transition-all"
+                                    title="مائل"
+                                >
+                                    <Italic size={18} />
+                                </button>
+                            </TooltipTrigger>
+                            <TooltipContent><p>مائل</p></TooltipContent>
+                        </Tooltip>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <button
+                                    onClick={() => onFormatCommand('justifyRight')}
+                                    className="group p-2 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 hover:text-rose-300 transition-all"
+                                    title="محاذاة يمين"
+                                >
+                                    <AlignRight size={18} />
+                                </button>
+                            </TooltipTrigger>
+                            <TooltipContent><p>محاذاة يمين</p></TooltipContent>
+                        </Tooltip>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <button
+                                    onClick={() => onFormatCommand('justifyCenter')}
+                                    className="group p-2 rounded-lg bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-400 hover:text-cyan-300 transition-all"
+                                    title="توسيط"
+                                >
+                                    <AlignCenter size={18} />
+                                </button>
+                            </TooltipTrigger>
+                            <TooltipContent><p>توسيط</p></TooltipContent>
+                        </Tooltip>
 
-                        <Separator orientation="vertical" className="h-6" />
+                        <Separator orientation="vertical" className="h-6 bg-white/10" />
 
-                        <ToggleGroup type="single" defaultValue="right" aria-label="Text alignment">
-                           <Tooltip><TooltipTrigger asChild><ToggleGroupItem value="right" aria-label="Align right" onClick={() => onFormatCommand('justifyRight')}><AlignRight size={16}/></ToggleGroupItem></TooltipTrigger><TooltipContent><p>محاذاة لليمين</p></TooltipContent></Tooltip>
-                           <Tooltip><TooltipTrigger asChild><ToggleGroupItem value="center" aria-label="Align center" onClick={() => onFormatCommand('justifyCenter')}><AlignCenter size={16}/></ToggleGroupItem></TooltipTrigger><TooltipContent><p>توسيط</p></TooltipContent></Tooltip>
-                           <Tooltip><TooltipTrigger asChild><ToggleGroupItem value="left" aria-label="Align left" onClick={() => onFormatCommand('justifyLeft')}><AlignLeft size={16}/></ToggleGroupItem></TooltipTrigger><TooltipContent><p>محاذاة لليسار</p></TooltipContent></Tooltip>
-                        </ToggleGroup>
-
-                        <Separator orientation="vertical" className="h-6" />
-
-                        <Tooltip><TooltipTrigger asChild>
-                            <Button variant="ghost" size="icon" onClick={onAutoFormat} disabled={isProcessingAI}>
-                                <Bot size={16}/>
-                            </Button>
-                        </TooltipTrigger><TooltipContent><p>تنسيق بالذكاء الاصطناعي</p></TooltipContent></Tooltip>
-
+                        <button className="group p-2 rounded-lg bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 hover:text-blue-300 transition-all" title="Film">
+                            <Film size={18} />
+                        </button>
+                        <button className="group p-2 rounded-lg bg-violet-500/10 hover:bg-violet-500/20 text-violet-400 hover:text-violet-300 transition-all" title="Camera">
+                            <Camera size={18} />
+                        </button>
+                        <button className="group p-2 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 hover:text-amber-300 transition-all" title="Pause">
+                            <Pause size={18} />
+                        </button>
+                        <button className="group p-2 rounded-lg bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-400 hover:text-cyan-300 transition-all" title="Scissors">
+                            <Scissors size={18} />
+                        </button>
+                        <button className="group p-2 rounded-lg bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 hover:text-indigo-300 transition-all" title="Upload">
+                            <Upload size={18} />
+                        </button>
+                        <button className="group p-2 rounded-lg bg-teal-500/10 hover:bg-teal-500/20 text-teal-400 hover:text-teal-300 transition-all" title="File">
+                            <FileText size={18} />
+                        </button>
                     </TooltipProvider>
                 </div>
             </div>

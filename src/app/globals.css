@@ -602,6 +602,16 @@
     );
     background-size: 200% 100%;
     animation: skeleton-loading 1.5s ease-in-out infinite;
+    border-radius: var(--radius);
+  }
+
+  @keyframes skeleton-loading {
+    0% {
+      background-position: 200% 0;
+    }
+    100% {
+      background-position: -200% 0;
+    }
   }
 
   /* Station Progress Ring */
@@ -862,112 +872,6 @@
     border-radius: var(--radius);
     z-index: -1;
   }
-
-  .editor-page {
-    @apply bg-card shadow-lg mx-auto mb-5 p-24 relative;
-    width: 21cm;
-    min-height: 29.7cm;
-  }
-
-  .editor-page-number {
-    @apply absolute bottom-12 left-1/2 -translate-x-1/2 text-sm text-muted-foreground;
-  }
-
-  .content-editable:focus {
-    @apply outline-none;
-  }
-
-  .content-editable > div {
-    line-height: 14pt;
-    min-height: 14pt;
-  }
-
-  /* Screenplay format classes */
-  .format-basmala {
-    text-align: left;
-    direction: ltr;
-    width: 100%;
-    font-weight: normal;
-    font-size: 16pt;
-    margin-bottom: 24px;
-  }
-  .format-scene-header-top-line {
-      display: flex;
-      justify-content: space-between;
-      align-items: baseline;
-      width: 100%;
-  }
-  .format-scene-header-1 {
-    font-weight: bold;
-    text-transform: uppercase;
-  }
-  .format-scene-header-2 {
-    flex: 0 0 auto;
-  }
-  .format-scene-header-3 {
-    text-align: center;
-  }
-  .format-action {
-    text-align: right;
-    width: 100%;
-    margin: 0;
-  }
-  .format-character {
-    text-align: center;
-    margin: 0 auto;
-  }
-  .format-parenthetical {
-    text-align: center;
-    margin: 0 auto;
-  }
-  .format-dialogue {
-    width: 2.5in;
-    text-align: center;
-    margin: 0 auto;
-  }
-  .format-transition {
-    text-align: center;
-    margin: 0 auto;
-  }
-  
-  /* Screenplay Spacing Rules (Enter key behavior) */
-  .content-editable > div {
-    margin-bottom: 0; /* Reset default bottom margin */
-  }
-
-  /* Default top margin for block elements */
-  .format-scene-header-top-line,
-  .format-scene-header-3,
-  .format-action,
-  .format-character,
-  .format-dialogue,
-  .format-parenthetical,
-  .format-transition {
-    margin-top: 14pt;
-  }
-
-  /* Rule: NO space between character/parenthetical and dialogue */
-  .format-character + .format-dialogue,
-  .format-parenthetical + .format-dialogue {
-    margin-top: 0;
-  }
-
-  /* Rule: NO space between character and parenthetical */
-  .format-character + .format-parenthetical {
-    margin-top: 0;
-  }
-
-  /* Rule: NO space after Basmala */
-  .format-basmala + .format-scene-header-top-line {
-      margin-top: 0;
-  }
-
-  /* Special case for first element */
-  .content-editable > div:first-child,
-  .content-editable > .format-basmala:first-child {
-      margin-top: 0;
-  }
-
 }
 
 /* === Utility Classes === */

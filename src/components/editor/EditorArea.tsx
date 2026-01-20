@@ -155,30 +155,39 @@ export const EditorArea = forwardRef<HTMLDivElement, EditorAreaProps>(({ onConte
     };
 
     return (
-        <div className="flex-grow p-4 bg-background">
-            <div className="relative w-full max-w-[calc(21cm+4rem)] mx-auto">
-                <div
-                    ref={ref}
-                    contentEditable={true}
-                    suppressContentEditableWarning={true}
-                    className="content-editable editor-page"
-                    onInput={onContentChange}
-                    onKeyUp={onContentChange}
-                    onMouseUp={onContentChange}
-                    onKeyDown={handleKeyDown}
-                    onPaste={handlePaste}
-                    style={{
-                        fontFamily: `${font}, 'PT Sans', sans-serif`,
-                        fontSize: size,
-                        lineHeight: 1.8,
-                    }}
-                />
-                <div className="absolute top-0 right-0 bottom-0 left-0 -z-10 pointer-events-none">
-                     {Array.from({ length: pageCount }).map((_, i) => (
-                        <div key={i} className="editor-page !p-0">
-                            <span className="editor-page-number">{i + 1}</span>
-                        </div>
-                    ))}
+        <div className="flex-1 relative overflow-auto">
+            <div className="flex justify-center py-8">
+                <div className="relative w-full max-w-[calc(21cm+4rem)]">
+                    <div
+                        ref={ref}
+                        contentEditable={true}
+                        suppressContentEditableWarning={true}
+                        className="screenplay-page focus:outline-none relative z-10"
+                        onInput={onContentChange}
+                        onKeyUp={onContentChange}
+                        onMouseUp={onContentChange}
+                        onKeyDown={handleKeyDown}
+                        onPaste={handlePaste}
+                        style={{
+                            boxSizing: 'border-box',
+                            fontFamily: `${font}, 'PT Sans', sans-serif`,
+                            fontSize: size,
+                            direction: 'rtl',
+                            lineHeight: '14pt',
+                            width: '210mm',
+                            minHeight: '297mm',
+                            margin: '0 auto',
+                            paddingTop: '1in',
+                            paddingBottom: '0.5in',
+                            paddingRight: '1.5in',
+                            paddingLeft: '1in',
+                            backgroundColor: 'white',
+                            color: 'black',
+                            borderRadius: '16px',
+                            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.05) inset',
+                            border: '1px solid rgba(255, 255, 255, 0.1)',
+                        }}
+                    />
                 </div>
             </div>
         </div>

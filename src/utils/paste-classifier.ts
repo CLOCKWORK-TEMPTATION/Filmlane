@@ -113,7 +113,7 @@ const buildLineDivHTML = (
 
 const stripLeadingBullets = (input: string): string => {
   return input.replace(
-    /^[\s\u200E\u200F\u061C\ufeFF]*[•·∙⋅●○◦■□▪▫◆◇–—−‒―‣⁃*+\-]+\s*/,
+    /^[\s\u200E\u200F\u061C\ufeFF]*[•·∙⋅●○◦■□▪▫◆◇–—−‒―‣⁃*+\-]+\s*/,
     '',
   );
 };
@@ -122,7 +122,7 @@ const normalizeLine = (input: string): string => {
   return input
     .replace(/[\u064B-\u065F\u0670]/g, '')
     .replace(/[\u200f\u200e\ufeff\t]+/g, '')
-    .replace(/^[\s\u200E\u200F\u061C\ufeFF]*[•·∙⋅●○◦■□▪▫◆◇–—−‒―‣⁃*+\-]+/, '')
+    .replace(/^[\s\u200E\u200F\u061C\ufeFF]*[•·∙⋅●○◦■□▪▫◆◇–—−‒―‣⁃*+\-]+/, '')
     .trim();
 };
 
@@ -426,7 +426,7 @@ const buildContext = (
     hasColon: trimmedLine.includes(':') || trimmedLine.includes('：'),
     hasPunctuation: /[.!?،؛]/.test(trimmedLine),
     startsWithBullet:
-      /^[\s\u200E\u200F\u061C\uFEFF]*[•·∙⋅●○◦■□▪▫◆◇–—−‒―‣⁃*+]/.test(
+      /^[\s\u200E\u200F\u061C\uFEFF]*[•·∙⋅●○◦■□▪▫◆◇–—−‒―‣⁃*+]/.test(
         currentLine,
       ),
     isShort: trimmedLine.length < 30,
@@ -608,7 +608,7 @@ const classifyWithContext = (line: string, ctx: LineContext): string => {
   if (ctx.stats.startsWithBullet) {
     const parsed = parseInlineCharacterDialogue(
       line
-        .replace(/^[\s\u200E\u200F\u061C\uFEFF]*[•·∙⋅●○◦■□▪▫◆◇–—−‒―‣⁃*+]/, '')
+        .replace(/^[\s\u200E\u200F\u061C\uFEFF]*[•·∙⋅●○◦■□▪▫◆◇–—−‒―‣⁃*+]/, '')
         .trim(),
     );
     if (!parsed) {
@@ -777,7 +777,7 @@ export const handlePaste = async (
       const charHTML = buildLineDivHTML(
         'format-character',
         charStyles,
-        characterName,
+        characterName + ':',
         charMarginTop,
       );
       const dialogueHTML = buildLineDivHTML(
@@ -838,6 +838,11 @@ export const handlePaste = async (
 
     formatClass = classification;
     cleanLine = strippedLine;
+
+    // Add colon after character name
+    if (formatClass === 'character' && !cleanLine.endsWith(':') && !cleanLine.endsWith('：')) {
+      cleanLine = cleanLine + ':';
+    }
 
     const marginTop = getSpacingMarginTop(previousFormatClass, formatClass);
     const styles = getFormatStylesFn(formatClass, '', '');
