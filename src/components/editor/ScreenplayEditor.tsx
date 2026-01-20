@@ -8,7 +8,6 @@ import { EditorToolbar } from './EditorToolbar';
 import { EditorArea } from './EditorArea';
 import { EditorFooter } from './EditorFooter';
 import { EditorSidebar } from './EditorSidebar';
-import { generateSceneIdeas } from '@/ai/flows/generate-scene-ideas';
 import { autoFormatScreenplay } from '@/ai/flows/auto-format-screenplay';
 import { useToast } from '@/hooks/use-toast';
 import type { DocumentStats } from '@/types/screenplay';
@@ -75,41 +74,19 @@ export const ScreenplayEditor = () => {
         });
     };
 
-    const updateStats = useCallback(() => {
-        if (!editorRef.current) return;
-        const text = editorRef.current.innerText || '';
-        const words = text.trim().split(/\s+/).filter(Boolean).length;
-        const characters = text.length;
-        const scenes = editorRef.current.querySelectorAll('.format-scene-header-1').length;
-        const pages = Math.max(1, Math.ceil(editorRef.current.scrollHeight / A4_PAGE_HEIGHT_PX));
-        setDocumentStats({ words, characters, pages, scenes });
-    }, []);
-
-    const updateCurrentFormat = useCallback(() => {
-        const selection = window.getSelection();
-        if (!selection || selection.rangeCount === 0) return;
-        let node = selection.getRangeAt(0).startContainer;
-        if (node.nodeType === Node.TEXT_NODE) {
-            node = node.parentNode!;
-        }
-        while (node && node.parentNode && node.parentNode !== editorRef.current) {
-            node = node.parentNode;
-        }
-        if (node && node instanceof HTMLElement && node.className) {
-            const format = screenplayFormats.find(f => node.classList.contains(formatClassMap[f.id]));
-            if (format) {
-                setCurrentFormat(format.id);
-            }
-        }
-    }, []);
-
     const handleContentChange = useCallback(() => {
         if (editorRef.current) {
             setContent(editorRef.current.innerHTML);
-            updateStats();
-            updateCurrentFormat();
         }
-    }, [updateStats, updateCurrentFormat]);
+    }, []);
+
+    const handleStatsChange = useCallback((stats: DocumentStats) => {
+        setDocumentStats(stats);
+    }, []);
+
+    const handleFormatChange = useCallback((format: string) => {
+        setCurrentFormat(format);
+    }, []);
 
     useEffect(() => {
         if (editorRef.current && editorRef.current.innerHTML === '') {
@@ -125,24 +102,6 @@ export const ScreenplayEditor = () => {
         document.execCommand(command, false, value);
         editorRef.current?.focus();
         handleContentChange();
-    };
-
-    const handleGenerateIdeas = async (theme: string) => {
-        setIsProcessingAI(true);
-        try {
-            const result = await generateSceneIdeas({ theme });
-            const ideasHtml = result.sceneIdeas.map(idea => `<div class="${formatClassMap.action}">${idea}</div>`).join('');
-            document.execCommand('insertHTML', false, ideasHtml);
-        } catch (error) {
-            console.error(error);
-            toast({
-                variant: "destructive",
-                title: "خطأ في إنشاء الأفكار",
-                description: "حدث خطأ أثناء الاتصال بالذكاء الاصطناعي.",
-            });
-        } finally {
-            setIsProcessingAI(false);
-        }
     };
 
     const handleAutoFormat = async () => {
@@ -229,9 +188,10 @@ export const ScreenplayEditor = () => {
                             <EditorArea
                                 ref={editorRef}
                                 onContentChange={handleContentChange}
+                                onStatsChange={handleStatsChange}
+                                onFormatChange={handleFormatChange}
                                 font={selectedFont}
                                 size={selectedSize}
-                                pageCount={documentStats.pages}
                             />
                         </div>
                     </div>

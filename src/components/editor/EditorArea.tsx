@@ -1,16 +1,18 @@
 'use client';
 import React, { forwardRef, useCallback, useRef, useMemo } from 'react';
-import { formatClassMap, screenplayFormats } from '@/constants';
-import { handlePaste as newHandlePaste, ContextMemoryManager, getFormatStyles } from '@/utils';
+import { formatClassMap, screenplayFormats, A4_PAGE_HEIGHT_PX } from '@/constants';
+import { handlePaste as newHandlePaste, ContextMemoryManager, getFormatStyles, getNextFormatOnTab, getNextFormatOnEnter } from '@/utils';
+import type { DocumentStats } from '@/types/screenplay';
 
 interface EditorAreaProps {
     onContentChange: () => void;
+    onStatsChange: (stats: DocumentStats) => void;
+    onFormatChange: (format: string) => void;
     font: string;
     size: string;
-    pageCount: number;
 }
 
-export const EditorArea = forwardRef<HTMLDivElement, EditorAreaProps>(({ onContentChange, font, size, pageCount }, ref) => {
+export const EditorArea = forwardRef<HTMLDivElement, EditorAreaProps>(({ onContentChange, onStatsChange, onFormatChange, font, size }, ref) => {
     const memoryManager = useMemo(() => new ContextMemoryManager(), []);
 
     const isCurrentElementEmpty = () => {
@@ -21,7 +23,7 @@ export const EditorArea = forwardRef<HTMLDivElement, EditorAreaProps>(({ onConte
         while (currentElement && currentElement.nodeType !== Node.ELEMENT_NODE) {
             currentElement = currentElement.parentNode!;
         }
-        while (currentElement && currentElement.tagName !== 'DIV' && (currentElement as HTMLElement).contentEditable !== 'true') {
+        while (currentElement && (currentElement as HTMLElement).tagName !== 'DIV' && (currentElement as HTMLElement).contentEditable !== 'true') {
             currentElement = currentElement.parentNode!;
         }
         if (!currentElement || (currentElement as HTMLElement).contentEditable === 'true') return true;
@@ -53,7 +55,7 @@ export const EditorArea = forwardRef<HTMLDivElement, EditorAreaProps>(({ onConte
          while (currentElement && currentElement.nodeType !== Node.ELEMENT_NODE) {
             currentElement = currentElement.parentNode!;
         }
-        while (currentElement && currentElement.tagName !== 'DIV' && (currentElement as HTMLElement).contentEditable !== 'true') {
+        while (currentElement && (currentElement as HTMLElement).tagName !== 'DIV' && (currentElement as HTMLElement).contentEditable !== 'true') {
             currentElement = currentElement.parentNode!;
         }
         if (!currentElement || (currentElement as HTMLElement).contentEditable === 'true') {
@@ -79,28 +81,31 @@ export const EditorArea = forwardRef<HTMLDivElement, EditorAreaProps>(({ onConte
         }
     };
 
-    const getNextFormatOnTab = (currentFormat: string, isEmpty = false, shiftPressed = false) => {
-        const mainSequence = ['scene-header-1', 'action', 'character', 'transition'];
-        if (currentFormat === 'character' && isEmpty) return shiftPressed ? 'action' : 'transition';
-        if (currentFormat === 'dialogue') return shiftPressed ? 'character' : 'parenthetical';
-        if (currentFormat === 'parenthetical') return shiftPressed ? 'dialogue' : 'dialogue';
-
-        const currentIndex = mainSequence.indexOf(currentFormat);
-        if (currentIndex !== -1) {
-            if (shiftPressed) return mainSequence[(currentIndex - 1 + mainSequence.length) % mainSequence.length];
-            else return mainSequence[(currentIndex + 1) % mainSequence.length];
+    const handleInteraction = useCallback(() => {
+        onContentChange();
+        
+        // Update Stats
+        if (ref && typeof ref !== 'function' && ref.current) {
+            const text = ref.current.innerText || '';
+            const words = text.trim().split(/\s+/).filter(Boolean).length;
+            const characters = text.length;
+            const scenes = ref.current.querySelectorAll('.format-scene-header-1').length;
+            const pages = Math.max(1, Math.ceil(ref.current.scrollHeight / A4_PAGE_HEIGHT_PX));
+            onStatsChange({ words, characters, pages, scenes });
         }
-        return currentFormat;
-    };
+
+        // Update Format
+        const format = getCurrentFormat();
+        onFormatChange(format);
+    }, [onContentChange, onStatsChange, onFormatChange, ref]);
 
     const handlePaste = useCallback(
         async (e: React.ClipboardEvent<HTMLDivElement>) => {
           if (typeof ref === 'function' || !ref) return;
-          await newHandlePaste(e, ref, (formatType) => getFormatStyles(formatType, size, font), onContentChange, memoryManager);
+          await newHandlePaste(e, ref, (formatType) => getFormatStyles(formatType, size, font), handleInteraction, memoryManager);
         },
-        [ref, size, font, onContentChange, memoryManager],
+        [ref, size, font, handleInteraction, memoryManager],
       );
-
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
         if (e.key === 'Enter' && !e.shiftKey) {
@@ -129,7 +134,7 @@ export const EditorArea = forwardRef<HTMLDivElement, EditorAreaProps>(({ onConte
                     selection.addRange(range);
                 }
             }
-            onContentChange();
+            handleInteraction();
             return;
         }
 
@@ -163,9 +168,9 @@ export const EditorArea = forwardRef<HTMLDivElement, EditorAreaProps>(({ onConte
                         contentEditable={true}
                         suppressContentEditableWarning={true}
                         className="screenplay-page focus:outline-none relative z-10"
-                        onInput={onContentChange}
-                        onKeyUp={onContentChange}
-                        onMouseUp={onContentChange}
+                        onInput={handleInteraction}
+                        onKeyUp={handleInteraction}
+                        onMouseUp={handleInteraction}
                         onKeyDown={handleKeyDown}
                         onPaste={handlePaste}
                         style={{
@@ -195,20 +200,3 @@ export const EditorArea = forwardRef<HTMLDivElement, EditorAreaProps>(({ onConte
 });
 
 EditorArea.displayName = "EditorArea";
-
-
-const getNextFormatOnEnter = (currentFormat: string): string => {
-    const transitions: { [key: string]: string } = {
-        'basmala': 'scene-header-1',
-        'scene-header-top-line': 'action',
-        'scene-header-1': 'action',
-        'scene-header-2': 'action',
-        'scene-header-3': 'action',
-        'action': 'action',
-        'character': 'dialogue',
-        'parenthetical': 'dialogue',
-        'dialogue': 'character',
-        'transition': 'scene-header-1'
-    };
-    return transitions[currentFormat] || 'action';
-};
