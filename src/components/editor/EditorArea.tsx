@@ -1,5 +1,5 @@
 'use client';
-import React, { forwardRef, useCallback, useRef } from 'react';
+import React, { forwardRef, useCallback, useRef, useMemo } from 'react';
 import { formatClassMap, screenplayFormats } from '@/constants';
 import { handlePaste as newHandlePaste, ContextMemoryManager, getFormatStyles } from '@/utils';
 
@@ -11,7 +11,7 @@ interface EditorAreaProps {
 }
 
 export const EditorArea = forwardRef<HTMLDivElement, EditorAreaProps>(({ onContentChange, font, size, pageCount }, ref) => {
-    const memoryManager = useRef(new ContextMemoryManager()).current;
+    const memoryManager = useMemo(() => new ContextMemoryManager(), []);
 
     const isCurrentElementEmpty = () => {
         const selection = window.getSelection();
