@@ -16,7 +16,7 @@ export function EditorToolbar({ onFormatCommand }: EditorToolbarProps) {
     return (
         <div className="sticky top-0 z-20 bg-background/80 backdrop-blur-sm border-b p-2">
             <div className="w-full max-w-[calc(21cm+4rem)] mx-auto">
-                <div className="p-2 rounded-md border bg-card flex items-center justify-center gap-3 overflow-x-auto" style={{direction: 'ltr'}}>
+                <div className="p-2 rounded-md border bg-card flex items-center justify-center gap-3 overflow-x-auto" style={{ direction: 'rtl' }}>
                     <TooltipProvider>
                         <Tooltip>
                             <TooltipTrigger asChild>

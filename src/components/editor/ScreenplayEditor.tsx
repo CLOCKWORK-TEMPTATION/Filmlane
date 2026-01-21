@@ -87,12 +87,10 @@ export const ScreenplayEditor = () => {
     }, []);
 
     useEffect(() => {
-        const editorElement = editorRef.current?.getElement();
-        if (editorElement && editorElement.innerHTML === '') {
-            const initialDiv = document.createElement('div');
-            initialDiv.className = formatClassMap.action;
-            initialDiv.innerHTML = '<br>';
-            editorElement.appendChild(initialDiv);
+        const rawText = editorRef.current?.getAllText() || '';
+        if (rawText.trim() === '') {
+            const initialHtml = `<div class="${formatClassMap.action}"><br></div>`;
+            editorRef.current?.insertContent(initialHtml, 'insert');
         }
     }, []);
 
@@ -120,10 +118,8 @@ export const ScreenplayEditor = () => {
     };
 
     const handleAutoFormat = async () => {
-        const editorElement = editorRef.current?.getElement();
-        if(!editorElement) return;
-        const rawText = editorElement.innerText;
-        
+        const rawText = editorRef.current?.getAllText() || '';
+
         if (!rawText.trim()) {
             toast({
                 title: "لا يوجد نص للتنسيق",
@@ -145,7 +141,7 @@ export const ScreenplayEditor = () => {
                 if (upperCaseLine.startsWith('INT.') || upperCaseLine.startsWith('EXT.')) {
                     formatClass = formatClassMap['scene-header-1'];
                 } else if (line.trim().match(/^[A-Z\s]+$/) && line.length < 35 && !line.includes('(')) {
-                     formatClass = formatClassMap.character;
+                    formatClass = formatClassMap.character;
                 } else if (line.startsWith('(') && line.endsWith(')')) {
                     formatClass = formatClassMap.parenthetical;
                 }
@@ -173,12 +169,11 @@ export const ScreenplayEditor = () => {
 
     return (
         <div
-            className={`min-h-screen flex flex-col h-screen font-sans transition-all duration-300 animate-fade-in ${
-                isDarkMode ? 'dark bg-gray-900 text-white' : 'bg-white text-black'
-            }`}
+            className={`min-h-screen flex flex-col h-screen font-sans transition-all duration-300 animate-fade-in ${isDarkMode ? 'dark bg-gray-900 text-white' : 'bg-white text-black'
+                }`}
             dir="rtl"
         >
-            <EditorHeader 
+            <EditorHeader
                 onSave={handleSave}
                 onDownload={handleDownload}
                 onHistory={handleHistory}
@@ -190,7 +185,7 @@ export const ScreenplayEditor = () => {
                         <div className="absolute top-0 right-1/4 w-96 h-96 bg-blue-500/5 rounded-full blur-3xl"></div>
                         <div className="absolute bottom-0 left-1/4 w-96 h-96 bg-violet-500/5 rounded-full blur-3xl"></div>
                     </div>
-                    
+
                     <div className="relative flex flex-col overflow-y-auto h-full">
                         <EditorToolbar
                             onFormatCommand={handleFormatCommand}
@@ -209,7 +204,7 @@ export const ScreenplayEditor = () => {
                     </div>
                 </div>
 
-                <EditorSidebar 
+                <EditorSidebar
                     onMessages={handleMessages}
                     onIdeas={handleLightbulb}
                     onCheck={handleStethoscope}

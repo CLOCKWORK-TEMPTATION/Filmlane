@@ -9,7 +9,7 @@ interface EditorFooterProps {
 
 export function EditorFooter({ stats, currentFormatLabel }: EditorFooterProps) {
     return (
-        <footer className="flex-shrink-0 px-4 py-1.5 text-xs border-t bg-card" style={{direction: 'ltr'}}>
+        <footer className="flex-shrink-0 px-4 py-1.5 text-xs border-t bg-card" style={{ direction: 'rtl' }}>
             <div className="flex justify-between items-center">
                 <div className="flex items-center gap-4 text-muted-foreground">
                     <span>{stats.pages} صفحة</span>

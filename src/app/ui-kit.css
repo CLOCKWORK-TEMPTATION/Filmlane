@@ -207,55 +207,74 @@
     line-height: inherit;
   }
 
-  /* تموضع رقم الصفحة (Page Number Positioning) */
-  .page-number {
-    position: absolute;
-    left: 1in;
-    font-size: 12pt;
-    font-family: var(--font-family-editor);
-    pointer-events: none;
-    color: #000;
-    z-index: 20;
-    user-select: none;
-  }
-
-  .page-frame {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 210mm;
-    pointer-events: none;
-    z-index: 5;
-  }
-
-  .page-frame__inner {
-    position: absolute;
-    inset: 1in 1.5in 1in 1in;
-    border: 1px solid #000;
-    pointer-events: none;
-  }
-
-  .page-break-spacer {
+  /* === New Real Page Model === */
+  .screenplay-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 30px; /* المسافة بين الصفحات */
+    padding-bottom: 50px;
     width: 100%;
+    background-color: #525659; /* لون الخلفية المشهور لمحررات PDF */
+  }
+
+  .screenplay-sheet {
+    position: relative;
+    width: 210mm; /* A4 width */
+    height: 297mm; /* A4 height */
+    background-color: white;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden; /* لمنع خروج المحتوى */
+    margin: 0 auto;
+  }
+
+  .screenplay-sheet__header {
+    height: 1in; /* مسافة الهامش العلوي */
+    width: 100%;
+    pointer-events: none; /* غير قابل للتفاعل */
+    user-select: none;
+    flex-shrink: 0;
+  }
+
+  .screenplay-sheet__body {
+    flex-grow: 1; /* يملأ المساحة المتبقية */
+    width: 100%;
+    padding-left: 1.5in; /* هامش يسار */
+    padding-right: 1in; /* هامش يمين */
+    outline: none;
+    font-family: var(--font-family-editor);
+    font-size: 12pt;
+    line-height: 14pt;
+    direction: rtl;
+    color: black;
+    white-space: pre-wrap; /* يحافظ على المسافات والأسطر */
+  }
+
+  .screenplay-sheet__footer {
+    height: 1in; /* مسافة الهامش السفلي */
+    width: 100%;
+    position: relative;
     pointer-events: none;
     user-select: none;
-    display: block;
-    background: transparent;
-    margin: 0;
+    flex-shrink: 0;
   }
 
-  .page-gap {
+  /* تنسيق رقم الصفحة */
+  .screenplay-page-number {
     position: absolute;
-    left: 0;
-    right: 0;
-    background: #1f2937;
-    pointer-events: none;
-    z-index: 15;
+    bottom: 0.5in;
+    left: 1in; /* الصفحة 1 بوصة من اليسار */
+    font-family: var(--font-family-editor);
+    font-size: 12pt;
+    color: black;
   }
 
-  .dark .page-gap {
-    background: #0f172a;
-  }
+  /* إزالة الستايلات القديمة */
+  .page-gap { display: none; }
+  .page-frame { display: none; }
+  .page-break-spacer { display: none; }
 
   .hero-animation-root {
     min-height: 100vh;
