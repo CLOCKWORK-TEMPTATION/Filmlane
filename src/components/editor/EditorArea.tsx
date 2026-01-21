@@ -9,8 +9,15 @@ import React, {
     useState,
     useImperativeHandle,
 } from 'react';
-import { formatClassMap, screenplayFormats, A4_PAGE_HEIGHT_PX } from '@/constants';
 import { handlePaste as newHandlePaste, ContextMemoryManager, getFormatStyles, getNextFormatOnTab, getNextFormatOnEnter } from '@/utils';
+import {
+    formatClassMap,
+    screenplayFormats,
+    PAGE_HEIGHT_PX,
+    HEADER_HEIGHT_PX,
+    FOOTER_HEIGHT_PX,
+    CONTENT_HEIGHT_PX
+} from '@/constants';
 import type { DocumentStats } from '@/types/screenplay';
 
 export interface EditorHandle {
@@ -34,17 +41,11 @@ export const EditorArea = forwardRef<EditorHandle, EditorAreaProps>(({ onContent
     const containerRef = useRef<HTMLDivElement>(null);
     const [pages, setPages] = useState<number[]>([1]); // Array of page IDs (1, 2, 3...)
 
-    // Page metrics (in pixels) - assuming 96 DPI
-    const PAGE_HEIGHT_PX = 1123; // 297mm
-    const HEADER_HEIGHT_PX = 96; // 1in
-    const FOOTER_HEIGHT_PX = 96; // 1in
-    // Body height = Page - Header - Footer
-    // BUT we must account for margins? 
-    // The CSS defines padding-top/bottom 0 for the page, but the header/footer divs take space.
-    // The previous CSS had padding-top 1in etc. 
-    // New CSS: .screenplay-sheet__body has flex-grow.
-    // We should measure the actual available height for content.
-    const CONTENT_HEIGHT_PX = PAGE_HEIGHT_PX - HEADER_HEIGHT_PX - FOOTER_HEIGHT_PX;
+    // Page metrics are now imported from constants to ensure sync with CSS
+    // const PAGE_HEIGHT_PX = 1123;
+    // const HEADER_HEIGHT_PX = 96;
+    // const CONTENT_HEIGHT_PX = ...
+
 
     // Helper to get all content nodes from all pages
     const getAllContentNodes = () => {

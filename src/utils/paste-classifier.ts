@@ -58,34 +58,34 @@ const getSpacingMarginTop = (
   }
 
   if (previousFormat === 'scene-header-2' && currentFormat === 'scene-header-3') {
-    return '14pt';
+    return '0';
   }
 
   if (previousFormat === 'scene-header-3' && currentFormat === 'action') {
-    return '14pt';
+    return '12pt';
   }
 
   if (previousFormat === 'action') {
     if (currentFormat === 'action' || currentFormat === 'character' || currentFormat === 'transition') {
-      return '14pt';
+      return '12pt';
     }
   }
 
   if (previousFormat === 'dialogue') {
     if (currentFormat === 'character' || currentFormat === 'action' || currentFormat === 'transition') {
-      return '14pt';
+      return '12pt';
     }
   }
 
   if (previousFormat === 'parenthetical') {
     if (currentFormat === 'character' || currentFormat === 'action' || currentFormat === 'transition') {
-      return '14pt';
+      return '0';
     }
   }
 
   if (previousFormat === 'transition') {
     if (currentFormat === 'scene-header-1' || currentFormat === 'scene-header-top-line') {
-      return '14pt';
+      return '12pt';
     }
   }
 
@@ -209,7 +209,7 @@ const isTransition = (line: string): boolean => {
  */
 
 const ACTION_VERB_LIST =
-  'يدخل|يخرج|ينظر|يرفع|تبتسم|ترقد|تقف|يبسم|يضع|يقول|تنظر|تربت|تقوم|يشق|تشق|تضرب|يسحب|يلتفت|يقف|يجلس|تجلس|يجري|تجري|يمشي|تمشي|يركض|تركض|يصرخ|اصرخ|يبكي|تبكي|يضحك|تضحك|يغني|تغني|يرقص|ترقص|يأكل|تأكل|يشرب|تشرب|ينام|تنام|يستيقظ|تستيقظ|يكتب|تكتب|يقرأ|تقرأ|يسمع|تسمع|يشم|تشم|يلمس|تلمس|يأخذ|تأخذ|يعطي|تعطي|يفتح|تفتح|يغلق|تغلق|يبدأ|تبدأ|ينتهي|تنتهي|يذهب|تذهب|يعود|تعود|يأتي|تأتي|يموت|تموت|يحيا|تحيا|يقاتل|تقاتل|ينصر|تنتصر|يخسر|تخسر|يرسم|ترسم|يصمم|تصمم|يخطط|تخطط|يقرر|تقرر|يفكر|تفكر|يتذكر|تتذكر|يحاول|تحاول|يستطيع|تستطيع|يريد|تريد|يحتاج|تحتاج|يبحث|تبحث|يجد|تجد|يفقد|تفقد|يحمي|تحمي|يراقب|تراقب|يخفي|تخفي|يكشف|تكشف|يكتشف|تكتشف|يعرف|تعرف|يتعلم|تتعلم|يعلم|تعلم|يوجه|توجه|يسافر|تسافر|يرحل|ترحل|يبقى|تبقى|ينتقل|تنتقل|يتغير|تتغير|ينمو|تنمو|يتطور|تتطور|يواجه|تواجه|يحل|تحل|يفشل|تفشل|ينجح|تنجح|يحقق|تحقق|ينهي|تنهي|يوقف|توقف|يستمر|تستمر|ينقطع|تنقطع|يرتبط|ترتبط|ينفصل|تنفصل|يتزوج|تتزوج|يطلق|تطلق|يولد|تولد|يكبر|تكبر|يشيخ|تشيخ|يمرض|تمرض|يشفي|تشفي|يصاب|تصاب|يتعافى|تتعافى|يقتل|تقتل|يُقتل|تُقتل|يختفي|تختفي|يظهر|تظهر|يختبئ|تختبئ|يطلب|تطلب|يأمر|تأمر|يمنع|تمنع|يسمح|تسمح|يوافق|توافق|يرفض|ترفض|يعتذر|تعتذر|يشكر|تشكر|يحيي|تحيي|يودع|تودع|يجيب|تجيب|يسأل|تسأل|يصيح|صيح|يهمس|همس|يصمت|صمت|يتكلم|تكلم|ينادي|تنادي|يحكي|تحكي|يروي|تروي|يقص|تقص|يتنهد|تتنهد|يئن|تئن';
+  'يدخل|يخرج|ينظر|يرفع|تبتسم|ترقد|تقف|يبسم|يضع|يقول|تنظر|تربت|تقوم|يشق|تشق|تضرب|يسحب|يلتفت|يقف|يجلس|تجلس|يجري|تجري|يمشي|تمشي|يركض|تركض|يصرخ|اصرخ|يبكي|تبكي|يضحك|تضحك|يغني|تغني|يرقص|ترقص|يأكل|تأكل|يشرب|تشرب|ينام|تنام|يستيقظ|تستيقظ|يكتب|تكتب|يقرأ|تقرأ|يسمع|تسمع|يشم|تشم|يلمس|تلمس|يأخذ|تأخذ|يعطي|تعطي|يفتح|تفتح|يغلق|تغلق|يبدأ|تبدأ|ينتهي|تنتهي|يذهب|تذهب|يعود|تعود|يأتي|تأتي|يموت|تموت|يحيا|تحيا|يقاتل|تقاتل|ينصر|تنتصر|يخسر|تخسر|يرسم|ترسم|يصمم|تصمم|يخطط|تخطط|يقرر|تقرر|يفكر|تفكر|يتذكر|تتذكر|يحاول|تحاول|يستطيع|تستطيع|يريد|تريد|يحتاج|تحتاج|يبحث|تبحث|يجد|تجد|يفقد|تفقد|يحمي|تحمي|يراقب|تراقب|يخفي|تخفي|يكشف|تكشف|يكتشف|تكتشف|يعرف|تعرف|يتعلم|تتعلم|يعلم|تعلم|يوجه|توجه|يسافر|تسافر|يرحل|ترحل|يبقى|تبقى|ينتقل|تنتقل|يتغير|تتغير|ينمو|تنمو|يتطور|تتطور|يواجه|تواجه|يحل|تحل|يفشل|تفشل|ينجح|تنجح|يحقق|تحقق|ينهي|تنهي|يوقف|توقف|يستمر|تستمر|ينقطع|تنقطع|يرتبط|ترتبط|ينفصل|تنفصل|يتزوج|تتزوج|يطلق|تطلق|يولد|تولد|يكبر|تكبر|يشيخ|تشيخ|يمرض|تمرض|يشفي|تشفي|يصاب|تصاب|يتعافى|تتعافى|يقتل|تقتل|يُقتل|تُقتل|يختفي|تختفي|يظهر|تظهر|يختبئ|تختبئ|يطلب|تطلب|يأمر|تأمر|يمنع|تمنع|يسمح|تسمح|يوافق|توافق|يرفض|ترفض|يعتذر|تعتذر|يشكر|تشكر|يحيي|تحيي|يودع|تودع|يجيب|تجيب|يسأل|تسأل|يصيح|صيح|يهمس|همس|يصمت|صمت|يتكلم|تكلم|ينادي|تنادي|يحكي|تحكي|يروي|تروي|يقص|تقص|يتنهد|تتنهد|يئن|تئن|يتوقف|تتوقف|يستدير|تستدير|يحدق|تحدق|يلمح|تلمح';
 
 const EXTRA_ACTION_VERBS =
   'نرى|نسمع|نلاحظ|نقترب|نبتعد|ننتقل|ترفع|ينهض|تنهض|تقتحم|يقتحم|يتبادل|يبتسم|يبدؤون|تفتح|يفتح|تدخل|يُظهر|يظهر|تظهر';
@@ -247,7 +247,11 @@ const matchesActionStartPattern = (line: string): boolean => {
   const actionStartPatterns = [
     /^\s*(?:ثم\s+)?(?:و(?:هو|هي)\s+)?[يت][\u0600-\u06FF]{2,}(?:\s+\S|$)/,
     /^\s*(?:و|ف|ل)?(?:نرى|نسمع|نلاحظ|نقترب|نبتعد|ننتقل)(?:\s+\S|$)/,
+    /^\s*(?:ثم\s+)?(?:و(?:هو|هي)\s+)?[يت][\u0600-\u06FF]{2,}(?:\s+\S|$)/,
+    /^\s*(?:و|ف|ل)?(?:نرى|نسمع|نلاحظ|نقترب|نبتعد|ننتقل)(?:\s+\S|$)/,
     /^\s*(?:رأينا|سمعنا|لاحظنا|شاهدنا)(?:\s+\S|$)/,
+    // Add imperative check for Action (e.g. ادخل، اخرج) if it starts with Alif
+    /^\s*(?:ادخل|اخرج|انظر|استمع|اقترب|ابتعد|توقف)(?:\s+\S|$)/,
   ];
 
   return actionStartPatterns.some((pattern) => pattern.test(normalized));
@@ -327,7 +331,10 @@ const isCharacterLine = (
 
   if (!hasColon && arabicOnlyWithNumbers) {
     const tokens = normalized.split(/\s+/).filter(Boolean);
-    if (tokens.length === 0 || tokens.length > 3) return false;
+    if (tokens.length === 0 || tokens.length > 4) return false; // Allow slightly longer names (e.g. compound names)
+
+    // Safeguard: Character names rarely contain dialogue punctuation
+    if (/[؟!؟,،"«»]/.test(trimmed)) return false;
 
     const stopWords = new Set([
       'في',
@@ -351,6 +358,8 @@ const isCharacterLine = (
       'فجأة',
       'وهو',
       'وهي',
+      'ولكن',
+      'حتى',
     ]);
     if (tokens.some((t) => stopWords.has(t))) return false;
 
@@ -388,6 +397,62 @@ const isLikelyDialogue = (line: string, previousFormat: string): boolean => {
     }
   }
   return false;
+};
+
+/**
+ * دالة ذكية لحساب احتمالية أن يكون السطر حواراً بناءً على محتواه اللغوي
+ * Smart Linguistic Heuristic for Dialogue Detection
+ */
+const getDialogueProbability = (line: string): number => {
+  let score = 0;
+  const normalized = normalizeLine(line);
+
+  // 1. Punctuation Indicators (علامات الترقيم الحوارية)
+  if (/[؟?]/.test(line)) score += 3; // Question mark is a very strong indicator
+  if (/!/.test(line)) score += 1; // Exclamation can be in action too, but often dialogue
+  if (/\.\./.test(line)) score += 1; // Ellipses often indicate trailing dialogue
+
+  // 2. Vocative Particles (أدوات النداء)
+  // "Ya" followed by a word
+  if (/\bيا\s+[\u0600-\u06FF]+/.test(normalized)) score += 4;
+  if (/يا\s*([أا]خي|[أا]ختي|[يأ]سطى|باشا|بيه|هانم|مدام|أستاذ|ياعم|ياواد|يابنت)/.test(normalized)) score += 2; // Specific common vocatives
+
+  // 3. Conversational Start (بدايات حوارية شائعة)
+  const conversationalStarts = [
+    'ليه', 'مين', 'فين', 'إمتى', 'ازاي', 'كام', // Questions
+    'أنا', 'انت', 'إنتي', 'احنا', 'يا', // Pronouns/Vocative
+    'بس', 'طب', 'ما', 'مش', 'لا', 'أيوه', 'أه', // Colloquial particles
+    'طيب', 'خلاص', 'ياللا', 'يلا', 'عشان', 'علشان', // Colloquial
+    'يبقى', 'كده', 'هو', 'هي', 'دي', 'ده', // Demonstratives/Aux
+    'بقولك', 'بقولك', 'بتعمل', 'هتعمل', 'تعالى', 'روح', // Common commands/questions
+    'يلعن', 'يخرب', 'الله', 'والله', // Common expressions
+  ];
+  const firstWord = normalized.split(' ')[0];
+  if (conversationalStarts.includes(firstWord)) score += 2;
+
+  // Check deeper in the sentence for conversational markers
+  if (/\b(ده|دي|كده|عشان|علشان|عايز|عايزة|مش|هو|هي|احنا)\b/.test(normalized)) score += 1;
+
+  // 4. Quotation Marks (علامات التنصيص)
+  if (/["«»]/.test(line)) score += 2;
+
+  // 5. Length Heuristic (الطول)
+  if (normalized.length > 5 && normalized.length < 150) score += 1;
+
+  // Penalties (عقوبات)
+  if (isSceneHeader1(line) || isSceneHeader2(line)) score -= 10;
+
+  // Adjusted Action Penalty: If it starts with action verb BUT has strong dialogue markers, reduce penalty or ignore
+  if (isActionVerbStart(line)) {
+    // If we have strong dialogue indicators (like "Ya" or "?"), the action verb might be part of dialogue (e.g. "Look at me!")
+    // "انظر لي يا محمد" -> "Look" is imperative action verb, but "Ya" makes it dialogue.
+    // So only penalize if score is currently low.
+    if (score < 4) {
+      score -= 3;
+    }
+  }
+
+  return score;
 };
 
 /**
@@ -522,6 +587,28 @@ const isSceneHeader3 = (line: string, ctx: LineContext): boolean => {
 
 const isLikelyCharacter = (line: string, ctx: LineContext): boolean => {
   if (!ctx.stats.isShort || ctx.stats.wordCount > 5) return false;
+
+  // Character names generally don't have dialogue punctuation
+  // Unless it ends with colon (handled elsewhere)
+  if (/[؟!؟"«»]/.test(line) && !line.includes(':')) return false;
+
+  // Refined Logic (New):
+  // Even if it HAS a colon, if the text before the colon is PURELY an imperative verb
+  // it might be dialogue like "Enter:" (meaning "He says 'Enter'").
+  // Though standard screenplay uses "NAME:", sometimes people write "Start:" as action?
+  // User case: "ادخل:" -> This looks like an imperative verb "Edkhol".
+  const namePart = line.split(':')[0].trim();
+  const nameNormalized = normalizeLine(namePart);
+
+  // List of verbs that might look like names but are commands
+  const IMPERATIVE_VERBS = new Set(['ادخل', 'اخرج', 'انظر', 'توقف', 'اسمع', 'تعال', 'امش', 'اكتب', 'اقرأ']);
+  if (IMPERATIVE_VERBS.has(nameNormalized)) {
+    // If the "name" is just a command, treat it as Dialogue (or Action/Parenthetical based on context)
+    // The user said: "ادخل:" was treated as character. They want it as Dialogue?
+    // "ادخل:" -> Dialogue "Enter." (as in someone speaking the command)
+    return false;
+  }
+
   if (isTransition(line)) return false;
   if (isActionVerbStart(normalizeLine(line))) return false;
 
@@ -549,7 +636,12 @@ const classifyWithContext = (line: string, ctx: LineContext): string => {
   if (isTransition(line)) return 'transition';
 
   if (isParenthetical(line)) {
-    if (ctx.pattern.isInDialogueBlock) {
+    // Parenthetical logic refined:
+    // It's a parenthetical if it's in a dialogue block OR follows a character immediately
+    if (
+      ctx.pattern.isInDialogueBlock ||
+      lastType === 'character'
+    ) {
       return 'parenthetical';
     }
   }
@@ -614,6 +706,15 @@ const classifyWithContext = (line: string, ctx: LineContext): string => {
     if (!parsed) {
       return 'action';
     }
+  }
+
+  // --- Smart Fallback (الحل الذكي والجذري) ---
+  // If we haven't classified it yet, check linguistic probability
+  // instead of blindly defaulting to 'action'.
+  const dialogueScore = getDialogueProbability(line);
+  // Threshold: 3 means at least a question mark OR a vocative particle OR combination of weaker signals
+  if (dialogueScore >= 3) {
+    return 'dialogue';
   }
 
   return 'action';

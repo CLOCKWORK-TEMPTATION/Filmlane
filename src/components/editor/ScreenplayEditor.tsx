@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useTheme } from 'next-themes';
-import { screenplayFormats, formatClassMap, A4_PAGE_HEIGHT_PX } from '@/constants';
+import { screenplayFormats, formatClassMap } from '@/constants';
 import { EditorHeader } from './EditorHeader';
 import { EditorToolbar } from './EditorToolbar';
 import { EditorArea, EditorHandle } from './EditorArea';

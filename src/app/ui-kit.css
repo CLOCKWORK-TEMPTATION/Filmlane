@@ -101,6 +101,17 @@
   /* === Font Families === */
   --font-family-ui: "Cairo", system-ui, -apple-system, sans-serif;
   --font-family-editor: "AzarMehrMonospaced-San", monospace;
+
+  /* === Page Metrics (Must match constants/page.ts) === */
+  /* 96px = 1in */
+  /* 1123px = 297mm approx */
+  --page-height: 1123px;
+  --page-width: 794px; /* ~210mm */
+  /* Top/Bottom margins simplified as header/footer heights for layout structure */
+  --page-header-height: 0.8in;
+  --page-footer-height: 0.8in;
+  --page-margin-left: 1in;
+  --page-margin-right: 1.25in; /* المساحة الأكبر لليمين عشان التجليد العربي */
 }
 
 .dark {
@@ -220,8 +231,8 @@
 
   .screenplay-sheet {
     position: relative;
-    width: 210mm; /* A4 width */
-    height: 297mm; /* A4 height */
+    width: var(--page-width);
+    height: var(--page-height);
     background-color: white;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
     display: flex;
@@ -231,7 +242,7 @@
   }
 
   .screenplay-sheet__header {
-    height: 1in; /* مسافة الهامش العلوي */
+    height: var(--page-header-height);
     width: 100%;
     pointer-events: none; /* غير قابل للتفاعل */
     user-select: none;
@@ -241,8 +252,8 @@
   .screenplay-sheet__body {
     flex-grow: 1; /* يملأ المساحة المتبقية */
     width: 100%;
-    padding-left: 1.5in; /* هامش يسار */
-    padding-right: 1in; /* هامش يمين */
+    padding-left: var(--page-margin-left);
+    padding-right: var(--page-margin-right);
     outline: none;
     font-family: var(--font-family-editor);
     font-size: 12pt;
@@ -250,10 +261,11 @@
     direction: rtl;
     color: black;
     white-space: pre-wrap; /* يحافظ على المسافات والأسطر */
+    box-sizing: border-box; /* Important: ensures padding is inside width */
   }
 
   .screenplay-sheet__footer {
-    height: 1in; /* مسافة الهامش السفلي */
+    height: var(--page-footer-height);
     width: 100%;
     position: relative;
     pointer-events: none;
