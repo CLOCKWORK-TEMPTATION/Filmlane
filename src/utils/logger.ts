@@ -10,28 +10,30 @@ type LogLevel = keyof typeof LOG_LEVELS;
 const CURRENT_LOG_LEVEL: LogLevel = 'info';
 
 class Logger {
-  private log(level: LogLevel, component: string, message: string) {
+  private log(level: LogLevel, component: string, message: string, data?: any) {
     if (LOG_LEVELS[level] >= LOG_LEVELS[CURRENT_LOG_LEVEL]) {
+      const timestamp = new Date().toISOString();
+      const prefix = `[${timestamp}] [${level.toUpperCase()}] [${component}]`;
       if (level === 'error') {
-        console.error(`[${level.toUpperCase()}] [${component}] ${message}`);
+        console.error(`${prefix} ${message}`, data || '');
       } else if (level === 'warning') {
-        console.warn(`[${level.toUpperCase()}] [${component}] ${message}`);
+        console.warn(`${prefix} ${message}`, data || '');
       } else {
-        console.log(`[${level.toUpperCase()}] [${component}] ${message}`);
+        console.log(`${prefix} ${message}`, data || '');
       }
     }
   }
 
-  info(component: string, message: string) {
-    this.log('info', component, message);
+  info(component: string, message: string, data?: any) {
+    this.log('info', component, message, data);
   }
 
-  warning(component: string, message: string) {
-    this.log('warning', component, message);
+  warning(component: string, message: string, data?: any) {
+    this.log('warning', component, message, data);
   }
 
-  error(component: string, message: string) {
-    this.log('error', component, message);
+  error(component: string, message: string, data?: any) {
+    this.log('error', component, message, data);
   }
 }
 

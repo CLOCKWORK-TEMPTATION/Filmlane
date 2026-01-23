@@ -64,3 +64,5 @@ export class ContextMemoryManager {
     await this.saveContext(sessionId, memory);
   }
 }
+
+export const memoryManager = new ContextMemoryManager();

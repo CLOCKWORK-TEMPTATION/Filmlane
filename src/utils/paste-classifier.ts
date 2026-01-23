@@ -1,8 +1,7 @@
+
 import React from 'react';
 import { logger } from './logger';
-import {
-  ContextMemoryManager,
-} from './context-memory-manager';
+import { ContextMemoryManager, memoryManager as defaultMemoryManager } from './context-memory-manager';
 import type { ContextMemory, LineContext } from '@/types/screenplay';
 import { getFormatStyles } from './editor-styles';
 
@@ -39,6 +38,8 @@ const cssObjectToString = (styles: React.CSSProperties): string => {
  * - parenthetical → يتبع نفس قواعد dialogue
  * - transition → scene-header-1/scene-header-top-line: سطر فارغ
  */
+import { shouldTriggerReview, constructAIRequestPayload, type AIPayload } from './ai-reviewer';
+
 const getSpacingMarginTop = (
   previousFormat: string,
   currentFormat: string,
@@ -97,9 +98,13 @@ const buildLineDivHTML = (
   styles: React.CSSProperties,
   text: string,
   marginTop?: string,
+  id?: string,
 ): string => {
   const div = document.createElement('div');
   div.className = className;
+  if (id) {
+    div.id = id;
+  }
 
   const finalStyles = { ...styles };
   if (marginTop) {
@@ -167,15 +172,23 @@ const isSceneHeader1 = (line: string): boolean => {
 
 const TIME_RE = /(نهار|ليل|صباح|مساء|فجر)/i;
 const LOCATION_RE = /(داخلي|خارجي)/i;
+ const TIME_TOKEN_RE = /(?:^|[\s،؛\-–—])(?:نهار|ليل|صباح|مساء|فجر)(?:$|[\s،؛\-–—])/i;
+ const LOCATION_LINE_START_RE = /^(?:داخلي|خارجي)[.:]?(?:\s|$)/i;
 
 const isSceneHeader2 = (line: string): boolean => {
   const normalized = normalizeLine(line)
     .replace(/[-–—]/g, ' ')
     .replace(/\s+/g, ' ')
     .trim();
-  const hasTime = TIME_RE.test(normalized);
-  const hasLocation = LOCATION_RE.test(normalized);
-  return hasTime && hasLocation;
+  // Guardrails: prevent classifying long descriptive paragraphs as scene headers
+  const wordCount = normalized.split(/\s+/).filter(Boolean).length;
+  if (wordCount > 12) return false;
+  if (normalized.length > 120) return false;
+
+  // Scene header 2 should start with داخل/خارج (or their variants) and include a time token.
+  const hasLocationAtStart = LOCATION_LINE_START_RE.test(normalized);
+  const hasTimeToken = TIME_TOKEN_RE.test(normalized);
+  return hasLocationAtStart && hasTimeToken;
 };
 
 const isCompleteSceneHeader = (line: string): boolean => {
@@ -292,7 +305,7 @@ const parseInlineCharacterDialogue = (
   const dialogueText = (inlineMatch[2] || '').trim();
   if (!characterName || !dialogueText) return null;
 
-  if (!CHARACTER_RE.test(`${characterName}:`)) return null;
+  if (!CHARACTER_RE.test(`${characterName}: `)) return null;
   return { characterName, dialogueText };
 };
 
@@ -556,7 +569,7 @@ const isSceneHeader3 = (line: string, ctx: LineContext): boolean => {
   const lastType = ctx.previousTypes[ctx.previousTypes.length - 1];
 
   if (
-    ['scene-header-top-line', 'scene-header-1', 'scene-header-2'].includes(
+    ['scene-header-top-line', 'scene-header-1', 'scene-header-2', 'transition'].includes(
       lastType,
     ) &&
     wordCount <= 12 &&
@@ -624,16 +637,16 @@ const isLikelyCharacter = (line: string, ctx: LineContext): boolean => {
   return true;
 };
 
-const classifyWithContext = (line: string, ctx: LineContext): string => {
+const classifyWithContext = (line: string, ctx: LineContext): { type: string; score: number } => {
   const lastType = ctx.previousTypes[ctx.previousTypes.length - 1];
   const nextLine = ctx.nextLines[0];
 
-  if (isBasmala(line)) return 'basmala';
+  if (isBasmala(line)) return { type: 'basmala', score: 10 };
 
-  if (isCompleteSceneHeader(line)) return 'scene-header-top-line';
-  if (isSceneHeader1(line)) return 'scene-header-1';
-  if (isSceneHeader2(line)) return 'scene-header-2';
-  if (isTransition(line)) return 'transition';
+  if (isCompleteSceneHeader(line)) return { type: 'scene-header-top-line', score: 10 };
+  if (isSceneHeader1(line)) return { type: 'scene-header-1', score: 10 };
+  if (isSceneHeader2(line)) return { type: 'scene-header-2', score: 10 };
+  if (isTransition(line)) return { type: 'transition', score: 10 };
 
   if (isParenthetical(line)) {
     // Parenthetical logic refined:
@@ -642,17 +655,33 @@ const classifyWithContext = (line: string, ctx: LineContext): string => {
       ctx.pattern.isInDialogueBlock ||
       lastType === 'character'
     ) {
-      return 'parenthetical';
+      return { type: 'parenthetical', score: 9 };
     }
   }
 
+  // --- PHASE 2: SEQUENCE LOGIC (Context Awareness) ---
+  // Rule: Character -> Dialogue
+  // If the previous line was a Character (or Parenthetical), the current line is overwhelmingly likely to be Dialogue,
+  // even if it looks like Action (e.g. starts with "Look").
+  // Exception: If it explicitly looks like another Character (dual dialogue or error).
+  if (lastType === 'character' || (lastType === 'parenthetical' && ctx.pattern.isInDialogueBlock)) {
+    // Check if it's actually another character (e.g. quick back-and-forth without spacing, or mistake)
+    if (isCharacterLine(line, { lastFormat: lastType, isInDialogueBlock: true })) {
+      return { type: 'character', score: 8 };
+    }
+
+    // If it's not a character, it's Dialogue.
+    // We already checked for Scene Headers/Transitions/Basmala/Parenthetical above.
+    return { type: 'dialogue', score: 9 }; // High confidence because of context
+  }
+
   if (isLikelyAction(line)) {
-    return 'action';
+    return { type: 'action', score: 7 };
   }
 
   if (ctx.pattern.isInSceneHeader) {
     if (isSceneHeader3(line, ctx)) {
-      return 'scene-header-3';
+      return { type: 'scene-header-3', score: 8 };
     }
   }
 
@@ -664,7 +693,7 @@ const classifyWithContext = (line: string, ctx: LineContext): string => {
           isInDialogueBlock: true,
         })
       ) {
-        return 'dialogue';
+        return { type: 'dialogue', score: 8 };
       }
     }
     if (
@@ -672,7 +701,14 @@ const classifyWithContext = (line: string, ctx: LineContext): string => {
       !ctx.stats.hasColon &&
       !isCompleteSceneHeader(line)
     ) {
-      return 'dialogue';
+      return { type: 'dialogue', score: 7 };
+    }
+
+    // Rule: Dialogue Block Continuity
+    // If we've had 2+ lines of dialogue recently, and this line is short/ambiguous, keep it as dialogue.
+    // This helps with long monologues or broken lines.
+    if (ctx.pattern.isInDialogueBlock && !isLikelyAction(line) && !isCharacterLine(line)) {
+      return { type: 'dialogue', score: 6 };
     }
   }
 
@@ -683,18 +719,18 @@ const classifyWithContext = (line: string, ctx: LineContext): string => {
         isInDialogueBlock: ctx.pattern.isInDialogueBlock,
       })
     ) {
-      return 'character';
+      return { type: 'character', score: 8 };
     }
   }
 
   if (ctx.stats.isShort && nextLine && nextLine.trim().length > 20) {
     if (isLikelyCharacter(line, ctx)) {
-      return 'character';
+      return { type: 'character', score: 7 };
     }
   }
 
   if (ctx.stats.isLong && ctx.stats.hasPunctuation) {
-    return 'action';
+    return { type: 'action', score: 6 };
   }
 
   if (ctx.stats.startsWithBullet) {
@@ -704,7 +740,7 @@ const classifyWithContext = (line: string, ctx: LineContext): string => {
         .trim(),
     );
     if (!parsed) {
-      return 'action';
+      return { type: 'action', score: 6 };
     }
   }
 
@@ -714,10 +750,11 @@ const classifyWithContext = (line: string, ctx: LineContext): string => {
   const dialogueScore = getDialogueProbability(line);
   // Threshold: 3 means at least a question mark OR a vocative particle OR combination of weaker signals
   if (dialogueScore >= 3) {
-    return 'dialogue';
+    // Return the calculated linguistic score
+    return { type: 'dialogue', score: dialogueScore };
   }
 
-  return 'action';
+  return { type: 'action', score: 1 }; // Low confidence default
 };
 
 /**
@@ -731,16 +768,18 @@ const classifyWithContextAndMemory = async (
   ctx: LineContext,
   memoryManager: ContextMemoryManager | null,
   sessionId: string,
-): Promise<string> => {
-  let classification = classifyWithContext(line, ctx);
+): Promise<{ type: string; score: number }> => {
+  let result = classifyWithContext(line, ctx);
+  let classification = result.type;
+  let score = result.score;
 
-  if (!memoryManager) return classification;
+  if (!memoryManager) return result;
 
   try {
     const memory: ContextMemory | null = await memoryManager.loadContext(
       sessionId,
     );
-    if (!memory) return classification;
+    if (!memory) return result;
 
     if (ctx.stats.isShort && !ctx.stats.hasPunctuation) {
       const normalized = normalizeLine(line).replace(/[:：]/g, '');
@@ -757,6 +796,7 @@ const classifyWithContextAndMemory = async (
       if (knownCharacter) {
         if (ctx.stats.wordCount <= 3 && line.length < 40) {
           classification = 'character';
+          score = 10;
         }
       }
     }
@@ -773,6 +813,7 @@ const classifyWithContextAndMemory = async (
       isLikelyAction(line)
     ) {
       classification = 'action';
+      score = getDialogueProbability(line); // Re-eval score here?
     }
 
     if (
@@ -782,6 +823,7 @@ const classifyWithContextAndMemory = async (
       !isCompleteSceneHeader(line)
     ) {
       classification = 'dialogue';
+      score = 10;
     }
 
     if (
@@ -790,6 +832,7 @@ const classifyWithContextAndMemory = async (
       ctx.stats.isLong
     ) {
       classification = 'action';
+      score = score < 5 ? score : 0;
     }
 
     if (classification === 'character') {
@@ -798,13 +841,59 @@ const classifyWithContextAndMemory = async (
 
       if (appearances >= 3) {
         classification = 'character';
+        score = 10;
       }
     }
   } catch (error) {
     logger.error('Memory', `خطأ في استخدام الذاكرة: ${error}`);
   }
 
-  return classification;
+  return { type: classification, score };
+};
+
+/**
+ * =========================
+ *  Smart Line Recovery (Layer A)
+ * =========================
+ */
+const smartSplitIntoLines = (text: string): string => {
+  let processed = text;
+
+  // Pattern explanation:
+  // (^|[^\S\n])  -> Match Start of string OR Whitespace that is NOT a newline
+  // This ensures we don't match if it's already properly on a new line (preceded by \n)
+
+  // 1. Scene Headers & Locations
+  processed = processed.replace(/(^|[^\S\n])(INT\.|EXT\.|داخلي\.|خارجي\.|داخلي |خارجي |مشهد |Scene )/gi, '\n$2');
+
+  // 2. Scene Numbers (e.g., "مشهد 50")
+  processed = processed.replace(/(^|[^\S\n])(مشهد|Scene)(\s*\d+)/gi, '\n$2$3');
+
+  // 3. Times (Inject \n AFTER time if followed by text)
+  // " - DAY Action..." -> " - DAY\nAction..."
+  // Keep regular space check here, but ensure we don't duplicate newline if already there
+  processed = processed.replace(/(\s|-)(نهار|ليل|صباح|مساء|فجر|Day|Night)(\s+)(?!\n)/gi, '$1$2\n');
+
+  // 4. Transitions
+  processed = processed.replace(/(^|[^\S\n])(CUT TO:|FADE IN:|قطع:|تلاشي:)/gi, '\n$2');
+
+  // 5. Inline Character Dialogue: "اسم: نص..." -> split before the character name
+  // Arabic names (1-3 tokens) followed by ':' or '：'
+  processed = processed.replace(
+    /(^|[^\S\n])([\u0600-\u06FF]{2,}(?:\s+[\u0600-\u06FF]{2,}){0,2})\s*[:：]\s*/g,
+    '\n$2: ',
+  );
+
+  // 6. List markers inside merged text (keep as strong boundaries)
+  // Examples: "- ..." , "• ..." , " ..."
+  processed = processed
+    .replace(/(^|[^\S\n])(-)\s+/g, '\n$2 ')
+    .replace(
+      /(^|[^\S\n])([•·∙⋅●○◦■□▪▫◆◇–—−‒―‣⁃*+])\s*/g,
+      '\n$2 ',
+    );
+
+  return processed;
 };
 
 /**
@@ -822,12 +911,40 @@ export const handlePaste = async (
     font: string,
   ) => React.CSSProperties,
   updateContentFn: () => void,
-  memoryManager: ContextMemoryManager | null = null,
+  memoryManager?: ContextMemoryManager | null,
   sessionId: string = `session-${Date.now()}`,
+  onAIReviewNeeded?: (payload: AIPayload) => void,
 ): Promise<void> => {
   e.preventDefault();
 
-  logger.info('Paste', `🚀 بدء عملية اللصق (Session: ${sessionId})`);
+  // Use passed memory manager or singleton default (allow explicit null to disable)
+  const memory = memoryManager === null ? null : (memoryManager || defaultMemoryManager);
+
+  // Load context from storage
+  let memoryData: ContextMemory | null = null;
+  if (memory && typeof memory.loadContext === 'function') {
+    try {
+      memoryData = await memory.loadContext(sessionId);
+    } catch (err) {
+      logger.warning('Paste', 'Failed to load context memory', err);
+    }
+  }
+
+  // Fallback if load failed or returned null (new session)
+  if (!memoryData) {
+    memoryData = {
+      sessionId,
+      lastModified: Date.now(),
+      data: {
+        commonCharacters: [],
+        commonLocations: [],
+        lastClassifications: [],
+        characterDialogueMap: {},
+      },
+    };
+  }
+
+  logger.info('Paste', `🚀 بدء عملية اللصق(Session: ${sessionId})`);
 
   const textData = e.clipboardData.getData('text/plain');
   if (!textData) {
@@ -835,31 +952,47 @@ export const handlePaste = async (
     return;
   }
 
+  // Normalize line endings (Fix Windows \r\n issues)
+  let textToProcess = textData.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+
   const selection = window.getSelection();
   if (!selection || !selection.rangeCount) {
     logger.error('Paste', 'لا يوجد تحديد نشط');
     return;
   }
 
-  const lines = textData.split('\n').filter((line) => line.trim());
+  // --- Smart Line Recovery (Layer A) ---
+  const basicLinesCheck = textToProcess.split('\n');
+  const looksLikeMergedStructuredText =
+    /(^|[^\S\n])(?:-|•||\u2022|\u25AA)\s+/.test(textToProcess) ||
+    /(^|[^\S\n])[\u0600-\u06FF]{2,}(?:\s+[\u0600-\u06FF]{2,}){0,2}\s*[:：]\s*/.test(
+      textToProcess,
+    );
+
+  if (basicLinesCheck.length <= 2 && (textToProcess.length >= 300 || looksLikeMergedStructuredText)) {
+    logger.info('Paste', '🔧 Triggering Smart Line Recovery (Merged Text Detected)');
+    textToProcess = smartSplitIntoLines(textToProcess);
+  }
+
+  const lines = textToProcess.split('\n').filter((line) => line.trim());
   logger.info('Paste', `📋 بدء معالجة ${lines.length} سطر`);
   logger.info(
     'Paste',
-    `أول 3 أسطر: ${lines
-      .slice(0, 3)
-      .map((l) => `"${l.substring(0, 30)}..."`)
-      .join(', ')}`,
+    `أول 3 أسطر: ${lines.slice(0, 3).map((l) => `"${l.substring(0, 30)}..."`).join(', ')}`,
   );
 
   let formattedHTML = '';
   let previousFormatClass = 'action';
   const classifiedTypes: string[] = [];
+  const processedBlock: { id: string; text: string; type: string; score: number }[] = [];
 
   logger.info('Processing', `بدء معالجة ${lines.length} سطر...`);
 
   for (let i = 0; i < lines.length; i++) {
     const trimmedLine = lines[i].trim();
     if (!trimmedLine) continue;
+
+    const lineId = `line-${sessionId}-${i}`;
 
     const strippedLine = stripLeadingBullets(trimmedLine);
     const ctx = buildContext(lines, i, classifiedTypes);
@@ -880,26 +1013,47 @@ export const handlePaste = async (
         charStyles,
         characterName + ':',
         charMarginTop,
+        `${lineId}-char`
       );
       const dialogueHTML = buildLineDivHTML(
         'format-dialogue',
         dialogueStyles,
         dialogueText,
         '0',
+        `${lineId}-dial`
       );
 
       formattedHTML += charHTML + dialogueHTML;
       classifiedTypes.push('character', 'dialogue');
       previousFormatClass = 'dialogue';
+
+      // CRITICAL FIX: Sync processedBlock with the split lines
+      processedBlock.push({ id: `${lineId}-char`, text: characterName + ':', type: 'character', score: 10 });
+      processedBlock.push({ id: `${lineId}-dial`, text: dialogueText, type: 'dialogue', score: 10 });
+
       continue;
     }
 
-    const classification = await classifyWithContextAndMemory(
+    const res = await classifyWithContextAndMemory(
       strippedLine,
       ctx,
-      memoryManager,
+      memory,
       sessionId,
     );
+
+    // Save any memory updates if we learned new characters
+    if (memoryData && memory && typeof memory.saveContext === 'function') {
+      await memory.saveContext(sessionId, memoryData);
+    }
+    // Actually, simpler: let's save our local updates to the manager IF we found a character.
+    // Or just pass the manager and rely on it? But we updated 'memoryData.data...'.
+    // `memoryData` is a detached object here.
+    // We should save it back.
+
+    const classification = res.type;
+    const score = res.score;
+    // Store for AI review
+    processedBlock.push({ id: lineId, text: strippedLine, type: classification, score });
 
     if (classification === 'scene-header-top-line') {
       const parts = splitSceneHeader(strippedLine);
@@ -912,11 +1066,15 @@ export const handlePaste = async (
           'format-scene-header-1',
           part1Styles,
           parts.number,
+          undefined,
+          `${lineId}-p1`
         );
         const part2HTML = buildLineDivHTML(
           'format-scene-header-2',
           part2Styles,
           parts.description,
+          undefined,
+          `${lineId}-p2`
         );
 
         const topLevelMarginTop = getSpacingMarginTop(previousFormatClass, 'scene-header-top-line');
@@ -927,6 +1085,7 @@ export const handlePaste = async (
           topLevelStylesWithSpacing.marginTop = topLevelMarginTop;
         }
         topLevelDiv.setAttribute('style', cssObjectToString(topLevelStylesWithSpacing));
+        topLevelDiv.id = lineId;
         topLevelDiv.innerHTML = part1HTML + part2HTML;
 
         formattedHTML += topLevelDiv.outerHTML;
@@ -952,6 +1111,7 @@ export const handlePaste = async (
       styles,
       cleanLine,
       marginTop,
+      lineId
     );
     formattedHTML += lineHTML;
 
@@ -983,4 +1143,43 @@ export const handlePaste = async (
   updateContentFn();
 
   logger.info('Paste', '✅ تم إكمال عملية اللصق والتنسيق');
+
+  // TRIGGER AI REVIEW (BACKGROUND)
+  if (onAIReviewNeeded && processedBlock.length > 0) {
+    // Check if any line in the block looks suspicious
+    let shouldReview = false;
+    let triggeredLines = 0;
+    const reasonsMap: Record<string, number> = {};
+
+    // Use processedBlock for context to alignment with what we just built (including splits)
+    const reviewLines = processedBlock.map(p => p.text);
+
+    for (let i = 0; i < processedBlock.length; i++) {
+      const item = processedBlock[i];
+      const previousTypesForReview = processedBlock.slice(0, i).map(p => p.type);
+      const reviewCtx = buildContext(reviewLines, i, previousTypesForReview);
+
+      const result = shouldTriggerReview(item.text, item.type, item.score, reviewCtx);
+      if (result.trigger) {
+        shouldReview = true;
+        triggeredLines++;
+        const r = result.reason || 'Unknown';
+        reasonsMap[r] = (reasonsMap[r] || 0) + 1;
+      }
+    }
+
+    if (shouldReview) {
+      logger.info('Paste', '🤖 AI Review Triggered.', { triggeredLines, reasons: reasonsMap });
+      const payload = constructAIRequestPayload(
+        processedBlock,
+        [],
+        {
+          total_lines: processedBlock.length,
+          triggered_lines: triggeredLines,
+          reasons: reasonsMap
+        }
+      );
+      onAIReviewNeeded(payload);
+    }
+  }
 };

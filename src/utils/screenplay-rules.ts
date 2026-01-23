@@ -46,6 +46,6 @@ export const getNextFormatOnEnter = (currentFormat: string): string => {
         'dialogue': 'character',
         'transition': 'scene-header-1'
     };
-    return transitions[currentFormat] || 'action';
+    return transitions[currentFormat] ?? currentFormat;
 };
 

@@ -9,7 +9,7 @@ import React, {
     useState,
     useImperativeHandle,
 } from 'react';
-import { handlePaste as newHandlePaste, ContextMemoryManager, getFormatStyles, getNextFormatOnTab, getNextFormatOnEnter } from '@/utils';
+import { handlePaste as newHandlePaste, ContextMemoryManager, getFormatStyles, getNextFormatOnTab, getNextFormatOnEnter, type AIPayload, logger, ScreenplayContentService, applyPatches } from '@/utils';
 import {
     formatClassMap,
     screenplayFormats,
@@ -40,6 +40,7 @@ export const EditorArea = forwardRef<EditorHandle, EditorAreaProps>(({ onContent
     const fixedSize = '12pt';
     const containerRef = useRef<HTMLDivElement>(null);
     const [pages, setPages] = useState<number[]>([1]); // Array of page IDs (1, 2, 3...)
+
 
     // Page metrics are now imported from constants to ensure sync with CSS
     // const PAGE_HEIGHT_PX = 1123;
@@ -299,12 +300,46 @@ export const EditorArea = forwardRef<EditorHandle, EditorAreaProps>(({ onContent
         } as unknown as HTMLDivElement
     }), []);
 
+    const handleAIReviewNeeded = useCallback(async (payload: AIPayload) => {
+        logger.info('EditorArea', '🧠 AI Correction Triggered', payload);
+
+        try {
+            // 1. Call AI Service
+            const patches = await ScreenplayContentService.reviewContent(payload);
+
+            if (patches.length > 0) {
+                logger.info('EditorArea', `Applying ${patches.length} patches from AI.`);
+                if (containerRef.current) {
+                    // 2. Apply Patches
+                    applyPatches(containerRef.current, patches);
+
+                    // 3. Trigger updates (stats, etc.)
+                    handleInput();
+
+                    // 4. Save Report (Background)
+                    if (payload.stats) {
+                        fetch('/api/ai-report', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                stats: payload.stats,
+                                patchesCount: patches.length
+                            })
+                        }).catch(err => logger.error('EditorArea', 'Failed to save report', err));
+                    }
+                }
+            }
+        } catch (error) {
+            logger.error('EditorArea', 'AI Review Failed', error);
+        }
+    }, [handleInput]);
+
     const handlePaste = useCallback(
         async (e: React.ClipboardEvent<HTMLDivElement>) => {
             // Pass virtualEditorRef to mimic single-page behavior for the paster utility
-            await newHandlePaste(e, virtualEditorRef, (formatType) => getFormatStyles(formatType, fixedSize, fixedFont), handleInput, memoryManager);
+            await newHandlePaste(e, virtualEditorRef, (formatType) => getFormatStyles(formatType, fixedSize, fixedFont), handleInput, memoryManager, undefined, handleAIReviewNeeded);
         },
-        [handleInput, memoryManager, virtualEditorRef]
+        [handleInput, memoryManager, virtualEditorRef, handleAIReviewNeeded]
     );
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
