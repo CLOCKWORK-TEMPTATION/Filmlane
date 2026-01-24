@@ -1,6 +1,6 @@
 import { downloadFile } from './exporters';
 
-export interface ScreenplayData {
+export type ScreenplayData = {
   content: string;
   metadata: {
     title: string;
@@ -8,9 +8,9 @@ export interface ScreenplayData {
     date: string;
     version: string;
   };
-}
+};
 
-export const saveScreenplay = (data: ScreenplayData, filename: string = 'screenplay.json') => {
+export const saveScreenplay = (data: ScreenplayData, filename = 'screenplay.json') => {
   const jsonContent = JSON.stringify(data, null, 2);
   downloadFile(jsonContent, filename, 'application/json');
 };
@@ -20,7 +20,7 @@ export const loadScreenplay = (): Promise<ScreenplayData | null> => {
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = '.json';
-    
+
     input.onchange = (e) => {
       const file = (e.target as HTMLInputElement).files?.[0];
       if (!file) {

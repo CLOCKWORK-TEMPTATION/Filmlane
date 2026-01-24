@@ -1,7 +1,7 @@
 // Page metrics (in pixels) - assuming 96 DPI
 export const PPI = 96;
 export const PAGE_HEIGHT_PX = 1123; // ~297mm
-export const PAGE_WIDTH_PX = 794;   // ~210mm
+export const PAGE_WIDTH_PX = 794; // ~210mm
 export const HEADER_HEIGHT_PX = 96; // 1in
 export const FOOTER_HEIGHT_PX = 96; // 1in
 // Arabic Layout Margins

@@ -26,11 +26,7 @@ export const exportToFountain = (htmlContent: string): string => {
   return fountain;
 };
 
-export const downloadFile = (
-  content: string,
-  filename: string,
-  mimeType: string = 'text/plain'
-) => {
+export const downloadFile = (content: string, filename: string, mimeType = 'text/plain') => {
   const blob = new Blob([content], { type: mimeType });
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
@@ -68,10 +64,10 @@ export const exportToPDF = async (element: HTMLElement, filename: string) => {
       <body>${element.innerHTML}</body>
     </html>
   `);
-  
+
   printWindow.document.close();
   printWindow.focus();
-  
+
   setTimeout(() => {
     printWindow.print();
     printWindow.close();

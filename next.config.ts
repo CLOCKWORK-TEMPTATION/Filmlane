@@ -3,6 +3,9 @@ import type { NextConfig } from 'next';
 const nextConfig: NextConfig = {
   /* config options here */
   experimental: {
+    serverActions: {
+      allowedOrigins: ['localhost:9002', '127.0.0.1:61909'],
+    },
   },
   typescript: {
     ignoreBuildErrors: true,
@@ -18,6 +21,9 @@ const nextConfig: NextConfig = {
     '@opentelemetry/instrumentation',
     'import-in-the-middle',
     'require-in-the-middle',
+    'node-llama-cpp',
+    '@node-llama-cpp/win-x64',
+    '@node-llama-cpp/win-arm64',
   ],
   images: {
     remotePatterns: [

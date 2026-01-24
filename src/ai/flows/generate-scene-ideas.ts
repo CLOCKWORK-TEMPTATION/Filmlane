@@ -8,8 +8,8 @@
  * - GenerateSceneIdeasOutput - The return type for the generateSceneIdeas function.
  */
 
-import {ai} from '@/ai/genkit';
-import {z} from 'genkit';
+import { ai } from '@/ai/genkit';
+import { z } from 'genkit';
 
 const GenerateSceneIdeasInputSchema = z.object({
   theme: z.string().describe('The theme or short summary to base scene ideas on.'),
@@ -18,18 +18,20 @@ export type GenerateSceneIdeasInput = z.infer<typeof GenerateSceneIdeasInputSche
 
 const GenerateSceneIdeasOutputSchema = z.object({
   sceneIdeas: z.array(z.string()).describe('An array of scene ideas.'),
-  progress: z.string().describe('A one-sentence summary of what was generated.')
+  progress: z.string().describe('A one-sentence summary of what was generated.'),
 });
 export type GenerateSceneIdeasOutput = z.infer<typeof GenerateSceneIdeasOutputSchema>;
 
-export async function generateSceneIdeas(input: GenerateSceneIdeasInput): Promise<GenerateSceneIdeasOutput> {
+export async function generateSceneIdeas(
+  input: GenerateSceneIdeasInput,
+): Promise<GenerateSceneIdeasOutput> {
   return generateSceneIdeasFlow(input);
 }
 
 const prompt = ai.definePrompt({
   name: 'generateSceneIdeasPrompt',
-  input: {schema: GenerateSceneIdeasInputSchema},
-  output: {schema: GenerateSceneIdeasOutputSchema},
+  input: { schema: GenerateSceneIdeasInputSchema },
+  output: { schema: GenerateSceneIdeasOutputSchema },
   prompt: `You are a creative screenwriter. Generate 3 scene ideas based on the following theme or summary:\n\nTheme/Summary: {{{theme}}}\n\nPresent the scene ideas as a numbered list.\n\nYour output should be in the following JSON format:
 {
   "sceneIdeas": ["Scene Idea 1", "Scene Idea 2", "Scene Idea 3"],
@@ -44,8 +46,8 @@ const generateSceneIdeasFlow = ai.defineFlow(
     inputSchema: GenerateSceneIdeasInputSchema,
     outputSchema: GenerateSceneIdeasOutputSchema,
   },
-  async input => {
-    const {output} = await prompt(input);
+  async (input) => {
+    const { output } = await prompt(input);
     return output!;
-  }
+  },
 );

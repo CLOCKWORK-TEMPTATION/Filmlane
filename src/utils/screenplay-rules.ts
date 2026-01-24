@@ -11,21 +11,22 @@
  * @returns The next format type
  */
 export const getNextFormatOnTab = (
-    currentFormat: string,
-    isEmpty = false,
-    shiftPressed = false
+  currentFormat: string,
+  isEmpty = false,
+  shiftPressed = false,
 ): string => {
-    const mainSequence = ['scene-header-1', 'action', 'character', 'transition'];
-    if (currentFormat === 'character' && isEmpty) return shiftPressed ? 'action' : 'transition';
-    if (currentFormat === 'dialogue') return shiftPressed ? 'character' : 'parenthetical';
-    if (currentFormat === 'parenthetical') return shiftPressed ? 'dialogue' : 'dialogue';
+  const mainSequence = ['scene-header-1', 'action', 'character', 'transition'];
+  if (currentFormat === 'character' && isEmpty) return shiftPressed ? 'action' : 'transition';
+  if (currentFormat === 'dialogue') return shiftPressed ? 'character' : 'parenthetical';
+  if (currentFormat === 'parenthetical') return shiftPressed ? 'dialogue' : 'dialogue';
 
-    const currentIndex = mainSequence.indexOf(currentFormat);
-    if (currentIndex !== -1) {
-        if (shiftPressed) return mainSequence[(currentIndex - 1 + mainSequence.length) % mainSequence.length];
-        else return mainSequence[(currentIndex + 1) % mainSequence.length];
-    }
-    return currentFormat;
+  const currentIndex = mainSequence.indexOf(currentFormat);
+  if (currentIndex !== -1) {
+    if (shiftPressed)
+      return mainSequence[(currentIndex - 1 + mainSequence.length) % mainSequence.length];
+    else return mainSequence[(currentIndex + 1) % mainSequence.length];
+  }
+  return currentFormat;
 };
 
 /**
@@ -34,18 +35,17 @@ export const getNextFormatOnTab = (
  * @returns The next format type after pressing Enter
  */
 export const getNextFormatOnEnter = (currentFormat: string): string => {
-    const transitions: { [key: string]: string } = {
-        'basmala': 'scene-header-1',
-        'scene-header-top-line': 'action',
-        'scene-header-1': 'action',
-        'scene-header-2': 'action',
-        'scene-header-3': 'action',
-        'action': 'action',
-        'character': 'dialogue',
-        'parenthetical': 'dialogue',
-        'dialogue': 'character',
-        'transition': 'scene-header-1'
-    };
-    return transitions[currentFormat] ?? currentFormat;
+  const transitions: Record<string, string> = {
+    basmala: 'scene-header-1',
+    'scene-header-top-line': 'action',
+    'scene-header-1': 'action',
+    'scene-header-2': 'action',
+    'scene-header-3': 'action',
+    action: 'action',
+    character: 'dialogue',
+    parenthetical: 'dialogue',
+    dialogue: 'character',
+    transition: 'scene-header-1',
+  };
+  return transitions[currentFormat] ?? currentFormat;
 };
-

@@ -20,9 +20,6 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ success: true, lineId });
   } catch (error: any) {
-    return NextResponse.json(
-      { error: error?.message || 'خطأ غير متوقع' },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: error?.message || 'خطأ غير متوقع' }, { status: 500 });
   }
 }

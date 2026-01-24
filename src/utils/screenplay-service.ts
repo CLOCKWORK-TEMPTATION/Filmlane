@@ -1,53 +1,65 @@
+'use server';
 
+/**
+ * Screenplay Content Service powered by Gemini 2.5 Flash-Lite
+ * Optimized for High-Speed Production Workflows (January 2026)
+ *
+ * Server Action implementation for secure API key usage.
+ */
+
+import { GoogleGenAI } from '@google/genai';
 import { AIPayload, AIPatchOp } from './ai-reviewer';
 import { logger } from './logger';
 
-const API_ENDPOINT = '/api/ai-proxy';
+const MODEL_NAME = 'gemini-2.5-flash-lite';
 
-type CompletionResponse = {
-    choices?: Array<{ text?: string }>;
-    error?: { message?: string };
-};
+/**
+ * Sends the screenplay block to Gemini for intelligent review.
+ */
+export async function reviewContent(payload: AIPayload): Promise<AIPatchOp[]> {
+  const apiKey = process.env.GOOGLE_API_KEY;
 
-export const ScreenplayContentService = {
-    /**
-     * Sends the screenplay block to the AI for review.
-     */
-    reviewContent: async (payload: AIPayload): Promise<AIPatchOp[]> => {
-        logger.info('AI', 'Sending content for review...', { lines: payload.pasted_block.length });
+  if (!apiKey) {
+    logger.error('AI', 'GOOGLE_API_KEY not found in environment variables.');
+    return [];
+  }
 
-        try {
-            // Chunking Strategy:
-            // Split the payload into chunks of ~60 lines or ~4000 chars to fit 8192 token limit of Qwen 2.5.
-            const MAX_CHUNK_LINES = 60;
-            const MAX_CHUNK_CHARS = 4000;
+  const client = new GoogleGenAI({ apiKey });
 
-            const chunks: typeof payload.pasted_block[] = [];
-            let currentChunk: typeof payload.pasted_block = [];
-            let currentSize = 0;
+  console.warn(
+    `[AI] Starting content review process (Server-Side)... lines: ${payload.pasted_block.length}`,
+  );
 
-            for (const line of payload.pasted_block) {
-                const lineLen = line.text.length;
-                if (currentChunk.length >= MAX_CHUNK_LINES || (currentSize + lineLen) > MAX_CHUNK_CHARS) {
-                    chunks.push(currentChunk);
-                    currentChunk = [];
-                    currentSize = 0;
-                }
-                currentChunk.push(line);
-                currentSize += lineLen;
-            }
-            if (currentChunk.length > 0) chunks.push(currentChunk);
+  try {
+    // استراتيجية التقسيم المحسنة لـ Gemini 2.5
+    const MAX_CHUNK_LINES = 500;
+    const MAX_CHUNK_CHARS = 30000;
 
-            logger.info('AI', `Split payload into ${chunks.length} chunks for processing.`);
+    const chunks: (typeof payload.pasted_block)[] = [];
+    let currentChunk: typeof payload.pasted_block = [];
+    let currentSize = 0;
 
-            const allPatches: AIPatchOp[] = [];
+    for (const line of payload.pasted_block) {
+      const lineLen = line.text.length;
+      if (currentChunk.length >= MAX_CHUNK_LINES || currentSize + lineLen > MAX_CHUNK_CHARS) {
+        chunks.push(currentChunk);
+        currentChunk = [];
+        currentSize = 0;
+      }
+      currentChunk.push(line);
+      currentSize += lineLen;
+    }
+    if (currentChunk.length > 0) chunks.push(currentChunk);
 
-            // Process chunks strictly sequentially to avoid overwhelming the local server
-            for (let i = 0; i < chunks.length; i++) {
-                const chunk = chunks[i];
-                logger.info('AI', `Processing chunk ${i + 1}/${chunks.length} (${chunk.length} lines)...`);
+    console.warn(`[AI] Split payload into ${chunks.length} chunks for processing.`);
 
-                const promptText = `
+    const allPatches: AIPatchOp[] = [];
+
+    // Process chunks
+    for (let i = 0; i < chunks.length; i++) {
+      const chunk = chunks[i];
+
+      const promptText = `
 أنت محرك برمجي صارم (Strict Engine) لاستخراج بيانات JSON فقط. لست مساعداً للمحادثة.
 المهمة: تحليل النص واستخراج تصحيحات (Patches) للأخطاء فقط.
 
@@ -80,97 +92,42 @@ Output:
 }
 
 Input Data:
-${JSON.stringify(chunk, null, 2)}
-
-Output (JSON):
+${JSON.stringify(chunk)}
 `.trim();
 
-                try {
-                    const response = await fetch(API_ENDPOINT, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': 'Bearer local-ai'
-                        },
-                        body: JSON.stringify({
-                            model: 'qwen25-14b',
-                            prompt: promptText,
-                            max_tokens: 1500,
-                            temperature: 0,
-                            stop: undefined // Do not stop at "}", let it finish JSON
-                        })
-                    });
+      try {
+        const response = await client.models.generateContent({
+          model: MODEL_NAME,
+          contents: promptText,
+        });
 
-                    if (!response.ok) {
-                        logger.error('AI', `Chunk ${i + 1} failed: ${response.statusText}`);
-                        continue; // Skip failed chunk, keep others
-                    }
+        const content = response.text || '';
 
-                    const data = (await response.json()) as CompletionResponse;
-                    const content = data.choices?.[0]?.text || "";
-
-                    // Robust JSON Extraction Strategy
-                    let parsedPatches: any = null;
-
-                    // 1. Try direct parse first (fastest, assumes clean output)
-                    try {
-                        parsedPatches = JSON.parse(content);
-                    } catch (e) {
-                        // 2. Fallback: Brace Balancing Extractor
-                        // Finds the first valid {...} block that matches JSON structure
-                        const extractJSON = (str: string): any => {
-                            let braceCount = 0;
-                            let startIndex = -1;
-                            let inString = false;
-
-                            for (let j = 0; j < str.length; j++) {
-                                const char = str[j];
-
-                                // Toggle string state to ignore braces inside strings
-                                if (char === '"' && (j === 0 || str[j - 1] !== '\\')) {
-                                    inString = !inString;
-                                }
-
-                                if (!inString) {
-                                    if (char === '{') {
-                                        if (braceCount === 0) startIndex = j;
-                                        braceCount++;
-                                    } else if (char === '}') {
-                                        braceCount--;
-                                        if (braceCount === 0 && startIndex !== -1) {
-                                            // Found a potential block
-                                            const candidate = str.substring(startIndex, j + 1);
-                                            try {
-                                                return JSON.parse(candidate);
-                                            } catch (err) {
-                                                // Continue searching if this block wasn't valid JSON
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                            return null;
-                        };
-
-                        parsedPatches = extractJSON(content);
-                    }
-
-                    if (parsedPatches && Array.isArray(parsedPatches.patches)) {
-                        allPatches.push(...parsedPatches.patches);
-                    } else {
-                        logger.warning('AI', `Could not parse JSON from chunk ${i + 1}. Content: ${content.substring(0, 50)}...`);
-                    }
-                } catch (err) {
-                    logger.error('AI', `Error processing chunk ${i + 1}`, err);
-                }
+        let parsedPatches: unknown = null;
+        try {
+          parsedPatches = JSON.parse(content);
+        } catch {
+          const match = content.match(/\{[\s\S]*\}/);
+          if (match) {
+            try {
+              parsedPatches = JSON.parse(match[0]);
+            } catch (parseError) {
+              console.error('[AI] JSON parse failed', parseError);
             }
-
-            logger.info('AI', `Completed all chunks. Total patches found: ${allPatches.length}`);
-            return allPatches;
-
-        } catch (error) {
-            logger.error('AI', 'Failed to review content', error);
-            return [];
+          }
         }
+
+        if (parsedPatches && Array.isArray(parsedPatches.patches)) {
+          allPatches.push(...parsedPatches.patches);
+        }
+      } catch (err) {
+        console.error(`[AI] Error processing chunk ${i + 1}`, err);
+      }
     }
-};
+
+    return allPatches;
+  } catch (error: unknown) {
+    console.error('[AI] Critical failure during content review', error);
+    return [];
+  }
+}

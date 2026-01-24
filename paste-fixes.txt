@@ -1,0 +1,32 @@
+// Fixes for paste-classifier.ts
+
+// Line 135: Remove \- escape
+// OLD: return input.replace(/^[\s\u200E\u200F\u061C\ufeFF]*[•·∙⋅●○◦■□▪▫◆◇–—−‒―‣⁃*+\-]+\s*/, '');
+// NEW: return input.replace(/^[\s\u200E\u200F\u061C\ufeFF]*[•·∙⋅●○◦■□▪▫◆◇–—−‒―‣⁃*+-]+\s*/, '');
+
+// Line 140: Remove \- escape
+// OLD: .replace(/^[\s\u200E\u200F\u061C\ufeFF]*[•·∙⋅●○◦■□▪▫◆◇–—−‒―‣⁃*+\-]+/, '')
+// NEW: .replace(/^[\s\u200E\u200F\u061C\ufeFF]*[•·∙⋅●○◦■□▪▫◆◇–—−‒―‣⁃*+-]+/, '')
+
+// Line 158: Remove \[ \] escape
+// OLD: .replace(/[{}()\[\]]/g, '')
+// NEW: .replace(/[{}()[\]]/g, '')
+
+// Line 185-187: Remove unused TIME_RE and LOCATION_RE, keep TIME_TOKEN_RE
+// DELETE: const TIME_RE = /(نهار|ليل|صباح|مساء|فجر)/i;
+// DELETE: const LOCATION_RE = /(داخلي|خارجي)/i;
+
+// Line 312: Remove \( \) escape
+// OLD: return /^[\(（].*?[\)）]$/.test(line.trim());
+// NEW: return /^[(（].*?[)）]$/.test(line.trim());
+
+// Line 426: Use TIME_RE and LOCATION_RE in isLikelyDialogue
+// Add usage of TIME_TOKEN_RE and location/time keywords
+
+// Line 531: Export buildContext
+// OLD: const buildContext = (
+// NEW: export const buildContext = (
+
+// Line 646: Export isLikelyCharacter
+// OLD: const isLikelyCharacter = (line: string, ctx: LineContext): boolean => {
+// NEW: export const isLikelyCharacter = (line: string, ctx: LineContext): boolean => {

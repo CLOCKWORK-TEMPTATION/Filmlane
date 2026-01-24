@@ -8,7 +8,7 @@ export type { ClassificationRecord, ContextMemory };
  * In a real application, this might use localStorage or a backend service.
  */
 export class ContextMemoryManager {
-  private storage: Map<string, ContextMemory> = new Map();
+  private storage = new Map<string, ContextMemory>();
 
   constructor() {
     logger.info('MemoryManager', 'ContextMemoryManager initialized (in-memory).');
@@ -29,7 +29,10 @@ export class ContextMemoryManager {
   }
 
   async updateMemory(sessionId: string, classifications: ClassificationRecord[]): Promise<void> {
-    logger.info('MemoryManager', `Updating memory for session ${sessionId} with ${classifications.length} records.`);
+    logger.info(
+      'MemoryManager',
+      `Updating memory for session ${sessionId} with ${classifications.length} records.`,
+    );
 
     const memory = (await this.loadContext(sessionId)) || {
       sessionId,

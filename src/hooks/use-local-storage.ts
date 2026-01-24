@@ -1,11 +1,7 @@
 import { useEffect, useRef } from 'react';
 
-export function useAutoSave<T>(
-  key: string,
-  value: T,
-  delay: number = 3000
-) {
-  const timeoutRef = useRef<NodeJS.Timeout>();
+export function useAutoSave<T>(key: string, value: T, delay = 3000) {
+  const timeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
 
   useEffect(() => {
     if (timeoutRef.current) {

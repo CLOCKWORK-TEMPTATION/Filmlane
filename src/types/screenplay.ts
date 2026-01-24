@@ -1,48 +1,64 @@
 import type { LucideIcon } from 'lucide-react';
 
-export interface ScreenplayFormat {
+export type ScreenplayFormat = {
   id: string;
   label: string;
   shortcut: string;
   color: string;
   icon: LucideIcon;
-}
+};
 
-export interface DocumentStats {
+export type DocumentStats = {
   words: number;
   characters: number;
   pages: number;
   scenes: number;
-}
+};
 
-export interface FontOption {
+export type FontOption = {
   value: string;
   label: string;
-}
+};
 
-export interface TextSizeOption {
+export type TextSizeOption = {
   value: string;
   label: string;
-}
+};
 
-export interface ClassificationRecord {
+export type ClassificationRecord = {
   line: string;
   classification: string;
   timestamp: number;
-}
+  score?: number;
+};
 
-export interface ContextMemory {
+export type ClassificationSettings = {
+  llmThreshold: number;
+  autoConfirmThreshold: number;
+  learningEnabled: boolean;
+};
+
+export type ClassificationFeedbackPayload = {
+  sessionId: string;
+  lineId: string;
+  lineText: string;
+  originalType: string;
+  correctedType: string;
+  confidence: number;
+};
+
+export type ContextMemory = {
   sessionId: string;
   lastModified: number;
   data: {
     commonCharacters: string[];
     commonLocations: string[];
     lastClassifications: string[];
-    characterDialogueMap: { [character: string]: number };
+    characterDialogueMap: Record<string, number>;
   };
-}
+};
 
-export interface LineContext {
+export type LineContext = {
   previousLines: string[];
   currentLine: string;
   nextLines: string[];
@@ -62,4 +78,4 @@ export interface LineContext {
     lastSceneDistance: number;
     lastCharacterDistance: number;
   };
-}
+};

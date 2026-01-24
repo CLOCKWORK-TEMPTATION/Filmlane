@@ -9,8 +9,8 @@ import React from 'react';
  */
 export const getFormatStyles = (
   formatType: string,
-  selectedSize: string = '12pt',
-  selectedFont: string = 'AzarMehrMonospaced-San',
+  selectedSize = '12pt',
+  selectedFont = 'AzarMehrMonospaced-San',
 ): React.CSSProperties => {
   const normalizedSize = selectedSize === '12pt' ? selectedSize : '12pt';
   const normalizedLineHeight = '15pt';
@@ -23,7 +23,7 @@ export const getFormatStyles = (
     fontWeight: 'bold',
   };
 
-  const formatStyles: { [key: string]: React.CSSProperties } = {
+  const formatStyles: Record<string, React.CSSProperties> = {
     basmala: {
       textAlign: 'left',
       direction: 'rtl',
@@ -45,6 +45,8 @@ export const getFormatStyles = (
     'scene-header-2': {
       flex: '0 0 auto',
       fontWeight: 'normal',
+      marginRight: 'auto',
+      textAlign: 'left',
     },
     'scene-header-3': {
       textAlign: 'center',

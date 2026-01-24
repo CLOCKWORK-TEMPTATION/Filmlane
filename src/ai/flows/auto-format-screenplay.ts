@@ -8,8 +8,8 @@
  * - AutoFormatScreenplayOutput - The return type for the autoFormatScreenplay function.
  */
 
-import {ai} from '@/ai/genkit';
-import {z} from 'genkit';
+import { ai } from '@/ai/genkit';
+import { z } from 'genkit';
 
 const AutoFormatScreenplayInputSchema = z.object({
   rawText: z.string().describe('The raw screenplay text to format.'),
@@ -17,18 +17,24 @@ const AutoFormatScreenplayInputSchema = z.object({
 export type AutoFormatScreenplayInput = z.infer<typeof AutoFormatScreenplayInputSchema>;
 
 const AutoFormatScreenplayOutputSchema = z.object({
-  formattedScreenplay: z.string().describe('The screenplay formatted with proper scene headings, character names, and dialogue.'),
+  formattedScreenplay: z
+    .string()
+    .describe(
+      'The screenplay formatted with proper scene headings, character names, and dialogue.',
+    ),
 });
 export type AutoFormatScreenplayOutput = z.infer<typeof AutoFormatScreenplayOutputSchema>;
 
-export async function autoFormatScreenplay(input: AutoFormatScreenplayInput): Promise<AutoFormatScreenplayOutput> {
+export async function autoFormatScreenplay(
+  input: AutoFormatScreenplayInput,
+): Promise<AutoFormatScreenplayOutput> {
   return autoFormatScreenplayFlow(input);
 }
 
 const prompt = ai.definePrompt({
   name: 'autoFormatScreenplayPrompt',
-  input: {schema: AutoFormatScreenplayInputSchema},
-  output: {schema: AutoFormatScreenplayOutputSchema},
+  input: { schema: AutoFormatScreenplayInputSchema },
+  output: { schema: AutoFormatScreenplayOutputSchema },
   prompt: `You are an expert screenplay formatter. Your job is to take raw text and turn it into a properly formatted screenplay.
 
 Consider the following screenplay elements when formatting:
@@ -49,8 +55,8 @@ const autoFormatScreenplayFlow = ai.defineFlow(
     inputSchema: AutoFormatScreenplayInputSchema,
     outputSchema: AutoFormatScreenplayOutputSchema,
   },
-  async input => {
-    const {output} = await prompt(input);
+  async (input) => {
+    const { output } = await prompt(input);
     return output!;
-  }
+  },
 );

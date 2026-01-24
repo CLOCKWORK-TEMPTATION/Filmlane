@@ -1,14 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import {
-  Download,
-  History,
-  Info,
-  Redo2,
-  Save,
-  Undo2,
-} from 'lucide-react';
+import { Download, History, Info, Redo2, Save, Undo2 } from 'lucide-react';
 
 type EditorHeaderProps = {
   onSave?: () => void;
@@ -19,12 +12,7 @@ type EditorHeaderProps = {
   onRedo?: () => void;
 };
 
-export function EditorHeader({
-  onSave,
-  onDownload,
-  onHistory,
-  onInfo,
-}: EditorHeaderProps) {
+export function EditorHeader({ onSave, onDownload, onHistory, onInfo }: EditorHeaderProps) {
   const iconClass = 'w-5 h-5 transition-colors duration-200';
 
   return (
@@ -36,24 +24,18 @@ export function EditorHeader({
           className="group relative p-2 rounded-xl hover:bg-white/10 transition-all duration-300"
         >
           <div className="absolute inset-0 bg-sky-500/0 group-hover:bg-sky-500/10 rounded-xl transition-all duration-300"></div>
-          <Info
-            className={`${iconClass} text-sky-400 group-hover:text-sky-300 relative`}
-          />
+          <Info className={`${iconClass} text-sky-400 group-hover:text-sky-300 relative`} />
         </button>
 
         {/* Undo/Redo Group */}
         <div className="flex items-center gap-1">
           <button className="group relative p-2 rounded-xl hover:bg-white/10 transition-all duration-300 disabled:opacity-40 disabled:cursor-not-allowed">
             <div className="absolute inset-0 bg-slate-500/0 group-hover:bg-slate-500/10 rounded-xl transition-all duration-300"></div>
-            <Undo2
-              className={`${iconClass} text-slate-400 group-hover:text-slate-300 relative`}
-            />
+            <Undo2 className={`${iconClass} text-slate-400 group-hover:text-slate-300 relative`} />
           </button>
           <button className="group relative p-2 rounded-xl hover:bg-white/10 transition-all duration-300 disabled:opacity-40 disabled:cursor-not-allowed">
             <div className="absolute inset-0 bg-slate-500/0 group-hover:bg-slate-500/10 rounded-xl transition-all duration-300"></div>
-            <Redo2
-              className={`${iconClass} text-slate-400 group-hover:text-slate-300 relative`}
-            />
+            <Redo2 className={`${iconClass} text-slate-400 group-hover:text-slate-300 relative`} />
           </button>
         </div>
 
@@ -65,9 +47,7 @@ export function EditorHeader({
             className="group relative p-2 rounded-xl hover:bg-white/10 transition-all duration-300"
           >
             <div className="absolute inset-0 bg-violet-500/0 group-hover:bg-violet-500/10 rounded-xl transition-all duration-300"></div>
-            <Save
-              className={`${iconClass} text-violet-400 group-hover:text-violet-300 relative`}
-            />
+            <Save className={`${iconClass} text-violet-400 group-hover:text-violet-300 relative`} />
           </button>
 
           {/* Download - Pink */}
@@ -76,9 +56,7 @@ export function EditorHeader({
             className="group relative p-2 rounded-xl hover:bg-white/10 transition-all duration-300"
           >
             <div className="absolute inset-0 bg-pink-500/0 group-hover:bg-pink-500/10 rounded-xl transition-all duration-300"></div>
-            <Download
-              className={`${iconClass} text-pink-400 group-hover:text-pink-300 relative`}
-            />
+            <Download className={`${iconClass} text-pink-400 group-hover:text-pink-300 relative`} />
           </button>
 
           {/* History - Amber */}

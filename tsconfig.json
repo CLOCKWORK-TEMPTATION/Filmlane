@@ -30,12 +30,6 @@
     "out",
     "coverage",
     ".next/cache",
-    "storybook-static",
-    "**/*.test.ts",
-    "**/*.test.tsx",
-    "**/*.spec.ts",
-    "**/*.spec.tsx",
-    "**/*.stories.ts",
-    "**/*.stories.tsx"
+    "storybook-static"
   ]
 }

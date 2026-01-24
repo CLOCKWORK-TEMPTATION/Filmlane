@@ -4,19 +4,21 @@ export function useHistory<T>(initialState: T) {
   const [index, setIndex] = useState(0);
   const [history, setHistory] = useState<T[]>([initialState]);
 
-  const setState = useCallback((action: T | ((prev: T) => T)) => {
-    setHistory((currentHistory) => {
-      const newState = typeof action === 'function' 
-        ? (action as (prev: T) => T)(currentHistory[index])
-        : action;
-      
-      const newHistory = currentHistory.slice(0, index + 1);
-      newHistory.push(newState);
-      
-      setIndex(newHistory.length - 1);
-      return newHistory;
-    });
-  }, [index]);
+  const setState = useCallback(
+    (action: T | ((prev: T) => T)) => {
+      setHistory((currentHistory) => {
+        const newState =
+          typeof action === 'function' ? (action as (prev: T) => T)(currentHistory[index]) : action;
+
+        const newHistory = currentHistory.slice(0, index + 1);
+        newHistory.push(newState);
+
+        setIndex(newHistory.length - 1);
+        return newHistory;
+      });
+    },
+    [index],
+  );
 
   const undo = useCallback(() => {
     if (index > 0) {
@@ -33,12 +35,12 @@ export function useHistory<T>(initialState: T) {
   const canUndo = index > 0;
   const canRedo = index < history.length - 1;
 
-  return { 
-    state: history[index], 
-    set: setState, 
-    undo, 
-    redo, 
-    canUndo, 
-    canRedo 
+  return {
+    state: history[index],
+    set: setState,
+    undo,
+    redo,
+    canUndo,
+    canRedo,
   };
 }
