@@ -1,4 +1,13 @@
 import type { LineContext } from '@/types/screenplay';
+import {
+  ACTION_VERB_LIST,
+  EXTRA_ACTION_VERBS,
+  STOP_WORDS,
+  STAGE_DIRECTION_PREFIXES,
+  CONVERSATIONAL_STARTS,
+  IMPERATIVE_VERBS,
+  ACTION_START_PATTERNS,
+} from './constants';
 
 export type ConfidenceScore = {
   score: number;
@@ -48,32 +57,6 @@ const LOCATION_LINE_START_RE = /^(?:داخلي|خارجي)[.:]?(?:\s|$)/i;
 const TRANSITION_RE = /^(قطع|اختفاء|تحول|انتقال|fade|cut|dissolve|wipe)/i;
 const CHARACTER_RE = /^\s*(?:صوت\s+)?[\u0600-\u06FF][\u0600-\u06FF\s0-9٠-٩]{0,30}:?\s*$/;
 
-const STOP_WORDS = new Set([
-  'في',
-  'على',
-  'من',
-  'إلى',
-  'داخل',
-  'خارج',
-  'أمام',
-  'خلف',
-  'تحت',
-  'فوق',
-  'بين',
-  'حول',
-  'ثم',
-  'بعد',
-  'قبل',
-  'عندما',
-  'بينما',
-  'مع',
-  'فجأة',
-  'وهو',
-  'وهي',
-  'ولكن',
-  'حتى',
-]);
-
 const ACTION_VERB_HINTS = new Set([
   'يبدو',
   'تبدو',
@@ -87,30 +70,34 @@ const ACTION_VERB_HINTS = new Set([
   'تهمس',
 ]);
 
-const STAGE_DIRECTION_PREFIXES = [
-  'بهدوء',
-  'بصمت',
-  'بغضب',
-  'بحزن',
-  'بابتسامة',
-  'بقلق',
-  'بدهشة',
-  'بتردد',
-  'بخجل',
-  'بصوت',
-  'بنبرة',
-];
-
-const ACTION_START_PATTERNS = [
-  /^\s*(?:ثم\s+)?(?:و(?:هو|هي)\s+)?[يت][\u0600-\u06FF]{2,}(?:\s+\S|$)/,
-  /^\s*(?:و|ف|ل)?(?:نرى|نسمع|نلاحظ|نقترب|نبتعد|ننتقل)(?:\s+\S|$)/,
-  /^\s*(?:رأينا|سمعنا|لاحظنا|شاهدنا)(?:\s+\S|$)/,
-  /^\s*(?:ادخل|اخرج|انظر|استمع|اقترب|ابتعد|توقف)(?:\s+\S|$)/,
-];
+// Combine all action verbs for checking
+const ALL_ACTION_VERBS = new Set(
+  (ACTION_VERB_LIST + '|' + EXTRA_ACTION_VERBS)
+    .split('|')
+    .map((v) => v.trim())
+    .filter(Boolean),
+);
 
 const isActionStart = (line: string): boolean => {
   const normalized = normalizeLine(line);
-  return ACTION_START_PATTERNS.some((pattern) => pattern.test(normalized));
+
+  if (ACTION_START_PATTERNS.some((pattern) => pattern.test(normalized))) return true;
+
+  const firstToken = normalized.split(/\s+/)[0] ?? '';
+  if (!firstToken) return false;
+
+  if (ALL_ACTION_VERBS.has(firstToken)) return true;
+
+  // Check leading particles
+  const leadingParticles = ['و', 'ف', 'ل'];
+  for (const p of leadingParticles) {
+    if (firstToken.startsWith(p) && firstToken.length > 1) {
+      const candidate = firstToken.slice(1);
+      if (ALL_ACTION_VERBS.has(candidate)) return true;
+    }
+  }
+
+  return false;
 };
 
 export class ConfidenceScorer {
@@ -128,7 +115,6 @@ export class ConfidenceScorer {
     let score = 0;
 
     const normalized = normalizeLine(line).replace(/[-–—]/g, ' ').replace(/\s+/g, ' ').trim();
-
     const wordCount = normalized.split(/\s+/).filter(Boolean).length;
 
     if (SCENE_NUMBER_RE.test(normalized)) {
@@ -186,6 +172,16 @@ export class ConfidenceScorer {
       normalized.startsWith(prefix),
     );
     const isActionLike = isActionStart(line) || ACTION_VERB_HINTS.has(firstToken);
+
+    // Check if name is actually an imperative verb (common issue: "ادخل:" -> should be dialogue/action)
+    const namePart = hasColon ? normalized.split(/[:：]/)[0].trim() : normalized;
+    const isImperativeName = IMPERATIVE_VERBS.has(namePart);
+
+    if (isImperativeName) {
+      score -= 5;
+      sources.push('imperative_verb_name');
+      matches.imperativeVerbName = true;
+    }
 
     if (hasColon && (trimmed.endsWith(':') || trimmed.endsWith('：'))) {
       score += this.weights.exactPattern;
@@ -249,24 +245,60 @@ export class ConfidenceScorer {
     const wordCount = normalized.split(/\s+/).filter(Boolean).length;
     const lastType = ctx.previousTypes.slice(-1)[0];
 
+    // 1. Punctuation Indicators
     if (/[؟?]/.test(line)) {
       score += 3;
       sources.push('question_mark');
       matches.questionMark = true;
     }
+    if (/!/.test(line)) {
+      score += 1;
+      sources.push('exclamation');
+      matches.exclamation = true;
+    }
+    if (/\.\./.test(line)) {
+      score += 1;
+      sources.push('ellipses');
+      matches.ellipses = true;
+    }
 
+    // 2. Vocative Particles
     if (/\bيا\s+[\u0600-\u06FF]+/.test(normalized)) {
       score += 4;
       sources.push('vocative_particle');
       matches.vocativeParticle = true;
     }
+    if (
+      /يا\s*([أا]خي|[أا]ختي|[يأ]سطى|باشا|بيه|هانم|مدام|أستاذ|ياعم|ياواد|يابنت)/.test(normalized)
+    ) {
+      score += 2;
+      sources.push('common_vocative');
+      matches.commonVocative = true;
+    }
 
+    // 3. Conversational Starts
+    const firstWord = normalized.split(' ')[0];
+    if (CONVERSATIONAL_STARTS.includes(firstWord)) {
+      score += 2;
+      sources.push('conversational_start');
+      matches.conversationalStart = true;
+    }
+
+    // Deeper conversational markers
+    if (/\b(ده|دي|كده|عشان|علشان|عايز|عايزة|مش|هو|هي|احنا)\b/.test(normalized)) {
+      score += 1;
+      sources.push('conversational_marker');
+      matches.conversationalMarker = true;
+    }
+
+    // 4. Quotation Marks
     if (/["«»]/.test(line)) {
       score += this.weights.linguisticPattern;
       sources.push('quotes');
       matches.quotes = true;
     }
 
+    // 5. Context
     if (lastType === 'character' || lastType === 'parenthetical') {
       score += this.weights.exactPattern;
       sources.push('after_character');
@@ -279,10 +311,31 @@ export class ConfidenceScorer {
       matches.dialogueContext = true;
     }
 
+    // Special Rule: If previous was dialogue, and this line is NOT a scene header/character,
+    // it's very likely continued dialogue.
+    if (lastType === 'dialogue') {
+      // Check it's not a character or scene header (handled by other scorers, but we boost dialogue here)
+      // We assume other scorers will output high confidence for their types.
+      // But we boost dialogue here to win over "Action" if ambiguous.
+      score += 2;
+      sources.push('continued_dialogue');
+      matches.continuedDialogue = true;
+    }
+
     if (wordCount >= 3 && wordCount <= 30) {
       score += this.weights.linguisticPattern;
       sources.push('dialogue_length');
       matches.dialogueLength = true;
+    }
+
+    // Penalties
+    if (isActionStart(line)) {
+      // Only penalize if we don't have strong dialogue indicators
+      if (score < 4) {
+        score -= 3;
+        sources.push('action_start_penalty');
+        matches.actionStartPenalty = true;
+      }
     }
 
     return buildResult({ score, sources, matches });

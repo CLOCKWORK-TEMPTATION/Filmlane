@@ -4,15 +4,16 @@ Note: _This is purely the output of the chat conversation and does not contain a
 
 ### User Input
 
-ليه الجملة دي تم  تصنيفها  على انها اكشن  رغم انها المفروض حوار 
+ليه الجملة دي تم تصنيفها على انها اكشن رغم انها المفروض حوار
 """
+
 <div class="format-action" style="font-family: AzarMehrMonospaced-San; font-size: 12pt; direction: rtl; line-height: 15pt; min-height: 15pt; font-weight: bold; text-align: justify; text-align-last: right; text-justify: inter-word; width: 100%; margin: 0">تلفزيون تاني يا كريم ؟</div>
 
 """"
 
-*Viewed [paste-classifier.ts](file:///e:/yarab%20we%20elnby/New%20folder/Filmlane/src/utils/paste-classifier.ts) *
+_Viewed [paste-classifier.ts](file:///e:/yarab%20we%20elnby/New%20folder/Filmlane/src/utils/paste-classifier.ts) _
 
-*Viewed [paste-classifier.ts](file:///e:/yarab%20we%20elnby/New%20folder/Filmlane/src/utils/paste-classifier.ts) *
+_Viewed [paste-classifier.ts](file:///e:/yarab%20we%20elnby/New%20folder/Filmlane/src/utils/paste-classifier.ts) _
 
 ### Planner Response
 
@@ -39,28 +40,31 @@ Note: _This is purely the output of the chat conversation and does not contain a
 
 ### User Input
 
-طبما فيش  حل اذكى  و جذري عن كده ؟
+طبما فيش حل اذكى و جذري عن كده ؟
 
-*Edited relevant file*
+_Edited relevant file_
 
 ### Planner Response
 
 تم إضافة **حل جذري وذكي** يعتمد على التحليل اللغوي للمحتوى بدلاً من الاعتماد فقط على السياق المسبق.
 
 ### 🧠 ما قمت بإضافته:
+
 أضفت نظام تقييم (Scoring System) يسمى [getDialogueProbability](cci:1://file:///e:/yarab%20we%20elnby/New%20folder/Filmlane/src/utils/paste-classifier.ts:392:0-431:2) يعمل كـ "شبكة أمان ذكية" عندما يفشل المصنف في تحديد نوع السطر بناءً على القواعد الهيكلية.
 
 هذا النظام يمنح "نقاط حوار" بناءً على محتوى السطر:
+
 1.  **علامات الاستفهام (؟)**: +3 نقاط (مؤشر قوي جداً).
 2.  **أداة النداء "يا"**: +4 نقاط (مؤشر حاسم في العامية والفصحى).
 3.  **كلمات استفتاحية حوارية** (مثل: ليه، مين، فين، طب، بس..): +2 نقطة.
 4.  **علامات التعجب والتنصيص**: نقاط إضافية.
 5.  **عقوبات**: يتم خصم نقاط إذا بدأ السطر بفعل حركة صريح (Action Verb).
 
-### كيف سيعالج هذا مشكلة: *"تلفزيون تاني يا كريم ؟"*
-*   السطر يحتوي على "؟": **+3**
-*   السطر يحتوي على "يا كريم": **+4**
-*   **المجموع: 7 نقاط.**
+### كيف سيعالج هذا مشكلة: _"تلفزيون تاني يا كريم ؟"_
+
+- السطر يحتوي على "؟": **+3**
+- السطر يحتوي على "يا كريم": **+4**
+- **المجموع: 7 نقاط.**
 
 بينما الحد الأدنى (Threshold) لاعتبار السطر حواراً هو **3 نقاط**.
 إذن، سيتم تصنيف الجملة فوراً كـ **Dialogue**، حتى لو لم يسبقها اسم شخصية، وحتى لو كانت مقطوعة من سياقها.
@@ -69,11 +73,11 @@ Note: _This is purely the output of the chat conversation and does not contain a
 
 ### User Input
 
-تمام  ارجو انك تلقي نظرة على شروط تصنيف باقي العناصر  علشان التعديل ده  يكون   يعمل بتناغم معاهم  ولو عند اقتراحات  لتقوية  نظام تصنيف العناصر ياريت 
+تمام ارجو انك تلقي نظرة على شروط تصنيف باقي العناصر علشان التعديل ده يكون يعمل بتناغم معاهم ولو عند اقتراحات لتقوية نظام تصنيف العناصر ياريت
 
-*Viewed [paste-classifier.ts](file:///e:/yarab%20we%20elnby/New%20folder/Filmlane/src/utils/paste-classifier.ts) *
+_Viewed [paste-classifier.ts](file:///e:/yarab%20we%20elnby/New%20folder/Filmlane/src/utils/paste-classifier.ts) _
 
-*Edited relevant file*
+_Edited relevant file_
 
 ### Planner Response
 
@@ -82,40 +86,41 @@ Note: _This is purely the output of the chat conversation and does not contain a
 ### ملخص التعديلات: (Harmonization Update)
 
 1.  **حماية الشخصيات من "الضوضاء" (False Positives Safeguard):**
-    *   تم تعديل [isLikelyCharacter](cci:1://file:///e:/yarab%20we%20elnby/New%20folder/Filmlane/src/utils/paste-classifier.ts:568:0-588:2) و [isCharacterLine](cci:1://file:///e:/yarab%20we%20elnby/New%20folder/Filmlane/src/utils/paste-classifier.ts:294:0-382:2) لرفض أي سطر يحتوي على علامات ترقيم حوارية (`؟` `!` `"` `«` `»`) من أن يصنف كاسم شخصية (إلا إذا انتهى بنقطتين صريحتين). هذا يمنع جملة مثل "أنت بخير؟" من أن تُصنف كشخصية لمجرد أنها قصيرة.
+    - تم تعديل [isLikelyCharacter](cci:1://file:///e:/yarab%20we%20elnby/New%20folder/Filmlane/src/utils/paste-classifier.ts:568:0-588:2) و [isCharacterLine](cci:1://file:///e:/yarab%20we%20elnby/New%20folder/Filmlane/src/utils/paste-classifier.ts:294:0-382:2) لرفض أي سطر يحتوي على علامات ترقيم حوارية (`؟` `!` `"` `«` `»`) من أن يصنف كاسم شخصية (إلا إذا انتهى بنقطتين صريحتين). هذا يمنع جملة مثل "أنت بخير؟" من أن تُصنف كشخصية لمجرد أنها قصيرة.
 
 2.  **تعزيز قائمة الأفعال الحركية (Action Verbs Expansion):**
-    *   أضفت أفعالاً مهمة كانت مفقودة مثل: `يتوقف`، `تتوقف`، `يستدير`، `تستدير`، `يحدق`، `تحدق`، `يلمح`، `تلمح`.
+    - أضفت أفعالاً مهمة كانت مفقودة مثل: `يتوقف`، `تتوقف`، `يستدير`، `تستدير`، `يحدق`، `تحدق`، `يلمح`، `تلمح`.
 
 3.  **تحسين منطق "ما بين القوسين" (Parenthetical Refinement):**
-    *   الآن يتم التعرف على الأقواس كـ `parenthetical` ليس فقط داخل كتلة الحوار، بل أيضاً إذا جاءت *مباشرة* بعد شخصية، حتى لو لم يبدأ الحوار بعد.
+    - الآن يتم التعرف على الأقواس كـ `parenthetical` ليس فقط داخل كتلة الحوار، بل أيضاً إذا جاءت _مباشرة_ بعد شخصية، حتى لو لم يبدأ الحوار بعد.
 
 4.  **توسيع قواعد الأسماء (Flexible naming):**
-    *   سمحت بأسماء شخصيات أطول قليلاً (حتى 4 كلمات بدلاً من 3) لاستيعاب الأسماء المركبة، مع الحفاظ على صرامة قائمة الكلمات المحظورة (`stopWords`) وإضافة "ولكن" و"حتى" إليها.
+    - سمحت بأسماء شخصيات أطول قليلاً (حتى 4 كلمات بدلاً من 3) لاستيعاب الأسماء المركبة، مع الحفاظ على صرامة قائمة الكلمات المحظورة (`stopWords`) وإضافة "ولكن" و"حتى" إليها.
 
 الآن النظام أصبح "واعياً" لغوياً:
-*   "يا كريم ؟" -> حوار (بسبب النقاط اللغوية).
-*   "أنت بخير؟" -> حوار (لأنها ممنوعة من أن تكون شخصية بسبب علامة الاستفهام).
-*   "يستدير أحمد" -> حركة (بسبب قائمة الأفعال المحسنة).
+
+- "يا كريم ؟" -> حوار (بسبب النقاط اللغوية).
+- "أنت بخير؟" -> حوار (لأنها ممنوعة من أن تكون شخصية بسبب علامة الاستفهام).
+- "يستدير أحمد" -> حركة (بسبب قائمة الأفعال المحسنة).
 
 هل تريد اختبار حالة معينة أخرى؟
 
 ### User Input
 
-اشرحلي الجزء ده 
-  .screenplay-sheet__body {
-    flex-grow: 1; /* يملأ المساحة المتبقية */
-    width: 100%;
-    padding-left: 1.5in; /* هامش يسار */
-    padding-right: 1in; /* هامش يمين */
-    outline: none;
-    font-family: var(--font-family-editor);
-    font-size: 12pt;
-    line-height: 14pt;
-    direction: rtl;
-    color: black;
-    white-space: pre-wrap; /* يحافظ على المسافات والأسطر */
-  }
+اشرحلي الجزء ده
+.screenplay-sheet\_\_body {
+flex-grow: 1; /_ يملأ المساحة المتبقية _/
+width: 100%;
+padding-left: 1.5in; /_ هامش يسار _/
+padding-right: 1in; /_ هامش يمين _/
+outline: none;
+font-family: var(--font-family-editor);
+font-size: 12pt;
+line-height: 14pt;
+direction: rtl;
+color: black;
+white-space: pre-wrap; /_ يحافظ على المسافات والأسطر _/
+}
 
 ### Planner Response
 
@@ -124,53 +129,57 @@ Note: _This is purely the output of the chat conversation and does not contain a
 إليك شرح مفصل لكل سطر:
 
 ### 1. التحكم في الأبعاد والتمدد
-*   `flex-grow: 1;`: هذا السطر مهم جداً لأنه يعمل داخل نظام **Flexbox**. وظيفته جعل جسم الصفحة "يتمدد" ليأخذ كل المساحة الطولية المتاحة في الصفحة. هذا يضمن أن الهيدر يبقى في الأعلى، الفوتر في الأسفل تماماً، وجسم الصفحة يملأ كل الفراغ بينهما (حتى لو كان النص قليلاً).
-*   `width: 100%;`: جعل عرض منطقة الكتابة يملأ عرض الصفحة بالكامل.
+
+- `flex-grow: 1;`: هذا السطر مهم جداً لأنه يعمل داخل نظام **Flexbox**. وظيفته جعل جسم الصفحة "يتمدد" ليأخذ كل المساحة الطولية المتاحة في الصفحة. هذا يضمن أن الهيدر يبقى في الأعلى، الفوتر في الأسفل تماماً، وجسم الصفحة يملأ كل الفراغ بينهما (حتى لو كان النص قليلاً).
+- `width: 100%;`: جعل عرض منطقة الكتابة يملأ عرض الصفحة بالكامل.
 
 ### 2. الهوامش (المسافات البيضاء)
-*   `padding-left: 1.5in;`: يضع هامشاً أيسر بمقدار **1.5 بوصة**. (في معايير السيناريو العالمية، يُترك عادة 1.5 بوصة جهة التجليد/الدبوس).
-*   `padding-right: 1in;`: يضع هامشاً أيمن بمقدار **1 بوصة**.
+
+- `padding-left: 1.5in;`: يضع هامشاً أيسر بمقدار **1.5 بوصة**. (في معايير السيناريو العالمية، يُترك عادة 1.5 بوصة جهة التجليد/الدبوس).
+- `padding-right: 1in;`: يضع هامشاً أيمن بمقدار **1 بوصة**.
 
 **ملاحظة تقنية:** بما أن الاتجاه `RTL` (عربي)، فالكتابة تبدأ من اليمين (حيث الهامش 1 بوصة) وتنتهي عند اليسار (حيث الهامش 1.5 بوصة). إذا كنت تنوي تجليد السكريبت من اليمين (مثل الكتب العربية)، قد تحتاج لعكس هذه القيم مستقبلاً (جعل اليمين 1.5 واليسار 1).
 
 ### 3. تجربة الكتابة
-*   `outline: none;`: يمنع ظهور الإطار الأزرق (Focus Ring) الذي يضعه المتصفح حول العنصر عند الكتابة بداخله أو الضغط عليه، مما يعطي مظهراً أنظف يشبه الورقة الحقيقية.
-*   `white-space: pre-wrap;`: **أخطر وأهم سطر للمحرر**.
-    *   **Pre**: تعني "احترم المسافات كما هي". إذا ضغطت مسافة 5 مرات، ستظهر 5 مسافات (بدون هذا السطر سيحولها المتصفح لمسافة واحدة).
-    *   **Wrap**: تعني "اكسر السطر تلقائياً" إذا وصل النص لنهاية الصفحة. بدونها سيستمر النص في سطر واحد لا نهائي.
+
+- `outline: none;`: يمنع ظهور الإطار الأزرق (Focus Ring) الذي يضعه المتصفح حول العنصر عند الكتابة بداخله أو الضغط عليه، مما يعطي مظهراً أنظف يشبه الورقة الحقيقية.
+- `white-space: pre-wrap;`: **أخطر وأهم سطر للمحرر**.
+  - **Pre**: تعني "احترم المسافات كما هي". إذا ضغطت مسافة 5 مرات، ستظهر 5 مسافات (بدون هذا السطر سيحولها المتصفح لمسافة واحدة).
+  - **Wrap**: تعني "اكسر السطر تلقائياً" إذا وصل النص لنهاية الصفحة. بدونها سيستمر النص في سطر واحد لا نهائي.
 
 ### 4. الخط والنص
-*   `font-family: var(--font-family-editor);`: يستخدم نوع الخط المحدد في المتغيرات (غالباً Courier Prime أو خط مشابه للآلة الكاتبة).
-*   `font-size: 12pt;`: حجم الخط القياسي عالمياً للسيناريوهات (12 نقطة).
-*   `line-height: 14pt;`: ارتفاع السطر. يعطي مسافة تنفس بسيطة بين الأسطر (أكبر من حجم الخط بنقطتين) لسهولة القراءة.
-*   `direction: rtl;`: يضبط اتجاه النص ليكون من اليمين لليسار (للغة العربية).
-*   `color: black;`: لون النص أسود صريح.
+
+- `font-family: var(--font-family-editor);`: يستخدم نوع الخط المحدد في المتغيرات (غالباً Courier Prime أو خط مشابه للآلة الكاتبة).
+- `font-size: 12pt;`: حجم الخط القياسي عالمياً للسيناريوهات (12 نقطة).
+- `line-height: 14pt;`: ارتفاع السطر. يعطي مسافة تنفس بسيطة بين الأسطر (أكبر من حجم الخط بنقطتين) لسهولة القراءة.
+- `direction: rtl;`: يضبط اتجاه النص ليكون من اليمين لليسار (للغة العربية).
+- `color: black;`: لون النص أسود صريح.
 
 **باختصار:** هذا الكلاس يحول الـ `div` العادي إلى "ورقة سيناريو" حقيقية تحترم المسافات، تملك الهوامش القياسية، وتتمدد لتملأ الصفحة بشكل صحيح.
 
 ### User Input
 
-تمام ابحث في باقي الملفات عن  االجزء اللي بيقوم بنفس الدور
+تمام ابحث في باقي الملفات عن االجزء اللي بيقوم بنفس الدور
 
-*Grep searched codebase*
+_Grep searched codebase_
 
-*Grep searched codebase*
+_Grep searched codebase_
 
-*Grep searched codebase*
+_Grep searched codebase_
 
-*Viewed [ui-kit.css](file:///e:/yarab%20we%20elnby/New%20folder/Filmlane/src/app/ui-kit.css) *
+_Viewed [ui-kit.css](file:///e:/yarab%20we%20elnby/New%20folder/Filmlane/src/app/ui-kit.css) _
 
-*Viewed [EditorArea.tsx](file:///e:/yarab%20we%20elnby/New%20folder/Filmlane/src/components/editor/EditorArea.tsx) *
+_Viewed [EditorArea.tsx](file:///e:/yarab%20we%20elnby/New%20folder/Filmlane/src/components/editor/EditorArea.tsx) _
 
-*Viewed [editor-styles.ts](file:///e:/yarab%20we%20elnby/New%20folder/Filmlane/src/utils/editor-styles.ts) *
+_Viewed [editor-styles.ts](file:///e:/yarab%20we%20elnby/New%20folder/Filmlane/src/utils/editor-styles.ts) _
 
-*Listed directory [constants](file:///e:/yarab%20we%20elnby/New%20folder/Filmlane/src/constants) *
+_Listed directory [constants](file:///e:/yarab%20we%20elnby/New%20folder/Filmlane/src/constants) _
 
-*Viewed [page.ts](file:///e:/yarab%20we%20elnby/New%20folder/Filmlane/src/constants/page.ts) *
+_Viewed [page.ts](file:///e:/yarab%20we%20elnby/New%20folder/Filmlane/src/constants/page.ts) _
 
-*Viewed [formats.ts](file:///e:/yarab%20we%20elnby/New%20folder/Filmlane/src/constants/formats.ts) *
+_Viewed [formats.ts](file:///e:/yarab%20we%20elnby/New%20folder/Filmlane/src/constants/formats.ts) _
 
-*Viewed [index.ts](file:///e:/yarab%20we%20elnby/New%20folder/Filmlane/src/constants/index.ts) *
+_Viewed [index.ts](file:///e:/yarab%20we%20elnby/New%20folder/Filmlane/src/constants/index.ts) _
 
 ### Planner Response
 
@@ -179,11 +188,13 @@ Note: _This is purely the output of the chat conversation and does not contain a
 **الملف:** [src/utils/editor-styles.ts](cci:7://file:///e:/yarab%20we%20elnby/New%20folder/Filmlane/src/utils/editor-styles.ts:0:0-0:0)
 
 ### التفاصيل:
+
 بينما يقوم ملف [ui-kit.css](cci:7://file:///e:/yarab%20we%20elnby/New%20folder/Filmlane/src/app/ui-kit.css:0:0-0:0) بتحديد **الإطار الخارجي** للصفحة (الهوامش 1.5 بوصة و 1 بوصة)، يقوم ملف [editor-styles.ts](cci:7://file:///e:/yarab%20we%20elnby/New%20folder/Filmlane/src/utils/editor-styles.ts:0:0-0:0) بتحديد **سلوك العناصر داخل هذا الإطار** (مثل عرض الحوار، محاذاة الأكشن، إلخ) لضمان أن النص يظهر بشكل سينمائي صحيح.
 
 **أهم الأجزاء في [src/utils/editor-styles.ts](cci:7://file:///e:/yarab%20we%20elnby/New%20folder/Filmlane/src/utils/editor-styles.ts:0:0-0:0) التي تتكامل مع الكود الخاص بك:**
 
 1.  **الحوار (Dialogue):**
+
     ```typescript
     dialogue: {
       width: '4.1in', // تحديد عرض ثابت لعمود الحوار
@@ -192,9 +203,11 @@ Note: _This is purely the output of the chat conversation and does not contain a
       // ...
     },
     ```
-    *   **العلاقة:** الصفحة توفر مساحة صافية للكتابة (عرض الصفحة A4 ناقص الهامشين الأيمن والأيسر). الكود أعلاه يضمن أن الحوار لا يملأ هذه المساحة بالكامل، بل يلتزم بعمود أضيق (4.1 بوصة) في المنتصف، وهو المعيار القياسي.
+
+    - **العلاقة:** الصفحة توفر مساحة صافية للكتابة (عرض الصفحة A4 ناقص الهامشين الأيمن والأيسر). الكود أعلاه يضمن أن الحوار لا يملأ هذه المساحة بالكامل، بل يلتزم بعمود أضيق (4.1 بوصة) في المنتصف، وهو المعيار القياسي.
 
 2.  **الأكشن (Action):**
+
     ```typescript
     action: {
       textAlign: 'justify',
@@ -203,7 +216,8 @@ Note: _This is purely the output of the chat conversation and does not contain a
       // ...
     },
     ```
-    *   **العلاقة:** هنا النص يأخذ العرض الكامل الذي حددته أنت في `padding-left/right` في CSS، مما يجعله يمتد من الهامش للهامش.
+
+    - **العلاقة:** هنا النص يأخذ العرض الكامل الذي حددته أنت في `padding-left/right` في CSS، مما يجعله يمتد من الهامش للهامش.
 
 3.  **عناوين المشاهد (Scene Headers):**
     ```typescript
@@ -214,74 +228,73 @@ Note: _This is purely the output of the chat conversation and does not contain a
     ```
 
 ### الخلاصة:
+
 لا يوجد تكرار "حرفي" للكود الخاص بك (بمعنى أنه لا يوجد ملف آخر يحدد `padding-left: 1.5in` للصفحة نفسها)، لكن ملف [editor-styles.ts](cci:7://file:///e:/yarab%20we%20elnby/New%20folder/Filmlane/src/utils/editor-styles.ts:0:0-0:0) هو **المكمل الضروري** الذي يفسر كيفية استغلال المساحة التي أنشأتها.
 
-*   **CSS:** يصنع "الوعاء" (الصفحة بالأبعاد والهوامش).
-*   **Editor Styles (JS):** يصنع "المحتوى" (كيف تتصرف الفقرات داخل الوعاء).
+- **CSS:** يصنع "الوعاء" (الصفحة بالأبعاد والهوامش).
+- **Editor Styles (JS):** يصنع "المحتوى" (كيف تتصرف الفقرات داخل الوعاء).
 
 ### User Input
 
-@[src/components/editor/EditorArea.tsx] @[src/components/editor/ScreenplayEditor.tsx] @[src/constants/page.ts] @[src/app/ui-kit.css]  .screenplay-sheet {
-    position: relative;
-    width: 210mm; /* A4 width */
-    height: 297mm; /* A4 height */
-    background-color: white;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    display: flex;
-    flex-direction: column;
-    overflow: hidden; /* لمنع خروج المحتوى */
-    margin: 0 auto;
-  }
+@[src/components/editor/EditorArea.tsx] @[src/components/editor/ScreenplayEditor.tsx] @[src/constants/page.ts] @[src/app/ui-kit.css] .screenplay-sheet {
+position: relative;
+width: 210mm; /_ A4 width _/
+height: 297mm; /_ A4 height _/
+background-color: white;
+box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+display: flex;
+flex-direction: column;
+overflow: hidden; /_ لمنع خروج المحتوى _/
+margin: 0 auto;
+}
 
-  .screenplay-sheet__header {
-    height: 1in; /* مسافة الهامش العلوي */
-    width: 100%;
-    pointer-events: none; /* غير قابل للتفاعل */
-    user-select: none;
-    flex-shrink: 0;
-  }
+.screenplay-sheet\_\_header {
+height: 1in; /_ مسافة الهامش العلوي _/
+width: 100%;
+pointer-events: none; /_ غير قابل للتفاعل _/
+user-select: none;
+flex-shrink: 0;
+}
 
-  .screenplay-sheet__body {
-    flex-grow: 1; /* يملأ المساحة المتبقية */
-    width: 100%;
-    padding-left: 1.5in; /* هامش يسار */
-    padding-right: 1in; /* هامش يمين */
-    outline: none;
-    font-family: var(--font-family-editor);
-    font-size: 12pt;
-    line-height: 14pt;
-    direction: rtl;
-    color: black;
-    white-space: pre-wrap; /* يحافظ على المسافات والأسطر */
-  }
+.screenplay-sheet\_\_body {
+flex-grow: 1; /_ يملأ المساحة المتبقية _/
+width: 100%;
+padding-left: 1.5in; /_ هامش يسار _/
+padding-right: 1in; /_ هامش يمين _/
+outline: none;
+font-family: var(--font-family-editor);
+font-size: 12pt;
+line-height: 14pt;
+direction: rtl;
+color: black;
+white-space: pre-wrap; /_ يحافظ على المسافات والأسطر _/
+}
 
-  .screenplay-sheet__footer {
-    height: 1in; /* مسافة الهامش السفلي */
-    width: 100%;
-    position: relative;
-    pointer-events: none;
-    user-select: none;
-    flex-shrink: 0;
-  }
+.screenplay-sheet\_\_footer {
+height: 1in; /_ مسافة الهامش السفلي _/
+width: 100%;
+position: relative;
+pointer-events: none;
+user-select: none;
+flex-shrink: 0;
+}
 
 ...
 
-
-
 export const EditorArea = forwardRef<EditorHandle, EditorAreaProps>(({ onContentChange, onStatsChange, onFormatChange, font, size, pageCount }, ref) => {
-    const fixedFont = 'AzarMehrMonospaced-San';
-    const fixedSize = '12pt';
-    const containerRef = useRef<HTMLDivElement>(null);
-    const [pages, setPages] = useState<number[]>([1]); // Array of page IDs (1, 2, 3...)
+const fixedFont = 'AzarMehrMonospaced-San';
+const fixedSize = '12pt';
+const containerRef = useRef<HTMLDivElement>(null);
+const [pages, setPages] = useState<number[]>([1]); // Array of page IDs (1, 2, 3...)
 
     // Page metrics (in pixels) - assuming 96 DPI
     const PAGE_HEIGHT_PX = 1123; // 297mm
     const HEADER_HEIGHT_PX = 96; // 1in
     const FOOTER_HEIGHT_PX = 96; // 1in
     // Body height = Page - Header - Footer
-    // BUT we must account for margins? 
+    // BUT we must account for margins?
     // The CSS defines padding-top/bottom 0 for the page, but the header/footer divs take space.
-    // The previous CSS had padding-top 1in etc. 
+    // The previous CSS had padding-top 1in etc.
     // New CSS: .screenplay-sheet__body has flex-grow.
     // We should measure the actual available height for content.
     const CONTENT_HEIGHT_PX = PAGE_HEIGHT_PX - HEADER_HEIGHT_PX - FOOTER_HEIGHT_PX;
@@ -297,16 +310,15 @@ export const EditorArea = forwardRef<EditorHandle, EditorAreaProps>(({ onContent
         return nodes;
     };
 
+انا حاسس ان في تعارض بين الملفات دي
 
-انا حاسس  ان في تعارض بين  الملفات دي 
+_Viewed [ScreenplayEditor.tsx](file:///e:/yarab%20we%20elnby/New%20folder/Filmlane/src/components/editor/ScreenplayEditor.tsx) _
 
-*Viewed [ScreenplayEditor.tsx](file:///e:/yarab%20we%20elnby/New%20folder/Filmlane/src/components/editor/ScreenplayEditor.tsx) *
+_Edited relevant file_
 
-*Edited relevant file*
+_Edited relevant file_
 
-*Edited relevant file*
-
-*Edited relevant file*
+_Edited relevant file_
 
 ### Planner Response
 
@@ -318,12 +330,13 @@ I need to update [src/constants/index.ts](cci:7://file:///e:/yarab%20we%20elnby/
 Also, I should check [src/components/editor/ScreenplayEditor.tsx](cci:7://file:///e:/yarab%20we%20elnby/New%20folder/Filmlane/src/components/editor/ScreenplayEditor.tsx:0:0-0:0) again because it was importing `A4_PAGE_HEIGHT_PX`. Since I replaced `A4_PAGE_HEIGHT_PX` with `PAGE_HEIGHT_PX` in [page.ts](cci:7://file:///e:/yarab%20we%20elnby/New%20folder/Filmlane/src/constants/page.ts:0:0-0:0), the import in [ScreenplayEditor.tsx](cci:7://file:///e:/yarab%20we%20elnby/New%20folder/Filmlane/src/components/editor/ScreenplayEditor.tsx:0:0-0:0) will break. I should update that import as well to be consistent.
 
 **Steps:**
+
 1.  Update [src/constants/index.ts](cci:7://file:///e:/yarab%20we%20elnby/New%20folder/Filmlane/src/constants/index.ts:0:0-0:0) to export all from `./page`.
-2.  Update [src/components/editor/ScreenplayEditor.tsx](cci:7://file:///e:/yarab%20we%20elnby/New%20folder/Filmlane/src/components/editor/ScreenplayEditor.tsx:0:0-0:0) to use the new `PAGE_HEIGHT_PX` constant (or remove it if unused, looking at the code it was imported but I don't recall seeing it *used* in the snippet provided earlier, but I'll check).
-    *   Looking at the previous `view_file` of [ScreenplayEditor.tsx](cci:7://file:///e:/yarab%20we%20elnby/New%20folder/Filmlane/src/components/editor/ScreenplayEditor.tsx:0:0-0:0):
-        `import { screenplayFormats, formatClassMap, A4_PAGE_HEIGHT_PX } from '@/constants';`
-        It imports it but doesn't seem to use it in the component body (I reviewed lines 1-217 and didn't see `A4_PAGE_HEIGHT_PX` used).
-    *   I will check if it's used. If so, I'll update it. If not, I'll remove the import to clean up.
+2.  Update [src/components/editor/ScreenplayEditor.tsx](cci:7://file:///e:/yarab%20we%20elnby/New%20folder/Filmlane/src/components/editor/ScreenplayEditor.tsx:0:0-0:0) to use the new `PAGE_HEIGHT_PX` constant (or remove it if unused, looking at the code it was imported but I don't recall seeing it _used_ in the snippet provided earlier, but I'll check).
+    - Looking at the previous `view_file` of [ScreenplayEditor.tsx](cci:7://file:///e:/yarab%20we%20elnby/New%20folder/Filmlane/src/components/editor/ScreenplayEditor.tsx:0:0-0:0):
+      `import { screenplayFormats, formatClassMap, A4_PAGE_HEIGHT_PX } from '@/constants';`
+      It imports it but doesn't seem to use it in the component body (I reviewed lines 1-217 and didn't see `A4_PAGE_HEIGHT_PX` used).
+    - I will check if it's used. If so, I'll update it. If not, I'll remove the import to clean up.
 
 Let's check [ScreenplayEditor.tsx](cci:7://file:///e:/yarab%20we%20elnby/New%20folder/Filmlane/src/components/editor/ScreenplayEditor.tsx:0:0-0:0) usage first.
 
@@ -336,6 +349,7 @@ And the lint error `'"@/constants"' has no exported member...` will be resolved 
 One detail: `A4_PAGE_HEIGHT_PX` was removed from [page.ts](cci:7://file:///e:/yarab%20we%20elnby/New%20folder/Filmlane/src/constants/page.ts:0:0-0:0). I should probably keep it as an alias for backward compatibility or just update all consumers. Since I am an agent with full control, I will update consumers.
 
 Plan:
+
 1.  `grep` for `A4_PAGE_HEIGHT_PX` to find broken usages.
 2.  Fix [src/constants/index.ts](cci:7://file:///e:/yarab%20we%20elnby/New%20folder/Filmlane/src/constants/index.ts:0:0-0:0).
 3.  Fix usages found in step 1.
@@ -373,6 +387,7 @@ Wait, I already saw [ScreenplayEditor.tsx](cci:7://file:///e:/yarab%20we%20elnby
 Also, [index.ts](cci:7://file:///e:/yarab%20we%20elnby/New%20folder/Filmlane/src/constants/index.ts:0:0-0:0).
 
 Let's execute.
+
 1. `grep_search` for `A4_PAGE_HEIGHT_PX`.
 2. Update [src/constants/index.ts](cci:7://file:///e:/yarab%20we%20elnby/New%20folder/Filmlane/src/constants/index.ts:0:0-0:0).
 3. Multi-replace for any found files.
@@ -447,6 +462,7 @@ It interacts with nothing.
 So I can just remove it from the import list.
 
 I'll execute.
+
 1. `grep_search` `A4_PAGE_HEIGHT_PX` just to be paranoid about other files.
 2. Update [index.ts](cci:7://file:///e:/yarab%20we%20elnby/New%20folder/Filmlane/src/constants/index.ts:0:0-0:0) to `export *`.
 3. Update [ScreenplayEditor.tsx](cci:7://file:///e:/yarab%20we%20elnby/New%20folder/Filmlane/src/components/editor/ScreenplayEditor.tsx:0:0-0:0) to remove the import.
@@ -466,7 +482,7 @@ I can combine these.
 I'll execute `grep` first to be absolutely sure.
 Then doing the edits in the next turn is safer? No, I'm an agent. I can do it now if I'm confident.
 I'll do the grep. If the grep returns only [ScreenplayEditor.tsx](cci:7://file:///e:/yarab%20we%20elnby/New%20folder/Filmlane/src/components/editor/ScreenplayEditor.tsx:0:0-0:0) (and [index.ts](cci:7://file:///e:/yarab%20we%20elnby/New%20folder/Filmlane/src/constants/index.ts:0:0-0:0) / [page.ts](cci:7://file:///e:/yarab%20we%20elnby/New%20folder/Filmlane/src/constants/page.ts:0:0-0:0) which I know about), I'll verify.
-Wait, I can't conditionally execute tools based on output of same-turn tools *unless* I use a subagent, which I am not doing here.
+Wait, I can't conditionally execute tools based on output of same-turn tools _unless_ I use a subagent, which I am not doing here.
 So I'll just do the grep now.
 
 Wait, I can fix [index.ts](cci:7://file:///e:/yarab%20we%20elnby/New%20folder/Filmlane/src/constants/index.ts:0:0-0:0) safely now. [ScreenplayEditor.tsx](cci:7://file:///e:/yarab%20we%20elnby/New%20folder/Filmlane/src/components/editor/ScreenplayEditor.tsx:0:0-0:0) can wait one turn.
@@ -540,8 +556,9 @@ It seems unused.
 So removing it is safe (and cleaner).
 
 Final plan confirmed:
+
 1. `multi_replace_file_content` on [src/components/editor/ScreenplayEditor.tsx](cci:7://file:///e:/yarab%20we%20elnby/New%20folder/Filmlane/src/components/editor/ScreenplayEditor.tsx:0:0-0:0) (Remove import).
-2. `multi_replace_file_content` on [src/constants/index.ts](cci:7://file:///e:/yarab%20we%20elnby/New%20folder/Filmlane/src/constants/index.ts:0:0-0:0) (Export *).
+2. `multi_replace_file_content` on [src/constants/index.ts](cci:7://file:///e:/yarab%20we%20elnby/New%20folder/Filmlane/src/constants/index.ts:0:0-0:0) (Export \*).
 
 Wait, I should also delete the commented out code in [EditorArea.tsx](cci:7://file:///e:/yarab%20we%20elnby/New%20folder/Filmlane/src/components/editor/EditorArea.tsx:0:0-0:0) mentioned earlier.
 I'll add a chunk for [EditorArea.tsx](cci:7://file:///e:/yarab%20we%20elnby/New%20folder/Filmlane/src/components/editor/EditorArea.tsx:0:0-0:0) too.
@@ -572,12 +589,14 @@ Replace: `export * from './page';`
 
 [EditorArea.tsx](cci:7://file:///e:/yarab%20we%20elnby/New%20folder/Filmlane/src/components/editor/EditorArea.tsx:0:0-0:0) cleanup.
 Target:
+
 ```typescript
-    // Page metrics are now imported from constants to ensure sync with CSS
-    // const PAGE_HEIGHT_PX = 1123;
-    // const HEADER_HEIGHT_PX = 96;
-    // const CONTENT_HEIGHT_PX = ...
+// Page metrics are now imported from constants to ensure sync with CSS
+// const PAGE_HEIGHT_PX = 1123;
+// const HEADER_HEIGHT_PX = 96;
+// const CONTENT_HEIGHT_PX = ...
 ```
+
 Replace: (empty string) or just keep it? I'll remove it.
 
 Wait, [EditorArea](cci:2://file:///e:/yarab%20we%20elnby/New%20folder/Filmlane/src/components/editor/EditorArea.tsx:28:0-35:1) target matching might be tricky due to whitespace.
@@ -616,6 +635,7 @@ So [ScreenplayEditor.tsx](cci:7://file:///e:/yarab%20we%20elnby/New%20folder/Fil
 So I MUST fix both.
 
 I'll do:
+
 1. [index.ts](cci:7://file:///e:/yarab%20we%20elnby/New%20folder/Filmlane/src/constants/index.ts:0:0-0:0): export `*` from `./page`.
 2. [ScreenplayEditor.tsx](cci:7://file:///e:/yarab%20we%20elnby/New%20folder/Filmlane/src/components/editor/ScreenplayEditor.tsx:0:0-0:0): Remove `A4_PAGE_HEIGHT_PX` import.
 
@@ -661,7 +681,7 @@ It's single line. Safe.
 
 Execute.
 
-Actually, I'll also run `grep_search` at the end just to see if I missed any spots for `A4_PAGE_HEIGHT_PX`. This helps me self-correct in the *next* turn if needed.
+Actually, I'll also run `grep_search` at the end just to see if I missed any spots for `A4_PAGE_HEIGHT_PX`. This helps me self-correct in the _next_ turn if needed.
 
 Wait, I shouldn't execute `grep_search` if I'm not going to use it.
 I'll trust my analysis.
@@ -789,12 +809,14 @@ Call 2: `replace_file_content` for [ScreenplayEditor.tsx](cci:7://file:///e:/yar
 
 Wait, [index.ts](cci:7://file:///e:/yarab%20we%20elnby/New%20folder/Filmlane/src/constants/index.ts:0:0-0:0) might have other exports.
 Step 53:
+
 ```typescript
 export { screenplayFormats, formatClassMap } from './formats';
 export { fonts, textSizes } from './fonts';
 export { colors } from './colors';
 export { A4_PAGE_HEIGHT_PX } from './page';
 ```
+
 So I replace line 4 only.
 
 Call 1: `replace_file_content` on [index.ts](cci:7://file:///e:/yarab%20we%20elnby/New%20folder/Filmlane/src/constants/index.ts:0:0-0:0).
@@ -912,12 +934,14 @@ This is perfect.
 I am essentially committing the changes now.
 
 Wait, step 64 snippet shows:
+
 ```typescript
-    // Page metrics are now imported from constants to ensure sync with CSS
-    // const PAGE_HEIGHT_PX = 1123;
-    // const HEADER_HEIGHT_PX = 96;
-    // const CONTENT_HEIGHT_PX = ...
+// Page metrics are now imported from constants to ensure sync with CSS
+// const PAGE_HEIGHT_PX = 1123;
+// const HEADER_HEIGHT_PX = 96;
+// const CONTENT_HEIGHT_PX = ...
 ```
+
 It does NOT show the removal of `const CONTENT_HEIGHT_PX = ...` logic lines if they were further down?
 Original code line 47: `const CONTENT_HEIGHT_PX = PAGE_HEIGHT_PX - HEADER_HEIGHT_PX - FOOTER_HEIGHT_PX;`
 My replacement in step 64 replaced lines 33-47 with the commented block.
@@ -943,9 +967,9 @@ TargetLintErrorIds:
 `1f35316f-279a-4d36-8965-1a28c826f89e`
 `dc5e1f63-bb5f-4d69-8b18-4957d582ea05`
 
-*Edited relevant file*
+_Edited relevant file_
 
-*Edited relevant file*
+_Edited relevant file_
 
 ### Planner Response
 
@@ -963,14 +987,14 @@ TargetLintErrorIds:
 
 انت عامل مقياس ال a4 كام في كام ؟
 
-*Viewed [page.ts](file:///e:/yarab%20we%20elnby/New%20folder/Filmlane/src/constants/page.ts) *
+_Viewed [page.ts](file:///e:/yarab%20we%20elnby/New%20folder/Filmlane/src/constants/page.ts) _
 
 ### Planner Response
 
 أنا شغال على مقياس **A4** القياسي بدقة شاشة ويب (Web Standard 96 DPI)، والأبعاد الحالية في الكود هي:
 
-*   **العرض:** `794 بيكسل` (ما يعادل تقريباً 210 مم).
-*   **الطول:** `1123 بيكسل` (ما يعادل تقريباً 297 مم).
+- **العرض:** `794 بيكسل` (ما يعادل تقريباً 210 مم).
+- **الطول:** `1123 بيكسل` (ما يعادل تقريباً 297 مم).
 
 هذه الأرقام مبنية على المعادلة القياسية:
 [(المقاس بالملم ÷ 25.4) × 96](cci:1://file:///e:/yarab%20we%20elnby/New%20folder/Filmlane/src/components/editor/EditorArea.tsx:292:12-297:13)
@@ -979,7 +1003,7 @@ TargetLintErrorIds:
 
 ### User Input
 
- بس ال word دي مقياسه 
+بس ال word دي مقياسه
 
 ### Planner Response
 
@@ -988,12 +1012,12 @@ TargetLintErrorIds:
 حسابياً، هذا المقاس هو نفسه ما نستخدمه، لكن الفرق يكمن في وحدة القياس المستخدمة في الكود (البيكسل) مقابل الوحدة التي تراها (البوصة):
 
 1.  **العرض (Width):**
-    *   Word (بوصة): **8.27"**
-    *   حسبتنا (بيكسل): 8.27 × 96 = **793.92** (نحن قربناها لـ **794px**).
+    - Word (بوصة): **8.27"**
+    - حسبتنا (بيكسل): 8.27 × 96 = **793.92** (نحن قربناها لـ **794px**).
 
 2.  **الطول (Height):**
-    *   Word (بوصة): **11.69"**
-    *   حسبتنا (بيكسل): 11.69 × 96 = **1122.24** (نحن قربناها لـ **1123px**).
+    - Word (بوصة): **11.69"**
+    - حسبتنا (بيكسل): 11.69 × 96 = **1122.24** (نحن قربناها لـ **1123px**).
 
 لذا، الأبعاد التي لدينا **صحيحة ومطابقة للـ A4 في Word** بـ "دقة الشاشة" القياسية. هل ترغب في تعديلها لتكون دقيقة بالعلامة العشرية (بدون تقريب) لضمان الدقة "الميترية" القصوى، أم أنك تلاحظ فرقاً فعلياً في الشكل؟
 
@@ -1009,9 +1033,10 @@ TargetLintErrorIds:
 
 1.  **في ملف [ui-kit.css](cci:7://file:///e:/yarab%20we%20elnby/New%20folder/Filmlane/src/app/ui-kit.css:0:0-0:0) (لأجل الشكل اللي بتشوفه بعينك):**
     مستخدمين متغيرات CSS مربوطة بالأرقام اللي حددناها:
+
     ```css
-    --page-margin-left: 1.5in;  /* الهامش الأيسر = 1.5 بوصة (منطقة التجليد) */
-    --page-margin-right: 1in;   /* الهامش الأيمن = 1 بوصة */
+    --page-margin-left: 1.5in; /* الهامش الأيسر = 1.5 بوصة (منطقة التجليد) */
+    --page-margin-right: 1in; /* الهامش الأيمن = 1 بوصة */
     ```
 
 2.  **في ملف [editor-styles.ts](cci:7://file:///e:/yarab%20we%20elnby/New%20folder/Filmlane/src/utils/editor-styles.ts:0:0-0:0) (لأجل تنسيق العناصر الداخلية زي الحوار):**
@@ -1021,31 +1046,28 @@ TargetLintErrorIds:
 **باختصار:**
 الهوامش متحددة في الـ CSS عشان "تحجز" المساحة البيضاء الفاضية يمين وشمال الصفحة، ومفيش أي كود تاني بيغير فيها، يبقى الصفحة عندك فيها مساحة كتابة صافية في النص، متحاوطة بـ 1.5 بوصة يسار و 1 بوصة يمين.
 
-*Edited relevant file*
+_Edited relevant file_
 
 ### User Input
 
+/_ === Page Metrics (Must match constants/page.ts) === _/
+/_ 96px = 1in _/
+/_ 1123px = 297mm approx _/
+--page-height: 1123px;
+--page-width: 794px; /_ ~210mm _/
+--page-header-height: 96px;
+--page-footer-height: 96px;
+--page-margin-left: 1.in;
+--page-margin-right: 1in;
 
-  /* === Page Metrics (Must match constants/page.ts) === */
-  /* 96px = 1in */
-  /* 1123px = 297mm approx */
-  --page-height: 1123px;
-  --page-width: 794px; /* ~210mm */
-  --page-header-height: 96px;
-  --page-footer-height: 96px;
-  --page-margin-left: 1.in;
-  --page-margin-right: 1in;
-
-
-احنا عربي فخلي اليسار  1 بوصة بس و  خلي  اليمين 1.25 بوصة 
+احنا عربي فخلي اليسار 1 بوصة بس و خلي اليمين 1.25 بوصة
 و خلي الاعلى 0.8
 و الاسفل 0.8
 }
 
+_Edited relevant file_
 
-*Edited relevant file*
-
-*Edited relevant file*
+_Edited relevant file_
 
 ### Planner Response
 
@@ -1060,44 +1082,47 @@ TargetLintErrorIds:
 
 ### User Input
 
-الجملة دي تم التعامل معاها على انها اكشن مع انها حوار  وهي نفس الجملة اللي كنا المفروض  حاولنا نحلل مشكلتها من كام رسالة 
+الجملة دي تم التعامل معاها على انها اكشن مع انها حوار وهي نفس الجملة اللي كنا المفروض حاولنا نحلل مشكلتها من كام رسالة
+
 <div class="format-action" style="font-family: AzarMehrMonospaced-San; font-size: 12pt; direction: rtl; line-height: 15pt; min-height: 15pt; font-weight: bold; text-align: justify; text-align-last: right; text-justify: inter-word; width: 100%; margin: 0">تلفزيون تاني يا كريم ؟</div>
 
-ونفس الوضع  مع الجملة دي 
+ونفس الوضع مع الجملة دي
+
 <div class="format-action" style="font-family: AzarMehrMonospaced-San; font-size: 12pt; direction: rtl; line-height: 15pt; min-height: 15pt; font-weight: bold; text-align: justify; text-align-last: right; text-justify: inter-word; width: 100%; margin: 0">يلعن كفاية في الارض يا اخي .. هو احنا ما ورناش غيرهم</div>
 
-بينما الجملة دي رغم انها حوار الى ان تم التعامل معاها على انها كاركتر 
+بينما الجملة دي رغم انها حوار الى ان تم التعامل معاها على انها كاركتر
+
 <div class="format-character" style="font-family: AzarMehrMonospaced-San; font-size: 12pt; direction: rtl; line-height: 15pt; min-height: 15pt; font-weight: bold; text-align: center; margin: 0 auto">ادخل:</div>
 
-بينما   الجملة دي رغم انها حوار تم التعامل معها على انها  اكشن 
-<div class="format-action" style="font-family: AzarMehrMonospaced-San; font-size: 12pt; direction: rtl; line-height: 15pt; min-height: 15pt; font-weight: bold; text-align: justify; text-align-last: right; text-justify: inter-word; width: 100%; margin: 0">يبقى تجبيه في عيد ميلادك .. لكن ده عيد جوازنا لو مش هنتفق على اللي عايزينه .. يبقى بلاش خالص</div>@[src/components/editor/EditorArea.tsx] 
+بينما الجملة دي رغم انها حوار تم التعامل معها على انها اكشن
 
+<div class="format-action" style="font-family: AzarMehrMonospaced-San; font-size: 12pt; direction: rtl; line-height: 15pt; min-height: 15pt; font-weight: bold; text-align: justify; text-align-last: right; text-justify: inter-word; width: 100%; margin: 0">يبقى تجبيه في عيد ميلادك .. لكن ده عيد جوازنا لو مش هنتفق على اللي عايزينه .. يبقى بلاش خالص</div>@[src/components/editor/EditorArea.tsx]
 
-ارجو و انت بتوجد حل انك تراجع  الملفات دي علشان ما يكونش في تضارب او تضاد بيعوق الحلول 
+ارجو و انت بتوجد حل انك تراجع الملفات دي علشان ما يكونش في تضارب او تضاد بيعوق الحلول
 
-@[src/components/editor/ScreenplayEditor.tsx] @[src/constants/formats.ts] @[src/utils/editor-styles.ts] @[src/utils/paste-classifier.ts] @[src/utils/screenplay-rules.ts] 
+@[src/components/editor/ScreenplayEditor.tsx] @[src/constants/formats.ts] @[src/utils/editor-styles.ts] @[src/utils/paste-classifier.ts] @[src/utils/screenplay-rules.ts]
 
-*Edited relevant file*
+_Edited relevant file_
 
-*Edited relevant file*
+_Edited relevant file_
 
-*Viewed [screenplay-rules.ts](file:///e:/yarab%20we%20elnby/New%20folder/Filmlane/src/utils/screenplay-rules.ts) *
+_Viewed [screenplay-rules.ts](file:///e:/yarab%20we%20elnby/New%20folder/Filmlane/src/utils/screenplay-rules.ts) _
 
 ### User Input
 
 This is a system-generated message that is sent due to the user's review policy. Proceed with the decision that you think is the most optimal here.
 
-*Edited relevant file*
+_Edited relevant file_
 
-*Edited relevant file*
+_Edited relevant file_
 
-*Edited relevant file*
+_Edited relevant file_
 
-*Edited relevant file*
+_Edited relevant file_
 
 ### User Input
 
-الحاجات دي اتنفذت و بعد اذنك كلمني عربي بس 
+الحاجات دي اتنفذت و بعد اذنك كلمني عربي بس
 
 ### Planner Response
 
@@ -1107,15 +1132,15 @@ This is a system-generated message that is sent due to the user's review policy.
 
 1.  **توحيد الأبعاد:** تم ضبط الهوامش لتناسب النسق العربي (1.25 بوصة لليمين، 1 بوصة لليسار) وتوحيد القيم بين الكود والـ CSS.
 2.  **ذكاء المصنف (Classifier):**
-    *   تمت معالجة جملة *"تلفزيون تاني يا كريم ؟"* وجملة *"يلعن كفاية.."* لتُصنف كـ **حوار** بدلاً من أكشن، بناءً على علامات الاستفهام والكلمات العامية (يا، يلعن، كفاية).
-    *   تمت معالجة جملة *"ادخل:"* لتُرفض كاسم شخصية لأنها فعل أمر، وتذهب للتصنيف الصحيح.
+    - تمت معالجة جملة _"تلفزيون تاني يا كريم ؟"_ وجملة _"يلعن كفاية.."_ لتُصنف كـ **حوار** بدلاً من أكشن، بناءً على علامات الاستفهام والكلمات العامية (يا، يلعن، كفاية).
+    - تمت معالجة جملة _"ادخل:"_ لتُرفض كاسم شخصية لأنها فعل أمر، وتذهب للتصنيف الصحيح.
 3.  **حل التعارض:** تم التأكد من عدم وجود تضارب بين ملفات التنسيق المختلفة.
 
 الكود الآن جاهز ويعمل بالتعديلات الجديدة.
 
 ### User Input
 
-طب عندي سؤال ومش عايزك تنفذ حاجة  عايزك ترد عليه بس ... افرض نفس الجمل ما كنش فيها  علامات استفهام ؟  مثلا .... تلفزيون تاني يا كريم ....... او ان  المتحدث بالحوار يكون بيستخدم الفصحى ... فالحالتين دول  هيكون ايه الوضع ؟ 
+طب عندي سؤال ومش عايزك تنفذ حاجة عايزك ترد عليه بس ... افرض نفس الجمل ما كنش فيها علامات استفهام ؟ مثلا .... تلفزيون تاني يا كريم ....... او ان المتحدث بالحوار يكون بيستخدم الفصحى ... فالحالتين دول هيكون ايه الوضع ؟
 
 ### Planner Response
 
@@ -1131,12 +1156,13 @@ This is a system-generated message that is sent due to the user's review policy.
 
 **لكن، امتى تحصل المشكلة فعلاً؟**
 لو جملة **فصحى تقريرية بحتة**، بدون نداء، وبدون علامات ترقيم، ومقطوعة من سياقها (مش تحت اسم شخصية).
-مثال: *"لقد ذهبنا إلى هناك ولم نجد شيئا"*
+مثال: _"لقد ذهبنا إلى هناك ولم نجد شيئا"_
 في الحالة دي، النظام هيحتار:
-*   مفيش "يا".
-*   مفيش "؟" أو "!".
-*   مفيش كلمات عامية زي "بقى" أو "أصل".
-*   نظام التنقيط هيديله **0 أو 1**.
+
+- مفيش "يا".
+- مفيش "؟" أو "!".
+- مفيش كلمات عامية زي "بقى" أو "أصل".
+- نظام التنقيط هيديله **0 أو 1**.
 
 **النتيجة:** النظام هيرجع للتصنيف الافتراضي (Default) وهو **Action**.
 
@@ -1145,9 +1171,9 @@ This is a system-generated message that is sent due to the user's review policy.
 
 ### User Input
 
-بتاريخ يناير 2026 اللي احنا فيه دلوقتي ... تقدر تقولي اسم نموذج مثلا ... ابحث عن الاجابة قبل الرد 
+بتاريخ يناير 2026 اللي احنا فيه دلوقتي ... تقدر تقولي اسم نموذج مثلا ... ابحث عن الاجابة قبل الرد
 
-*Searched web for state of the art arabic NLP models for text classification 2024 2025*
+_Searched web for state of the art arabic NLP models for text classification 2024 2025_
 
 ### Planner Response
 
@@ -1164,22 +1190,23 @@ This is a system-generated message that is sent due to the user's review policy.
 
 **نصيحتي ليك للتطبيق العملي (Web App):**
 بما إننا شغالين React Web App، تشغيل الموديلات دي في المتصفح مباشرة (Client-side) هيكون تقيل جداً على جهاز المستخدم. الحل العملي هو:
-*   استخدام نسخة **Distilled** (مخففة) من **AraBERT** وتشغيلها بـ **ONNX Runtime** في المتصفح. دي هتديك 'ذكاء' حقيقي في فهم الجملة من غير ما تهنج الجهاز.
-*   أو عمل **Microservice** صغيرة على السيرفر (Python) بتستخدم **MARBERT**، والفرونت إند يبعتلها النص وهي ترد بالتصنيف.
+
+- استخدام نسخة **Distilled** (مخففة) من **AraBERT** وتشغيلها بـ **ONNX Runtime** في المتصفح. دي هتديك 'ذكاء' حقيقي في فهم الجملة من غير ما تهنج الجهاز.
+- أو عمل **Microservice** صغيرة على السيرفر (Python) بتستخدم **MARBERT**، والفرونت إند يبعتلها النص وهي ترد بالتصنيف.
 
 الخلاصة: لو عايز اسم واحد تبدأ بيه بحثك أو تجربتك: **MARBERT**.
 
 ### User Input
 
-عفو بس البحث ده مش دقيق  بعيد عن قراري  هستخدم ايه او مش هستخدم ايه  ... لانك نحيت نموذج تبع فالكون نزل في  يناير 2026 و نحيت نموذج تاني وهو allam 
+عفو بس البحث ده مش دقيق بعيد عن قراري هستخدم ايه او مش هستخدم ايه ... لانك نحيت نموذج تبع فالكون نزل في يناير 2026 و نحيت نموذج تاني وهو allam
 
-*Searched web for Falcon new releases January 2026 arabic NLP*
+_Searched web for Falcon new releases January 2026 arabic NLP_
 
-*Searched web for Allam LLM updates January 2026 Saudi Arabia*
+_Searched web for Allam LLM updates January 2026 Saudi Arabia_
 
-*Searched web for Falcon 4 180B release date January 2026*
+_Searched web for Falcon 4 180B release date January 2026_
 
-*Searched web for Allam-2-70B model January 2026 release*
+_Searched web for Allam-2-70B model January 2026 release_
 
 ### Planner Response
 
@@ -1188,25 +1215,26 @@ This is a system-generated message that is sent due to the user's review policy.
 بالفعل، الساحة العربية ولعت في يناير 2026 بإطلاقات ضخمة:
 
 1.  **Falcon-H1-Arabic (من TII الإمارات):**
-    *   **تاريخ الإصدار:** 5 يناير 2026.
-    *   **الميزة الثورية:** ده موديل جديد كلياً مبني على معمارية "هجينة" (Hybrid Mamba-Transformer). يعني نسوا الـ Transformer التقليدي وعملوا حاجة بتفهم سياق أطول بكتير وسرعتها خيالية (Linear-time scaling).
-    *   **الأحجام:** نزل منه 3B, 7B, و 34B.
-    *   **الأداء:** النسخة الـ 34B بتنافس موديلات عالمية حجمها ضعفها (زي Llama-3.3 70B و Qwen2.5 72B) على المؤشرات العربية (OALL)! وده اكتساح حقيقي.
+    - **تاريخ الإصدار:** 5 يناير 2026.
+    - **الميزة الثورية:** ده موديل جديد كلياً مبني على معمارية "هجينة" (Hybrid Mamba-Transformer). يعني نسوا الـ Transformer التقليدي وعملوا حاجة بتفهم سياق أطول بكتير وسرعتها خيالية (Linear-time scaling).
+    - **الأحجام:** نزل منه 3B, 7B, و 34B.
+    - **الأداء:** النسخة الـ 34B بتنافس موديلات عالمية حجمها ضعفها (زي Llama-3.3 70B و Qwen2.5 72B) على المؤشرات العربية (OALL)! وده اكتساح حقيقي.
 
 2.  **ALLaM (علام - من السعوديةHUMAIN/SDAIA):**
-    *   المشروع السعودي الطموح جداً اللي استثمروا فيه مليارات.
-    *   في يناير 2026، التوقعات والتقارير بتشير لنمو ضخم في المنظومة دي، مع وجود نسخ زي **ALLaM-2-7B** (اللي نزلت قبل كده) والتمهيد لإطلاق نسخ أضخم (Foundation Models) بحجم **34B وأكبر** لتنافس عالمياً، مع تركيز شديد على "السيادة الوطنية للبيانات" وفهم اللهجات الخليجية والشامية بعمق.
+    - المشروع السعودي الطموح جداً اللي استثمروا فيه مليارات.
+    - في يناير 2026، التوقعات والتقارير بتشير لنمو ضخم في المنظومة دي، مع وجود نسخ زي **ALLaM-2-7B** (اللي نزلت قبل كده) والتمهيد لإطلاق نسخ أضخم (Foundation Models) بحجم **34B وأكبر** لتنافس عالمياً، مع تركيز شديد على "السيادة الوطنية للبيانات" وفهم اللهجات الخليجية والشامية بعمق.
 
 **تصحيح المسار:**
 لو إنت بتدور على "الأحدث والأقوى" في اللحظة دي (يناير 2026) لتقنيات الـ NLP العربية، فالاختيار محصور بين العملاقين دول:
-*   **Falcon-H1-Arabic (34B):** لو عايز **أداء تقني فائق**، سرعة استجابة بسبب معمارية Mamba، وتفوق في الفهم اللغوي المعقد.
-*   **ALLaM:** لو مهتم بدعم قوي للهجات المحلية جداً (خليجي/شامي) والاندماج مع بيئة عمل بتدعم اللغة العربية كأولوية قصوى وليست ثانوية.
+
+- **Falcon-H1-Arabic (34B):** لو عايز **أداء تقني فائق**، سرعة استجابة بسبب معمارية Mamba، وتفوق في الفهم اللغوي المعقد.
+- **ALLaM:** لو مهتم بدعم قوي للهجات المحلية جداً (خليجي/شامي) والاندماج مع بيئة عمل بتدعم اللغة العربية كأولوية قصوى وليست ثانوية.
 
 أكرر اعتذاري، وشكراً إنك نبهتني للنقطة الجوهرية دي.
 
 ### User Input
 
-عيد الاجابة بشكل شامل انا قولتلك   بعيد عن قراري  انا هستخدم  ايه  ... انا كان  خلافي هو   انك ما عملتش السيرش زي ما انا طلبت ... المهم عيد الاجابة كاملة دلوقتي  الوضع المناسب لمشكلتنا و تطبيقنا     ايه المناسب ليه 
+عيد الاجابة بشكل شامل انا قولتلك بعيد عن قراري انا هستخدم ايه ... انا كان خلافي هو انك ما عملتش السيرش زي ما انا طلبت ... المهم عيد الاجابة كاملة دلوقتي الوضع المناسب لمشكلتنا و تطبيقنا ايه المناسب ليه
 
 ### Planner Response
 
@@ -1215,23 +1243,27 @@ This is a system-generated message that is sent due to the user's review policy.
 لحل مشكلة "تصنيف الفقرات" في تطبيق ويب (Client-Side) زي اللي بنبنيه، عندنا 3 مسارات، وده تقييمهم بناءً على أحدث التقنيات:
 
 **1. المسار الأول: النماذج العملاقة الحديثة (The Heavy Hitters - Falcon H1 / ALLaM)**
-*   **النماذج:** **Falcon-H1-Arabic-7B** (الإصدار الجديد بمعمارية Mamba) أو **ALLaM-2-7B**.
-*   **الميزة:** فهم عبقري للسياق واللهجات بدون أي تدريب إضافي (Zero-shot). هترميله الجملة "تلفزيون تاني يا كريم" حتى لو من غير علامات، هيقولك "حوار" وهو مغمض.
-*   **العيب القاتل لتطبيقنا:** مستحيل تشتغل في المتصفح (Browser). محتاجة سيرفر GPU قوي جداً (Server-Side Inference). ده معناه إن كل سطر المستخدم بيعمله Paste هيروح للسيرفر ويرجع، وده هيعمل Latency (بطء) وتكلفة استضافة عالية.
-*   **الحكم:** **غير مناسبة** كحل مباشر داخل الـ Editor، إلا لو هنعمل ميزة "Smart Formatting" منفصلة (زرار يضغط عليه المستخدم فيصلح السيناريو كله مرة واحدة على السيرفر).
+
+- **النماذج:** **Falcon-H1-Arabic-7B** (الإصدار الجديد بمعمارية Mamba) أو **ALLaM-2-7B**.
+- **الميزة:** فهم عبقري للسياق واللهجات بدون أي تدريب إضافي (Zero-shot). هترميله الجملة "تلفزيون تاني يا كريم" حتى لو من غير علامات، هيقولك "حوار" وهو مغمض.
+- **العيب القاتل لتطبيقنا:** مستحيل تشتغل في المتصفح (Browser). محتاجة سيرفر GPU قوي جداً (Server-Side Inference). ده معناه إن كل سطر المستخدم بيعمله Paste هيروح للسيرفر ويرجع، وده هيعمل Latency (بطء) وتكلفة استضافة عالية.
+- **الحكم:** **غير مناسبة** كحل مباشر داخل الـ Editor، إلا لو هنعمل ميزة "Smart Formatting" منفصلة (زرار يضغط عليه المستخدم فيصلح السيناريو كله مرة واحدة على السيرفر).
 
 **2. المسار الثاني: النماذج المتخصصة الخفيفة (Distilled BERT Models)**
-*   **النماذج:** نسخ مضغوطة (Distilled/Quantized) من **MARBERT** أو **AraBERT**.
-*   **الميزة:** دقة ممتازة في تصنيف النصوص (Text Classification)، وممكن ضغطها لحجم صغير (مثلاً 20-50 ميجا) عشان تشتغل جوه المتصفح باستخدام تقنية **ONNX Runtime Web**.
-*   **الحكم:** **الحل الذهبي (Ideal Solution)** لو عايز ذكاء اصطناعي حقيقي "Live". هيشتغل على جهاز المستخدم بدون سيرفر، وسريع كفاية. الموديل هيتدرب بس على مهمة واحدة: "ده حوار ولا أكشن؟".
+
+- **النماذج:** نسخ مضغوطة (Distilled/Quantized) من **MARBERT** أو **AraBERT**.
+- **الميزة:** دقة ممتازة في تصنيف النصوص (Text Classification)، وممكن ضغطها لحجم صغير (مثلاً 20-50 ميجا) عشان تشتغل جوه المتصفح باستخدام تقنية **ONNX Runtime Web**.
+- **الحكم:** **الحل الذهبي (Ideal Solution)** لو عايز ذكاء اصطناعي حقيقي "Live". هيشتغل على جهاز المستخدم بدون سيرفر، وسريع كفاية. الموديل هيتدرب بس على مهمة واحدة: "ده حوار ولا أكشن؟".
 
 **3. المسار الثالث: الهندسة القواعدية المتطورة (Advanced Rules-Based Logic)**
-*   **التقنية:** الكود اللي احنا كتبناه وطورناه دلوقتي (Regex + Heuristics + Context scoring).
-*   **الميزة:** سرعة خيالية (Zero latency)، صفر تكلفة، صفر تحميل موديلات، وبيحل 95% من الحالات بعد التعديلات الأخيرة (زي "يا" النداء والكلمات العامية الشائعة).
-*   **الحكم:** **الأنسب حالياً كبداية (MVP)**. هو الحل العملي والمباشر اللي بيخلي الـ Editor خفيف وسريع جداً.
+
+- **التقنية:** الكود اللي احنا كتبناه وطورناه دلوقتي (Regex + Heuristics + Context scoring).
+- **الميزة:** سرعة خيالية (Zero latency)، صفر تكلفة، صفر تحميل موديلات، وبيحل 95% من الحالات بعد التعديلات الأخيرة (زي "يا" النداء والكلمات العامية الشائعة).
+- **الحكم:** **الأنسب حالياً كبداية (MVP)**. هو الحل العملي والمباشر اللي بيخلي الـ Editor خفيف وسريع جداً.
 
 **الخلاصة والقرار المقترح للتطبيق:**
 بما إننا بنبني Web Editor تفاعلي:
+
 1.  **خلينا مكملين بالمسار الثالث (Rules/Regex)** اللي طورناه دلوقتي لأنه الأسرع والأخف والأكثر عملية لتجربة المستخدم اللحظية.
 2.  لو في المستقبل احتاجنا "ميزة بريميوم" لتصحيح سيناريو كامل بضغطة زر (مثلاً سيناريو 100 صفحة فيه لخبطة كتير)، هنا نلجأ فوراً لـ **Falcon-H1-Arabic** (على السيرفر) لأنه الوحيد اللي هيفهم السياق المعقد ده بدقة "بشرية".
 
@@ -1239,7 +1271,7 @@ This is a system-generated message that is sent due to the user's review policy.
 
 ### User Input
 
-طب احنا لو استخددمنا  Falcon-H1-Arabic ... تقدر تقولي هيبقى استخدامه ازاي  و هل زي ما  شرحت انت قبل كده  بنسخ  مضغوطة   ولا ايه انسب طريقة  استخدام ؟
+طب احنا لو استخددمنا Falcon-H1-Arabic ... تقدر تقولي هيبقى استخدامه ازاي و هل زي ما شرحت انت قبل كده بنسخ مضغوطة ولا ايه انسب طريقة استخدام ؟
 
 ### Planner Response
 
@@ -1248,13 +1280,16 @@ This is a system-generated message that is sent due to the user's review policy.
 إليك الإجابة الشاملة لطريقة الاستخدام الأنسب لمشروعنا:
 
 ### 1. هل "نسخ مضغوطة" في المتصفح؟ (زي ما شرحت قبل كدة؟)
+
 **للأسف، لا.**
 النماذج اللي كلمتك عنها قبل كدة (زي Distilled BERT) حجمها حوالي **50 : 100 ميجا بايت**. دي المتصفح يقدر يحملها ويشغلها.
 أما **Falcon-H1** (حتى أصغر نسخة 3B) حجمها "مضغوطاً" لا يقل عن **2 : 3 جيجا بايت**.
-*   صعب جداً تخلي مستخدم يحمل 3 جيجا عشان يفتح صفحة ويب (Editor).
-*   هتحتاج جهاز مستخدم قوي جداً (رامات وكارت شاشة عالي) عشان المتصفح ما يهنجش.
+
+- صعب جداً تخلي مستخدم يحمل 3 جيجا عشان يفتح صفحة ويب (Editor).
+- هتحتاج جهاز مستخدم قوي جداً (رامات وكارت شاشة عالي) عشان المتصفح ما يهنجش.
 
 ### 2. طريقة الاستخدام المناسبة (Architecture)
+
 الطريقة الوحيدة العملية لاستخدام وحش زي Falcon هي **API (Server-Side)**.
 يعني الموديل مش هيكون عند المستخدم، هيكون على "سيرفر" خاص بيك.
 
@@ -1267,26 +1302,30 @@ This is a system-generated message that is sent due to the user's review policy.
 5.  **المتصفح:** يستلم الرد ويطبق التنسيق فوراً.
 
 ### 3. تكلفة ومتطلبات التشغيل
+
 بما إنه موديل حديث وقوي، مش هيشتغل على استضافة عادية (Shared Hosting).
-*   **محتاج GPU:** سيرفر بكارت شاشة (NVIDIA A10G أو T4 مثلاً).
-*   **الخدمات:** ممكن تستخدمه عبر منصات جاهزة (زي Hugging Face Inference Endpoints أو Replicate) وبتحاسبك بالساعة أو بالمليون كلمة، وده أوفر بكتير من إنك تشتري سيرفر كامل.
+
+- **محتاج GPU:** سيرفر بكارت شاشة (NVIDIA A10G أو T4 مثلاً).
+- **الخدمات:** ممكن تستخدمه عبر منصات جاهزة (زي Hugging Face Inference Endpoints أو Replicate) وبتحاسبك بالساعة أو بالمليون كلمة، وده أوفر بكتير من إنك تشتري سيرفر كامل.
 
 ### الخلاصة (Recommendation)
+
 لو قررت تستخدم **Falcon-H1-Arabic**:
-*   **الأسلوب:** API (Microservice).
-*   **المكان:** Hosted Service (Hugging Face / AWS SageMaker).
-*   **الميزة:** ذكاء خارق وفهم للسياق المعقد.
-*   **العيب:** لازم اتصال نت، وفي تكلفة لكل عملية معالجة (Running Cost).
+
+- **الأسلوب:** API (Microservice).
+- **المكان:** Hosted Service (Hugging Face / AWS SageMaker).
+- **الميزة:** ذكاء خارق وفهم للسياق المعقد.
+- **العيب:** لازم اتصال نت، وفي تكلفة لكل عملية معالجة (Running Cost).
 
 هل تحب نخطط لدمج API زي ده في المستقبل؟ أم نكتفي بالحل البرمجي السريع (Regex) حالياً؟
 
 ### User Input
 
-يعني  تقصد  هنستخدم vllm ?   وهل اجابتك السابقة  كانت مبنية على سيرش و لا على توقع  
+يعني تقصد هنستخدم vllm ? وهل اجابتك السابقة كانت مبنية على سيرش و لا على توقع
 
-*Searched web for vLLM support for Falcon-H1 Mamba architecture support*
+_Searched web for vLLM support for Falcon-H1 Mamba architecture support_
 
-*Searched web for run Falcon-H1-Arabic in browser WebLLM January 2026*
+_Searched web for run Falcon-H1-Arabic in browser WebLLM January 2026_
 
 ### Planner Response
 
@@ -1297,48 +1336,49 @@ This is a system-generated message that is sent due to the user's review policy.
 
 2.  **هل إجابتي السابقة عن "النسخ المضغوطة" كانت تخمين؟**
     كانت مبنية على **واقع هندسي** وتأكدت منه بالبحث حالا:
-    *   تقنية تشغيل الموديلات في المتصفح (**WebLLM**) موجودة وبتدعم موديلات زي Llama-3 و Phi-3.
-    *   **لكن:** Falcon-H1 لسه موديل "طازة" جداً (نزل 5 يناير 2026)، والبحث أكد إنه **مش مدعوم بشكل أصلي (Native Support) في WebLLM لحد دلوقتي**.
-    *   **الأهم:** حتى لو تم دعمه، حجم الملفات (حتى وهي مضغوطة 4-bit quantization) لموديل زي 7B بيكون حوالي **4 جيجا بايت**.
-        *   هل منطقي إن كل مستخدم يفتح الموقع يحمل 4 جيجا؟ (ده ينفع لتطبيق Desktop، لكن لتطبيق Web زي بتاعنا ده "قاتل" لتجربة المستخدم).
+    - تقنية تشغيل الموديلات في المتصفح (**WebLLM**) موجودة وبتدعم موديلات زي Llama-3 و Phi-3.
+    - **لكن:** Falcon-H1 لسه موديل "طازة" جداً (نزل 5 يناير 2026)، والبحث أكد إنه **مش مدعوم بشكل أصلي (Native Support) في WebLLM لحد دلوقتي**.
+    - **الأهم:** حتى لو تم دعمه، حجم الملفات (حتى وهي مضغوطة 4-bit quantization) لموديل زي 7B بيكون حوالي **4 جيجا بايت**.
+      - هل منطقي إن كل مستخدم يفتح الموقع يحمل 4 جيجا؟ (ده ينفع لتطبيق Desktop، لكن لتطبيق Web زي بتاعنا ده "قاتل" لتجربة المستخدم).
 
 **الخلاصة للقرار الهندسي:**
 إجابتي السابقة دقيقة 100%:
-*   لو عايز **Falcon-H1** (الأذكى والأحدث) -> لازم **سيرفر (API)** شغال بـ **vLLM**.
-*   لو عايز **Client-Side** (في المتصفح) -> لازم نستخدم موديلات أقدم وأصغر بكتير (زي Distilled BERT أو TinyLlama) وتكون مضغوطة جداً، ومش هتديك نفس ذكاء Falcon.
+
+- لو عايز **Falcon-H1** (الأذكى والأحدث) -> لازم **سيرفر (API)** شغال بـ **vLLM**.
+- لو عايز **Client-Side** (في المتصفح) -> لازم نستخدم موديلات أقدم وأصغر بكتير (زي Distilled BERT أو TinyLlama) وتكون مضغوطة جداً، ومش هتديك نفس ذكاء Falcon.
 
 لو الميزانية تسمح بسيرفر GPU، الـ **Falcon-H1 on vLLM** هو الخيار "البريميوم" اللي هيكسر الدنيا في دقة التصحيح.
 
 ### User Input
 
-طب  اعمل سيرش عن افضل طريقة لاستخدام فاvLLM + Falcon-H1-Arabic و حطلي خطة   للخطوات و ما تطبقهاش 
+طب اعمل سيرش عن افضل طريقة لاستخدام فاvLLM + Falcon-H1-Arabic و حطلي خطة للخطوات و ما تطبقهاش
 
-*Searched web for how to serve Falcon-H1-Arabic using vLLM guide*
+_Searched web for how to serve Falcon-H1-Arabic using vLLM guide_
 
-*Searched web for vLLM configuration for mamba hybrid models*
+_Searched web for vLLM configuration for mamba hybrid models_
 
-*Searched web for Falcon-H1-Arabic vLLM docker deployment steps*
+_Searched web for Falcon-H1-Arabic vLLM docker deployment steps_
 
-*Edited relevant file*
+_Edited relevant file_
 
 ### User Input
 
 @rules: طب وماذا عن خطة 3. المسار الثالث: الهندسة القواعدية المتطورة (Advanced Rules-Based Logic)
 
- علشان  نحل المشاكل اللي بتقابلنا ؟
+علشان نحل المشاكل اللي بتقابلنا ؟
 
-
-*Edited relevant file*
+_Edited relevant file_
 
 ### User Input
 
-انت ليه عامل الخطة على الحوار بس ... و باقي العناصر ؟ 
+انت ليه عامل الخطة على الحوار بس ... و باقي العناصر ؟
 
 ### Planner Response
 
 باختصار، لأن **الحوار هو أساس المشكلة وأصعب عنصر فيها**.
 
 في السيناريو العربي، العناصر سهلة التمييز جداً ما عدا الحوار:
+
 1.  **عناوين المشاهد (Scene Headers):** مميزة جداً بكلمات ثابتة زي (داخلي، خارجي، نهار، ليل). دي سهلة.
 2.  **الشخصيات (Characters):** جمل قصيرة (كلمة أو كلمتين) في منتصف السطر. دي سهلة.
 3.  **الانتقالات (Transitions):** كلمات محددة في أقصى اليسار (قطع لـ، تلاشي لـ). دي سهلة جداً.
@@ -1347,15 +1387,14 @@ This is a system-generated message that is sent due to the user's review policy.
 هما دول اللي شبه بعض جداً (فقرات نصية عادية)، واللخبطة بينهم هي اللي بتعمل 90% من المشاكل للمستخدم. عشان كده الخطة ركزت عليهم.
 
 لكن طبعاً، **نفس الاستراتيجية (المرحلة 2: السياق)** هتفيد باقي العناصر:
-*   يعني لو النظام عرف إنه في "مشهد جديد" (Scene Header)، هيتوقع فوراً إن السطر اللي بعده غالباً "وصف/أكشن"، ومش "حوار" ولا "شخصية".
+
+- يعني لو النظام عرف إنه في "مشهد جديد" (Scene Header)، هيتوقع فوراً إن السطر اللي بعده غالباً "وصف/أكشن"، ومش "حوار" ولا "شخصية".
 
 فالخطة شاملة النظام كله، بس التركيز على "الحوار" كان لأنه هو "ألم" المستخدم الحالي. هل تحب أحدث الملف ليشرح أثر ده على باقي العناصر؟
 
 ### User Input
 
-
-
-*Edited relevant file*
+_Edited relevant file_
 
 ### User Input
 
@@ -1372,75 +1411,73 @@ This is a system-generated message that is sent due to the user's review policy.
 
 ### User Input
 
+_Viewed [rules_strategy.md](file:///C:/Users/Mohmed%20Aimen%20Raed/.gemini/antigravity/brain/6e254982-57dd-4c80-96f8-9243b27da68f/rules_strategy.md) _
 
-
-*Viewed [rules_strategy.md](file:///C:/Users/Mohmed%20Aimen%20Raed/.gemini/antigravity/brain/6e254982-57dd-4c80-96f8-9243b27da68f/rules_strategy.md) *
-
-*Edited relevant file*
+_Edited relevant file_
 
 ### User Input
 
 This is a system-generated message that is sent due to the user's review policy. Proceed with the decision that you think is the most optimal here.
 
-*Viewed [paste-classifier.ts](file:///e:/yarab%20we%20elnby/New%20folder/Filmlane/src/utils/paste-classifier.ts) *
+_Viewed [paste-classifier.ts](file:///e:/yarab%20we%20elnby/New%20folder/Filmlane/src/utils/paste-classifier.ts) _
 
-*Read resource from file:///C:/Users/Mohmed%20Aimen%20Raed/.gemini/antigravity/brain/6e254982-57dd-4c80-96f8-9243b27da68f/task.md *
+_Read resource from file:///C:/Users/Mohmed%20Aimen%20Raed/.gemini/antigravity/brain/6e254982-57dd-4c80-96f8-9243b27da68f/task.md _
 
-*Edited relevant file*
+_Edited relevant file_
 
-*Edited relevant file*
+_Edited relevant file_
 
 ### User Input
 
 This is a system-generated message that is sent due to the user's review policy. Proceed with the decision that you think is the most optimal here.
 
-*Edited relevant file*
+_Edited relevant file_
 
 ### User Input
 
 لماذا توقفت ؟
 
-*Edited relevant file*
+_Edited relevant file_
 
-*Edited relevant file*
-
-### User Input
-
-تمام  كمل باقي  الخطوات و قيم  الجزء اللي انا حطيته قولي رايك فيه ايه 
-
-*Edited relevant file*
-
-*Edited relevant file*
+_Edited relevant file_
 
 ### User Input
 
-نفذ المرحلة  الاول 
+تمام كمل باقي الخطوات و قيم الجزء اللي انا حطيته قولي رايك فيه ايه
 
-*Edited relevant file*
+_Edited relevant file_
 
-*Edited relevant file*
-
-*Viewed [paste-classifier.ts](file:///e:/yarab%20we%20elnby/New%20folder/Filmlane/src/utils/paste-classifier.ts) *
-
-*Viewed [implementation_plan.md](file:///C:/Users/Mohmed%20Aimen%20Raed/.gemini/antigravity/brain/6e254982-57dd-4c80-96f8-9243b27da68f/implementation_plan.md) *
-
-*Edited relevant file*
+_Edited relevant file_
 
 ### User Input
 
-دلوقتي  خليها بتبتشغل في الخلفية  مباشرة بدون زر 
+نفذ المرحلة الاول
 
-*Viewed [EditorArea.tsx](file:///e:/yarab%20we%20elnby/New%20folder/Filmlane/src/components/editor/EditorArea.tsx) *
+_Edited relevant file_
 
-*Edited relevant file*
+_Edited relevant file_
 
-*Viewed [paste-classifier.ts](file:///e:/yarab%20we%20elnby/New%20folder/Filmlane/src/utils/paste-classifier.ts) *
+_Viewed [paste-classifier.ts](file:///e:/yarab%20we%20elnby/New%20folder/Filmlane/src/utils/paste-classifier.ts) _
 
-*Edited relevant file*
+_Viewed [implementation_plan.md](file:///C:/Users/Mohmed%20Aimen%20Raed/.gemini/antigravity/brain/6e254982-57dd-4c80-96f8-9243b27da68f/implementation_plan.md) _
+
+_Edited relevant file_
 
 ### User Input
 
-انت نفذت  ايه من الخطوات دي هذه لا تحتاج ذكاء، وتكفي وحدها لتفعيل المراجعة:
+دلوقتي خليها بتبتشغل في الخلفية مباشرة بدون زر
+
+_Viewed [EditorArea.tsx](file:///e:/yarab%20we%20elnby/New%20folder/Filmlane/src/components/editor/EditorArea.tsx) _
+
+_Edited relevant file_
+
+_Viewed [paste-classifier.ts](file:///e:/yarab%20we%20elnby/New%20folder/Filmlane/src/utils/paste-classifier.ts) _
+
+_Edited relevant file_
+
+### User Input
+
+انت نفذت ايه من الخطوات دي هذه لا تحتاج ذكاء، وتكفي وحدها لتفعيل المراجعة:
 
 DIALOGUE بدون CHARACTER قبله مباشرة
 
@@ -1480,7 +1517,7 @@ ACTION → CHARACTER → ACTION → CHARACTER بدون أي DIALOGUE
 
 ظهور “:” داخل سطر صنفته ACTION مع أن شكل السطر أقرب لاسم متحدث
 
-3) “السياق” الذي يجب إرساله للنموذج (لتقليل الهلاوس)
+3. “السياق” الذي يجب إرساله للنموذج (لتقليل الهلاوس)
 
 عند تفعيل المراجعة لا ترسل “النص كله”. أرسل:
 
@@ -1494,7 +1531,7 @@ ACTION → CHARACTER → ACTION → CHARACTER بدون أي DIALOGUE
 
 هذا يجعل النموذج “مراجعًا” وليس “مؤلفًا”.
 
-4) ما الذي يجب أن يرجعه LLM بالضبط؟ (حتى يكون قابلًا للتطبيق)
+4. ما الذي يجب أن يرجعه LLM بالضبط؟ (حتى يكون قابلًا للتطبيق)
 
 لا تطلب منه أن يعيد إخراج النص كاملًا بصيغة:
 ELEMENT = VALUE
@@ -1505,13 +1542,12 @@ ELEMENT = VALUE
 مثال مخرجات إلزامية:
 
 {
-  "patches": [
-    { "op": "relabel", "index": 14, "from": "ACTION", "to": "CHARACTER" },
-    { "op": "relabel", "index": 15, "from": "ACTION", "to": "DIALOGUE" },
-    { "op": "split_inline", "index": 22, "delimiter": ":", "leftType": "CHARACTER", "rightType": "DIALOGUE" }
-  ]
+"patches": [
+{ "op": "relabel", "index": 14, "from": "ACTION", "to": "CHARACTER" },
+{ "op": "relabel", "index": 15, "from": "ACTION", "to": "DIALOGUE" },
+{ "op": "split_inline", "index": 22, "delimiter": ":", "leftType": "CHARACTER", "rightType": "DIALOGUE" }
+]
 }
-
 
 relabel: تغيير نوع السطر فقط.
 
@@ -1519,7 +1555,7 @@ split_inline: تقسيم سطر واحد إلى سطرين بناءً على : �
 
 ممنوع “merge” أو إعادة صياغة.
 
-5) بروتوكول مراجعة آمن (حتى لا يفسد LLM أشياء صحيحة)
+5. بروتوكول مراجعة آمن (حتى لا يفسد LLM أشياء صحيحة)
 
 بعد استلام patches:
 
@@ -1545,7 +1581,7 @@ top_p منخفض
 
 حتى يكون “مراجعًا” لا “مبدعًا”.
 
-6) أين تضع المرحلة الثانية في الكود (منطقيًا)
+6. أين تضع المرحلة الثانية في الكود (منطقيًا)
 
 داخل مسار اللصق، بعد أن تنتج المرحلة الأولى:
 
@@ -1572,7 +1608,7 @@ Validate
 
 Proceed with insertion/formatting
 
-7) ما الذي تحتاج إضافته تحديدًا الآن (قائمة قصيرة وحاسمة)
+7. ما الذي تحتاج إضافته تحديدًا الآن (قائمة قصيرة وحاسمة)
 
 إخراج الدرجات من المصنّف (topScore/secondScore)
 
@@ -1603,55 +1639,54 @@ PatchApplier + Validator
 ممنوع تغيير نص أي سطر أو إعادة صياغته أو دمجه.
 المخرجات يجب أن تكون JSON فقط بهذه البنية:
 {
-  "patches": [
-    {"op":"relabel","index":<int>,"from":"<TYPE>","to":"<TYPE>"},
-    {"op":"split_inline","index":<int>,"delimiter":":","leftType":"CHARACTER","rightType":"DIALOGUE"}
-  ]
+"patches": [
+{"op":"relabel","index":<int>,"from":"<TYPE>","to":"<TYPE>"},
+{"op":"split_inline","index":<int>,"delimiter":":","leftType":"CHARACTER","rightType":"DIALOGUE"}
+]
 }
 الأنواع المسموحة: BASMALA, SCENE-HEADER-1, SCENE-HEADER-2, SCENE-HEADER-3, ACTION, CHARACTER, DIALOGUE, TRANSITION
 إذا لا توجد أخطاء: {"patches":[]}
 
 مثال User Payload يرسل “السياق + نتائج المرحلة الأولى”
 {
-  "before_context": [
-    {"text":"مشهد 2","type":"SCENE-HEADER-1"},
-    {"text":"ليل - داخلي","type":"SCENE-HEADER-2"}
-  ],
-  "pasted_block": [
-    {"text":"مكتب منتج","type":"SCENE-HEADER-3","score":0.92},
-    {"text":"نور توفيق - امرأة في منتصف الثلاثينات","type":"ACTION","score":0.61},
-    {"text":"نور : تلفزيون تاني يا كريم ؟","type":"ACTION","score":0.52}
-  ],
-  "rules": {
-    "character_requires_colon": true,
-    "dialogue_must_follow_character": true
-  }
+"before_context": [
+{"text":"مشهد 2","type":"SCENE-HEADER-1"},
+{"text":"ليل - داخلي","type":"SCENE-HEADER-2"}
+],
+"pasted_block": [
+{"text":"مكتب منتج","type":"SCENE-HEADER-3","score":0.92},
+{"text":"نور توفيق - امرأة في منتصف الثلاثينات","type":"ACTION","score":0.61},
+{"text":"نور : تلفزيون تاني يا كريم ؟","type":"ACTION","score":0.52}
+],
+"rules": {
+"character_requires_colon": true,
+"dialogue_must_follow_character": true
+}
 }
 
-3) استدعاء curl حقيقي بنفس خادمك (Copy/Paste)
+3. استدعاء curl حقيقي بنفس خادمك (Copy/Paste)
 
 جرّب الآن:
 
 curl -s http://127.0.0.1:8000/v1/chat/completions \
-  -H "Authorization: Bearer local-acegpt" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "model": "acegpt13bchat",
-    "temperature": 0,
-    "top_p": 0.1,
-    "max_tokens": 600,
-    "messages": [
-      {"role": "system", "content": "أنت وكيل مراجعة لتصنيف عناصر السيناريو بعد مرحلة قواعد أولى. مهمتك: إرجاع تصحيحات للتصنيف فقط على شكل JSON صالح. ممنوع تغيير نص أي سطر أو إعادة صياغته أو دمجه. المخرجات يجب أن تكون JSON فقط بهذه البنية: {\"patches\":[{\"op\":\"relabel\",\"index\":<int>,\"from\":\"<TYPE>\",\"to\":\"<TYPE>\"},{\"op\":\"split_inline\",\"index\":<int>,\"delimiter\":\":\",\"leftType\":\"CHARACTER\",\"rightType\":\"DIALOGUE\"}]}. الأنواع المسموحة: BASMALA, SCENE-HEADER-1, SCENE-HEADER-2, SCENE-HEADER-3, ACTION, CHARACTER, DIALOGUE, TRANSITION. إذا لا توجد أخطاء: {\"patches\":[]}."},
-      {"role": "user", "content": "{\"before_context\":[{\"text\":\"scene-header-3 = مكتب منتج\",\"type\":\"SCENE-HEADER-3\"}],\"pasted_block\":[{\"text\":\"نور : تلفزيون تاني يا كريم ؟\",\"type\":\"ACTION\",\"score\":0.52},{\"text\":\"كريم : خلينا واقعين يا نور\",\"type\":\"ACTION\",\"score\":0.49}],\"rules\":{\"character_requires_colon\":true,\"dialogue_must_follow_character\":true}}"}
-    ]
-  }' | head -n 120
-
+ -H "Authorization: Bearer local-acegpt" \
+ -H "Content-Type: application/json" \
+ -d '{
+"model": "acegpt13bchat",
+"temperature": 0,
+"top_p": 0.1,
+"max_tokens": 600,
+"messages": [
+{"role": "system", "content": "أنت وكيل مراجعة لتصنيف عناصر السيناريو بعد مرحلة قواعد أولى. مهمتك: إرجاع تصحيحات للتصنيف فقط على شكل JSON صالح. ممنوع تغيير نص أي سطر أو إعادة صياغته أو دمجه. المخرجات يجب أن تكون JSON فقط بهذه البنية: {\"patches\":[{\"op\":\"relabel\",\"index\":<int>,\"from\":\"<TYPE>\",\"to\":\"<TYPE>\"},{\"op\":\"split_inline\",\"index\":<int>,\"delimiter\":\":\",\"leftType\":\"CHARACTER\",\"rightType\":\"DIALOGUE\"}]}. الأنواع المسموحة: BASMALA, SCENE-HEADER-1, SCENE-HEADER-2, SCENE-HEADER-3, ACTION, CHARACTER, DIALOGUE, TRANSITION. إذا لا توجد أخطاء: {\"patches\":[]}."},
+{"role": "user", "content": "{\"before_context\":[{\"text\":\"scene-header-3 = مكتب منتج\",\"type\":\"SCENE-HEADER-3\"}],\"pasted_block\":[{\"text\":\"نور : تلفزيون تاني يا كريم ؟\",\"type\":\"ACTION\",\"score\":0.52},{\"text\":\"كريم : خلينا واقعين يا نور\",\"type\":\"ACTION\",\"score\":0.49}],\"rules\":{\"character_requires_colon\":true,\"dialogue_must_follow_character\":true}}"}
+]
+}' | head -n 120
 
 المفروض يعطي patches مثل:
 
 split_inline للسطرين (لأنهما اسم : حوار)
 
-4) “طريقة الشك” التي ستقرر استدعاء النموذج
+4. “طريقة الشك” التي ستقرر استدعاء النموذج
 
 هذه هي القاعدة العملية التي تعمل فورًا في paste pipeline:
 
@@ -1667,118 +1702,108 @@ Score ضعيف: topScore < 0.55 أو topScore-secondScore < 0.1
 
 هذا وحده يكفي ليجعل الاستدعاءات قليلة ومبررة.
 
-*Viewed [paste-classifier.ts](file:///e:/yarab%20we%20elnby/New%20folder/Filmlane/src/utils/paste-classifier.ts) *
+_Viewed [paste-classifier.ts](file:///e:/yarab%20we%20elnby/New%20folder/Filmlane/src/utils/paste-classifier.ts) _
 
-*Edited relevant file*
+_Edited relevant file_
 
 ### User Input
 
-هو ليه التركيز مع الحوار  بس ؟ 
+هو ليه التركيز مع الحوار بس ؟
 
-*Viewed [ai-reviewer.ts](file:///e:/yarab%20we%20elnby/New%20folder/Filmlane/src/utils/ai-reviewer.ts) *
+_Viewed [ai-reviewer.ts](file:///e:/yarab%20we%20elnby/New%20folder/Filmlane/src/utils/ai-reviewer.ts) _
 
-*Edited relevant file*
+_Edited relevant file_
 
 ### User Input
 
 اه كمل
 
-*Viewed [paste-classifier.ts](file:///e:/yarab%20we%20elnby/New%20folder/Filmlane/src/utils/paste-classifier.ts) *
+_Viewed [paste-classifier.ts](file:///e:/yarab%20we%20elnby/New%20folder/Filmlane/src/utils/paste-classifier.ts) _
 
-*Viewed [EditorArea.tsx](file:///e:/yarab%20we%20elnby/New%20folder/Filmlane/src/components/editor/EditorArea.tsx) *
+_Viewed [EditorArea.tsx](file:///e:/yarab%20we%20elnby/New%20folder/Filmlane/src/components/editor/EditorArea.tsx) _
 
-*Viewed [task.md](file:///C:/Users/Mohmed%20Aimen%20Raed/.gemini/antigravity/brain/6e254982-57dd-4c80-96f8-9243b27da68f/task.md) *
+_Viewed [task.md](file:///C:/Users/Mohmed%20Aimen%20Raed/.gemini/antigravity/brain/6e254982-57dd-4c80-96f8-9243b27da68f/task.md) _
 
-*Edited relevant file*
+_Edited relevant file_
 
-*Edited relevant file*
+_Edited relevant file_
 
-*Edited relevant file*
+_Edited relevant file_
 
-*Viewed [paste-classifier.ts](file:///e:/yarab%20we%20elnby/New%20folder/Filmlane/src/utils/paste-classifier.ts) *
+_Viewed [paste-classifier.ts](file:///e:/yarab%20we%20elnby/New%20folder/Filmlane/src/utils/paste-classifier.ts) _
 
-*Viewed [paste-classifier.ts](file:///e:/yarab%20we%20elnby/New%20folder/Filmlane/src/utils/paste-classifier.ts) *
+_Viewed [paste-classifier.ts](file:///e:/yarab%20we%20elnby/New%20folder/Filmlane/src/utils/paste-classifier.ts) _
 
-*Viewed [paste-classifier.ts](file:///e:/yarab%20we%20elnby/New%20folder/Filmlane/src/utils/paste-classifier.ts) *
+_Viewed [paste-classifier.ts](file:///e:/yarab%20we%20elnby/New%20folder/Filmlane/src/utils/paste-classifier.ts) _
 
-*Viewed [ai-reviewer.ts](file:///e:/yarab%20we%20elnby/New%20folder/Filmlane/src/utils/ai-reviewer.ts) *
+_Viewed [ai-reviewer.ts](file:///e:/yarab%20we%20elnby/New%20folder/Filmlane/src/utils/ai-reviewer.ts) _
 
-*Viewed [implementation_plan.md](file:///C:/Users/Mohmed%20Aimen%20Raed/.gemini/antigravity/brain/6e254982-57dd-4c80-96f8-9243b27da68f/implementation_plan.md) *
+_Viewed [implementation_plan.md](file:///C:/Users/Mohmed%20Aimen%20Raed/.gemini/antigravity/brain/6e254982-57dd-4c80-96f8-9243b27da68f/implementation_plan.md) _
 
-*Viewed [index.ts](file:///e:/yarab%20we%20elnby/New%20folder/Filmlane/src/utils/index.ts) *
+_Viewed [index.ts](file:///e:/yarab%20we%20elnby/New%20folder/Filmlane/src/utils/index.ts) _
 
-*Edited relevant file*
+_Edited relevant file_
 
-*Edited relevant file*
+_Edited relevant file_
 
-*Viewed [editor-styles.ts](file:///e:/yarab%20we%20elnby/New%20folder/Filmlane/src/utils/editor-styles.ts) *
+_Viewed [editor-styles.ts](file:///e:/yarab%20we%20elnby/New%20folder/Filmlane/src/utils/editor-styles.ts) _
 
-*Edited relevant file*
+_Edited relevant file_
 
-*Edited relevant file*
+_Edited relevant file_
 
-*Viewed [paste-classifier.ts](file:///e:/yarab%20we%20elnby/New%20folder/Filmlane/src/utils/paste-classifier.ts) *
+_Viewed [paste-classifier.ts](file:///e:/yarab%20we%20elnby/New%20folder/Filmlane/src/utils/paste-classifier.ts) _
 
-*Edited relevant file*
+_Edited relevant file_
 
-*Edited relevant file*
+_Edited relevant file_
 
-*Edited relevant file*
+_Edited relevant file_
 
-*Edited relevant file*
+_Edited relevant file_
 
-*Edited relevant file*
+_Edited relevant file_
 
-*Edited relevant file*
+_Edited relevant file_
 
-*Edited relevant file*
+_Edited relevant file_
 
-*Edited relevant file*
+_Edited relevant file_
 
-*Edited relevant file*
+_Edited relevant file_
 
-*Viewed [logger.ts](file:///e:/yarab%20we%20elnby/New%20folder/Filmlane/src/utils/logger.ts) *
+_Viewed [logger.ts](file:///e:/yarab%20we%20elnby/New%20folder/Filmlane/src/utils/logger.ts) _
 
-*Viewed [implementation_plan.md](file:///C:/Users/Mohmed%20Aimen%20Raed/.gemini/antigravity/brain/6e254982-57dd-4c80-96f8-9243b27da68f/implementation_plan.md) *
+_Viewed [implementation_plan.md](file:///C:/Users/Mohmed%20Aimen%20Raed/.gemini/antigravity/brain/6e254982-57dd-4c80-96f8-9243b27da68f/implementation_plan.md) _
 
-*Edited relevant file*
+_Edited relevant file_
 
-*Edited relevant file*
+_Edited relevant file_
 
 ### User Input
 
 mohamed@DESKTOP-FTCRLC9:~$ curl -s http://127.0.0.1:8000/health | head
 mohamed@DESKTOP-FTCRLC9:~$ curl -s http://127.0.0.1:8000/v1/models \
-  -H "Authorization: Bearer local-acegpt" | head -n 80
+ -H "Authorization: Bearer local-acegpt" | head -n 80
 {"object":"list","data":[{"id":"acegpt13bchat","object":"model","created":1769125171,"owned_by":"vllm","root":"MohamedRashad/AceGPT-13B-chat-AWQ","parent":null,"max_model_len":2048,"permission":[{"id":"modelperm-810d1e6990af9ac0","object":"model_permission","created":1769125171,"allow_create_engine":false,"allow_sampling":true,"allow_logprobs":true,"allow_search_indices":false,"allow_view":true,"allow_fine_tuning":false,"organization":"*","group":null,"is_blocking":false}]}]}mohamed@DESKTOP-FTCRLC9:~$
 
+_Viewed [screenplay-service.ts](file:///e:/yarab%20we%20elnby/New%20folder/Filmlane/src/utils/screenplay-service.ts) _
 
-
-
-
-
-
-
-
-
-
-*Viewed [screenplay-service.ts](file:///e:/yarab%20we%20elnby/New%20folder/Filmlane/src/utils/screenplay-service.ts) *
-
-*Edited relevant file*
+_Edited relevant file_
 
 ### User Input
 
-كمل باقي الخطوات 
+كمل باقي الخطوات
 
-*Viewed [screenplay-service.ts](file:///e:/yarab%20we%20elnby/New%20folder/Filmlane/src/utils/screenplay-service.ts) *
+_Viewed [screenplay-service.ts](file:///e:/yarab%20we%20elnby/New%20folder/Filmlane/src/utils/screenplay-service.ts) _
 
-*Viewed [task.md](file:///C:/Users/Mohmed%20Aimen%20Raed/.gemini/antigravity/brain/6e254982-57dd-4c80-96f8-9243b27da68f/task.md) *
+_Viewed [task.md](file:///C:/Users/Mohmed%20Aimen%20Raed/.gemini/antigravity/brain/6e254982-57dd-4c80-96f8-9243b27da68f/task.md) _
 
-*Edited relevant file*
+_Edited relevant file_
 
-*Edited relevant file*
+_Edited relevant file_
 
-*Edited relevant file*
+_Edited relevant file_
 
 ### User Input
 
@@ -1788,293 +1813,293 @@ Call Stack
 2
 
 Object.reviewContent
-file:///E:/yarab%20we%20elnby/New%20folder/Filmlane/.next/static/chunks/src_862242ac._.js (2348:23)
+file:///E:/yarab%20we%20elnby/New%20folder/Filmlane/.next/static/chunks/src*862242ac.*.js (2348:23)
 async EditorArea.useCallback[handleAIReviewNeeded]
-file:///E:/yarab%20we%20elnby/New%20folder/Filmlane/.next/static/chunks/src_862242ac._.js (2687:33)
+file:///E:/yarab%20we%20elnby/New%20folder/Filmlane/.next/static/chunks/src*862242ac.*.js (2687:33)
 
-*Edited relevant file*
+_Edited relevant file_
 
 ### User Input
 
 lockdown-install.js:1 SES Removing unpermitted intrinsics
-logger.ts:22 [2026-01-23T01:12:00.587Z] [INFO] [MemoryManager] ContextMemoryManager initialized (in-memory). 
-installHook.js:1 [2026-01-23T01:12:00.588Z] [INFO] [MemoryManager] ContextMemoryManager initialized (in-memory). 
-logger.ts:22 [2026-01-23T01:12:13.172Z] [INFO] [Paste] 🚀 بدء عملية اللصق (Session: session-1769130733172) 
-logger.ts:22 [2026-01-23T01:12:13.172Z] [INFO] [Paste] 📋 بدء معالجة 128 سطر 
+logger.ts:22 [2026-01-23T01:12:00.587Z] [INFO] [MemoryManager] ContextMemoryManager initialized (in-memory).
+installHook.js:1 [2026-01-23T01:12:00.588Z] [INFO] [MemoryManager] ContextMemoryManager initialized (in-memory).
+logger.ts:22 [2026-01-23T01:12:13.172Z] [INFO] [Paste] 🚀 بدء عملية اللصق (Session: session-1769130733172)
+logger.ts:22 [2026-01-23T01:12:13.172Z] [INFO] [Paste] 📋 بدء معالجة 128 سطر
 logger.ts:22 [2026-01-23T01:12:13.172Z] [INFO] [Paste] أول 3 أسطر: "بسم الله الرحمن الرحيم {
-...", "مشهد 1 									ليل-داخلي 
-...", "منزل نهال – الصالة – الحمام – ..." 
-logger.ts:22 [2026-01-23T01:12:13.172Z] [INFO] [Processing] بدء معالجة 128 سطر... 
-installHook.js:1 [2026-01-23T01:12:13.173Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172 
+...", "مشهد 1 ليل-داخلي
+...", "منزل نهال – الصالة – الحمام – ..."
+logger.ts:22 [2026-01-23T01:12:13.172Z] [INFO] [Processing] بدء معالجة 128 سطر...
+installHook.js:1 [2026-01-23T01:12:13.173Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:12:13.177Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172 
+installHook.js:1 [2026-01-23T01:12:13.177Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:12:13.179Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172 
+installHook.js:1 [2026-01-23T01:12:13.179Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:12:13.179Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172 
+installHook.js:1 [2026-01-23T01:12:13.179Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:12:13.180Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172 
+installHook.js:1 [2026-01-23T01:12:13.180Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:12:13.180Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172 
+installHook.js:1 [2026-01-23T01:12:13.180Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:12:13.181Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172 
+installHook.js:1 [2026-01-23T01:12:13.181Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:12:13.181Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172 
+installHook.js:1 [2026-01-23T01:12:13.181Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:12:13.182Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172 
+installHook.js:1 [2026-01-23T01:12:13.182Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:12:13.182Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172 
+installHook.js:1 [2026-01-23T01:12:13.182Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:12:13.183Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172 
+installHook.js:1 [2026-01-23T01:12:13.183Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:12:13.184Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172 
+installHook.js:1 [2026-01-23T01:12:13.184Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:12:13.184Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172 
+installHook.js:1 [2026-01-23T01:12:13.184Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:12:13.184Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172 
+installHook.js:1 [2026-01-23T01:12:13.184Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:12:13.185Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172 
+installHook.js:1 [2026-01-23T01:12:13.185Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:12:13.185Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172 
+installHook.js:1 [2026-01-23T01:12:13.185Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:12:13.185Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172 
+installHook.js:1 [2026-01-23T01:12:13.185Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:12:13.186Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172 
+installHook.js:1 [2026-01-23T01:12:13.186Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:12:13.186Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172 
+installHook.js:1 [2026-01-23T01:12:13.186Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:12:13.186Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172 
+installHook.js:1 [2026-01-23T01:12:13.186Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:12:13.186Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172 
+installHook.js:1 [2026-01-23T01:12:13.186Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:12:13.187Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172 
+installHook.js:1 [2026-01-23T01:12:13.187Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:12:13.187Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172 
+installHook.js:1 [2026-01-23T01:12:13.187Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:12:13.187Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172 
+installHook.js:1 [2026-01-23T01:12:13.187Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:12:13.187Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172 
+installHook.js:1 [2026-01-23T01:12:13.187Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:12:13.187Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172 
+installHook.js:1 [2026-01-23T01:12:13.187Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:12:13.188Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172 
+installHook.js:1 [2026-01-23T01:12:13.188Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:12:13.188Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172 
+installHook.js:1 [2026-01-23T01:12:13.188Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:12:13.188Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172 
+installHook.js:1 [2026-01-23T01:12:13.188Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:12:13.188Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172 
+installHook.js:1 [2026-01-23T01:12:13.188Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:12:13.188Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172 
+installHook.js:1 [2026-01-23T01:12:13.188Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:12:13.189Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172 
+installHook.js:1 [2026-01-23T01:12:13.189Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:12:13.189Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172 
+installHook.js:1 [2026-01-23T01:12:13.189Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:12:13.189Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172 
+installHook.js:1 [2026-01-23T01:12:13.189Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:12:13.189Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172 
+installHook.js:1 [2026-01-23T01:12:13.189Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:12:13.190Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172 
+installHook.js:1 [2026-01-23T01:12:13.190Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:12:13.190Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172 
+installHook.js:1 [2026-01-23T01:12:13.190Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:12:13.190Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172 
+installHook.js:1 [2026-01-23T01:12:13.190Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:12:13.190Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172 
+installHook.js:1 [2026-01-23T01:12:13.190Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:12:13.190Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172 
+installHook.js:1 [2026-01-23T01:12:13.190Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:12:13.191Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172 
+installHook.js:1 [2026-01-23T01:12:13.191Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:12:13.191Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172 
+installHook.js:1 [2026-01-23T01:12:13.191Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:12:13.192Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172 
+installHook.js:1 [2026-01-23T01:12:13.192Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:12:13.192Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172 
+installHook.js:1 [2026-01-23T01:12:13.192Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:12:13.193Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172 
+installHook.js:1 [2026-01-23T01:12:13.193Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:12:13.193Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172 
+installHook.js:1 [2026-01-23T01:12:13.193Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:12:13.193Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172 
+installHook.js:1 [2026-01-23T01:12:13.193Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:12:13.194Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172 
+installHook.js:1 [2026-01-23T01:12:13.194Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:12:13.194Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172 
+installHook.js:1 [2026-01-23T01:12:13.194Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:12:13.194Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172 
+installHook.js:1 [2026-01-23T01:12:13.194Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:12:13.194Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172 
+installHook.js:1 [2026-01-23T01:12:13.194Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:12:13.195Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172 
+installHook.js:1 [2026-01-23T01:12:13.195Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:12:13.195Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172 
+installHook.js:1 [2026-01-23T01:12:13.195Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:12:13.195Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172 
+installHook.js:1 [2026-01-23T01:12:13.195Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:12:13.195Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172 
+installHook.js:1 [2026-01-23T01:12:13.195Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:12:13.196Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172 
+installHook.js:1 [2026-01-23T01:12:13.196Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:12:13.196Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172 
+installHook.js:1 [2026-01-23T01:12:13.196Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:12:13.196Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172 
+installHook.js:1 [2026-01-23T01:12:13.196Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:12:13.196Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172 
+installHook.js:1 [2026-01-23T01:12:13.196Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:12:13.196Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172 
+installHook.js:1 [2026-01-23T01:12:13.196Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:12:13.196Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172 
+installHook.js:1 [2026-01-23T01:12:13.196Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:12:13.197Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172 
+installHook.js:1 [2026-01-23T01:12:13.197Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:12:13.197Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172 
+installHook.js:1 [2026-01-23T01:12:13.197Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:12:13.197Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172 
+installHook.js:1 [2026-01-23T01:12:13.197Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:12:13.197Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172 
+installHook.js:1 [2026-01-23T01:12:13.197Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:12:13.197Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172 
+installHook.js:1 [2026-01-23T01:12:13.197Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:12:13.198Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172 
+installHook.js:1 [2026-01-23T01:12:13.198Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:12:13.198Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172 
+installHook.js:1 [2026-01-23T01:12:13.198Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:12:13.198Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172 
+installHook.js:1 [2026-01-23T01:12:13.198Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:12:13.198Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172 
+installHook.js:1 [2026-01-23T01:12:13.198Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:12:13.198Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172 
+installHook.js:1 [2026-01-23T01:12:13.198Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:12:13.199Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172 
+installHook.js:1 [2026-01-23T01:12:13.199Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:12:13.199Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172 
+installHook.js:1 [2026-01-23T01:12:13.199Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:12:13.199Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172 
+installHook.js:1 [2026-01-23T01:12:13.199Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:12:13.199Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172 
+installHook.js:1 [2026-01-23T01:12:13.199Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:12:13.200Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172 
+installHook.js:1 [2026-01-23T01:12:13.200Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:12:13.200Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172 
+installHook.js:1 [2026-01-23T01:12:13.200Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:12:13.200Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172 
+installHook.js:1 [2026-01-23T01:12:13.200Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:12:13.200Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172 
+installHook.js:1 [2026-01-23T01:12:13.200Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:12:13.201Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172 
+installHook.js:1 [2026-01-23T01:12:13.201Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:12:13.201Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172 
+installHook.js:1 [2026-01-23T01:12:13.201Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:12:13.201Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172 
+installHook.js:1 [2026-01-23T01:12:13.201Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:12:13.201Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172 
+installHook.js:1 [2026-01-23T01:12:13.201Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:12:13.202Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172 
+installHook.js:1 [2026-01-23T01:12:13.202Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:12:13.202Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172 
+installHook.js:1 [2026-01-23T01:12:13.202Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:12:13.202Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172 
+installHook.js:1 [2026-01-23T01:12:13.202Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:12:13.202Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172 
+installHook.js:1 [2026-01-23T01:12:13.202Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:12:13.202Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172 
+installHook.js:1 [2026-01-23T01:12:13.202Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:12:13.203Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172 
+installHook.js:1 [2026-01-23T01:12:13.203Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:12:13.203Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172 
+installHook.js:1 [2026-01-23T01:12:13.203Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:12:13.203Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172 
+installHook.js:1 [2026-01-23T01:12:13.203Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:12:13.203Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172 
+installHook.js:1 [2026-01-23T01:12:13.203Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:12:13.203Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172 
+installHook.js:1 [2026-01-23T01:12:13.203Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:12:13.204Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172 
+installHook.js:1 [2026-01-23T01:12:13.204Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:12:13.204Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172 
+installHook.js:1 [2026-01-23T01:12:13.204Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:12:13.204Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172 
+installHook.js:1 [2026-01-23T01:12:13.204Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:12:13.204Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172 
+installHook.js:1 [2026-01-23T01:12:13.204Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:12:13.205Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172 
+installHook.js:1 [2026-01-23T01:12:13.205Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:12:13.205Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172 
+installHook.js:1 [2026-01-23T01:12:13.205Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:12:13.205Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172 
+installHook.js:1 [2026-01-23T01:12:13.205Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:12:13.205Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172 
+installHook.js:1 [2026-01-23T01:12:13.205Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:12:13.205Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172 
+installHook.js:1 [2026-01-23T01:12:13.205Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:12:13.206Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172 
+installHook.js:1 [2026-01-23T01:12:13.206Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:12:13.206Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172 
+installHook.js:1 [2026-01-23T01:12:13.206Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:12:13.206Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172 
+installHook.js:1 [2026-01-23T01:12:13.206Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:12:13.206Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172 
+installHook.js:1 [2026-01-23T01:12:13.206Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:12:13.206Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172 
+installHook.js:1 [2026-01-23T01:12:13.206Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:12:13.207Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172 
+installHook.js:1 [2026-01-23T01:12:13.207Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:12:13.207Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172 
+installHook.js:1 [2026-01-23T01:12:13.207Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:12:13.207Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172 
+installHook.js:1 [2026-01-23T01:12:13.207Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:12:13.207Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172 
+installHook.js:1 [2026-01-23T01:12:13.207Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:12:13.207Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172 
+installHook.js:1 [2026-01-23T01:12:13.207Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:12:13.208Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172 
+installHook.js:1 [2026-01-23T01:12:13.208Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:12:13.208Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172 
+installHook.js:1 [2026-01-23T01:12:13.208Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:12:13.209Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172 
+installHook.js:1 [2026-01-23T01:12:13.209Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:12:13.209Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172 
+installHook.js:1 [2026-01-23T01:12:13.209Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:12:13.210Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172 
+installHook.js:1 [2026-01-23T01:12:13.210Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:12:13.210Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172 
+installHook.js:1 [2026-01-23T01:12:13.210Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:12:13.210Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172 
+installHook.js:1 [2026-01-23T01:12:13.210Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:12:13.210Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172 
+installHook.js:1 [2026-01-23T01:12:13.210Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:12:13.211Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172 
+installHook.js:1 [2026-01-23T01:12:13.211Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:12:13.211Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172 
+installHook.js:1 [2026-01-23T01:12:13.211Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:12:13.211Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172 
+installHook.js:1 [2026-01-23T01:12:13.211Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:12:13.211Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172 
+installHook.js:1 [2026-01-23T01:12:13.211Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:12:13.212Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172 
+installHook.js:1 [2026-01-23T01:12:13.212Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:12:13.212Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172 
+installHook.js:1 [2026-01-23T01:12:13.212Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:12:13.212Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172 
+installHook.js:1 [2026-01-23T01:12:13.212Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:12:13.212Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172 
+installHook.js:1 [2026-01-23T01:12:13.212Z] [WARNING] [MemoryManager] No context found for session: session-1769130733172
 overrideMethod @ installHook.js:1
-logger.ts:22 [2026-01-23T01:12:13.238Z] [INFO] [Paste] ✅ تم إكمال عملية اللصق والتنسيق 
-logger.ts:22 [2026-01-23T01:12:13.238Z] [INFO] [Paste] 🤖 AI Review Triggered due to suspicious classifications. 
+logger.ts:22 [2026-01-23T01:12:13.238Z] [INFO] [Paste] ✅ تم إكمال عملية اللصق والتنسيق
+logger.ts:22 [2026-01-23T01:12:13.238Z] [INFO] [Paste] 🤖 AI Review Triggered due to suspicious classifications.
 logger.ts:22 [2026-01-23T01:12:13.238Z] [INFO] [EditorArea] 🧠 AI Correction Triggered Object
 logger.ts:22 [2026-01-23T01:12:13.238Z] [INFO] [AI] Sending content for review... Object
-:8000/v1/chat/completions:1  Failed to load resource: the server responded with a status of 400 (Bad Request)
+:8000/v1/chat/completions:1 Failed to load resource: the server responded with a status of 400 (Bad Request)
 installHook.js:1 [2026-01-23T01:12:13.333Z] [ERROR] [AI] API Error Details: 400 Bad Request {"error":{"message":"As of transformers v4.44, default chat template is no longer allowed, so you must provide a chat template if the tokenizer does not define one. None","type":"BadRequestError","param":null,"code":400}}
 overrideMethod @ installHook.js:1
 installHook.js:1 [2026-01-23T01:12:13.335Z] [ERROR] [AI] Failed to review content Error: AI API Error: Bad Request - {"error":{"message":"As of transformers v4.44, default chat template is no longer allowed, so you must provide a chat template if the tokenizer does not define one. None","type":"BadRequestError","param":null,"code":400}}
-    at Object.reviewContent (screenplay-service.ts:55:23)
-    at async EditorArea.useCallback[handleAIReviewNeeded] (EditorArea.tsx:307:29)
+at Object.reviewContent (screenplay-service.ts:55:23)
+at async EditorArea.useCallback[handleAIReviewNeeded] (EditorArea.tsx:307:29)
 overrideMethod @ installHook.js:1
 lockdown-install.js:1 SES Removing unpermitted intrinsics
-logger.ts:22 [2026-01-23T01:13:00.173Z] [INFO] [MemoryManager] ContextMemoryManager initialized (in-memory). 
-installHook.js:1 [2026-01-23T01:13:00.173Z] [INFO] [MemoryManager] ContextMemoryManager initialized (in-memory). 
+logger.ts:22 [2026-01-23T01:13:00.173Z] [INFO] [MemoryManager] ContextMemoryManager initialized (in-memory).
+installHook.js:1 [2026-01-23T01:13:00.173Z] [INFO] [MemoryManager] ContextMemoryManager initialized (in-memory).
 cascade-browser-integration.js:2 A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used:
 
 - A server/client branch `if (typeof window !== 'undefined')`.
@@ -2087,34 +2112,36 @@ It can also happen if the client has a browser extension installed which messes 
 
 https://react.dev/link/hydration-mismatch
 
-  ...
-    <HTTPAccessFallbackBoundary notFound={<SegmentViewNode>} forbidden={undefined} unauthorized={undefined}>
-      <HTTPAccessFallbackErrorBoundary pathname="/" notFound={<SegmentViewNode>} forbidden={undefined} ...>
-        <RedirectBoundary>
-          <RedirectErrorBoundary router={{...}}>
-            <InnerLayoutRouter url="/" tree={[...]} cacheNode={{lazyData:null, ...}} segmentPath={[...]}>
-              <SegmentViewNode type="page" pagePath="page.tsx">
-                <SegmentTrieNode>
-                <Home>
-                  <ScreenplayEditor>
-                    <div className="min-h-scre..." dir="rtl">
-                      <EditorHeader>
-                      <div className="flex-grow ...">
-                        ...
-                          <div className="relative p...">
-                            <EditorArea ref={{current:null}} ...>
-                              <div className="screenplay..." ref={{current:null}}>
-                                <div className="screenplay...">
-                                  <div>
-                                  <div
-                                    className="screenplay-sheet__body"
-                                    contentEditable={true}
-                                    suppressContentEditableWarning={true}
-                                    onInput={function EditorArea.useCallback[handleInput]}
-                                    onPaste={function EditorArea.useCallback[handlePaste]}
-                                    onKeyDown={function handleKeyDown}
-                                    onKeyUp={function EditorArea.useCallback[handleInput]}
-                                    onMouseUp={function EditorArea.useCallback[handleInput]}
+...
+<HTTPAccessFallbackBoundary notFound={<SegmentViewNode>} forbidden={undefined} unauthorized={undefined}>
+<HTTPAccessFallbackErrorBoundary pathname="/" notFound={<SegmentViewNode>} forbidden={undefined} ...>
+<RedirectBoundary>
+<RedirectErrorBoundary router={{...}}>
+<InnerLayoutRouter url="/" tree={[...]} cacheNode={{lazyData:null, ...}} segmentPath={[...]}>
+<SegmentViewNode type="page" pagePath="page.tsx">
+<SegmentTrieNode>
+<Home>
+<ScreenplayEditor>
+
+<div className="min-h-scre..." dir="rtl">
+<EditorHeader>
+<div className="flex-grow ...">
+...
+<div className="relative p...">
+<EditorArea ref={{current:null}} ...>
+<div className="screenplay..." ref={{current:null}}>
+<div className="screenplay...">
+<div>
+<div
+className="screenplay-sheet\_\_body"
+contentEditable={true}
+suppressContentEditableWarning={true}
+onInput={function EditorArea.useCallback[handleInput]}
+onPaste={function EditorArea.useCallback[handlePaste]}
+onKeyDown={function handleKeyDown}
+onKeyUp={function EditorArea.useCallback[handleInput]}
+onMouseUp={function EditorArea.useCallback[handleInput]}
+
 -                                   data-dashlane-rid="1c6086854af470fe"
                                   >
                                   ...
@@ -2194,282 +2221,282 @@ performWorkOnRootViaSchedulerTask @ react-dom-client.development.js:16815
 performWorkUntilDeadline @ scheduler.development.js:45
 turbopack-hot-reloader-common.ts:43 [Fast Refresh] rebuilding
 report-hmr-latency.ts:26 [Fast Refresh] done in 273ms
-logger.ts:22 [2026-01-23T01:13:16.283Z] [INFO] [Paste] 🚀 بدء عملية اللصق (Session: session-1769130796283) 
-logger.ts:22 [2026-01-23T01:13:16.284Z] [INFO] [Paste] 📋 بدء معالجة 128 سطر 
+logger.ts:22 [2026-01-23T01:13:16.283Z] [INFO] [Paste] 🚀 بدء عملية اللصق (Session: session-1769130796283)
+logger.ts:22 [2026-01-23T01:13:16.284Z] [INFO] [Paste] 📋 بدء معالجة 128 سطر
 logger.ts:22 [2026-01-23T01:13:16.284Z] [INFO] [Paste] أول 3 أسطر: "بسم الله الرحمن الرحيم {
-...", "مشهد 1 									ليل-داخلي 
-...", "منزل نهال – الصالة – الحمام – ..." 
-logger.ts:22 [2026-01-23T01:13:16.284Z] [INFO] [Processing] بدء معالجة 128 سطر... 
-installHook.js:1 [2026-01-23T01:13:16.285Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+...", "مشهد 1 ليل-داخلي
+...", "منزل نهال – الصالة – الحمام – ..."
+logger.ts:22 [2026-01-23T01:13:16.284Z] [INFO] [Processing] بدء معالجة 128 سطر...
+installHook.js:1 [2026-01-23T01:13:16.285Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.287Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.287Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.288Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.288Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.289Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.289Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.289Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.289Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.290Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.290Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.290Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.290Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.291Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.291Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.291Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.291Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.292Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.292Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.292Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.292Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.293Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.293Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.293Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.293Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.293Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.293Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.293Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.293Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.294Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.294Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.294Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.294Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.294Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.294Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.295Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.295Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.295Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.295Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.295Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.295Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.296Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.296Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.296Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.296Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.296Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.296Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.296Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.296Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.296Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.296Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.297Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.297Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.297Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.297Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.297Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.297Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.297Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.297Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.297Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.297Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.298Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.298Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.298Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.298Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.298Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.298Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.298Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.298Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.299Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.299Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.299Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.299Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.299Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.299Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.299Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.299Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.300Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.300Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.300Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.300Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.300Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.300Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.300Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.300Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.300Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.300Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.301Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.301Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.301Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.301Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.301Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.301Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.301Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.301Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.301Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.301Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.302Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.302Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.302Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.302Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.302Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.302Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.302Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.302Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.303Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.303Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.303Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.303Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.303Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.303Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.303Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.303Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.303Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.303Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.303Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.303Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.304Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.304Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.304Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.304Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.304Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.304Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.304Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.304Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.304Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.304Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.305Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.305Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.305Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.305Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.305Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.305Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.305Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.305Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.305Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.305Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.306Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.306Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.306Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.306Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.306Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.306Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.306Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.306Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.306Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.306Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.307Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.307Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.307Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.307Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.307Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.307Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.307Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.307Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.308Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.308Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.308Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.308Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.308Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.308Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.308Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.308Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.309Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.309Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.309Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.309Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.309Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.309Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.309Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.309Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.309Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.309Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.310Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.310Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.310Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.310Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.310Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.310Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.310Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.310Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.311Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.311Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.311Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.311Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.311Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.311Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.311Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.311Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.311Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.311Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.312Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.312Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.312Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.312Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.312Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.312Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.312Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.312Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.313Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.313Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.313Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.313Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.313Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.313Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.313Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.313Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.313Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.313Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.314Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.314Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.314Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.314Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.314Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.314Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.314Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.314Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.314Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.314Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.315Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.315Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.315Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.315Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.315Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.315Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.315Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.315Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.315Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.315Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.315Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.315Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.316Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.316Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.316Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.316Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.316Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.316Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.317Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.317Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.317Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.317Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.317Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.317Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.317Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.317Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.318Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.318Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.318Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.318Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.318Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.318Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.318Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.318Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.318Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.318Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-logger.ts:22 [2026-01-23T01:13:16.327Z] [INFO] [Paste] ✅ تم إكمال عملية اللصق والتنسيق 
-logger.ts:22 [2026-01-23T01:13:16.327Z] [INFO] [Paste] 🤖 AI Review Triggered due to suspicious classifications. 
+logger.ts:22 [2026-01-23T01:13:16.327Z] [INFO] [Paste] ✅ تم إكمال عملية اللصق والتنسيق
+logger.ts:22 [2026-01-23T01:13:16.327Z] [INFO] [Paste] 🤖 AI Review Triggered due to suspicious classifications.
 logger.ts:22 [2026-01-23T01:13:16.327Z] [INFO] [EditorArea] 🧠 AI Correction Triggered Object
 logger.ts:22 [2026-01-23T01:13:16.327Z] [INFO] [AI] Sending content for review... Object
-:8000/v1/chat/completions:1  Failed to load resource: the server responded with a status of 400 (Bad Request)
+:8000/v1/chat/completions:1 Failed to load resource: the server responded with a status of 400 (Bad Request)
 cascade-browser-integration.js:2 [2026-01-23T01:13:16.563Z] [ERROR] [AI] API Error Details: 400 Bad Request {"error":{"message":"As of transformers v4.44, default chat template is no longer allowed, so you must provide a chat template if the tokenizer does not define one. None","type":"BadRequestError","param":null,"code":400}}
 console.error @ cascade-browser-integration.js:2
 cascade-browser-integration.js:2 [2026-01-23T01:13:16.563Z] [ERROR] [AI] Failed to review content Error: AI API Error: Bad Request - {"error":{"message":"As of transformers v4.44, default chat template is no longer allowed, so you must provide a chat template if the tokenizer does not define one. None","type":"BadRequestError","param":null,"code":400}}
-    at Object.reviewContent (screenplay-service.ts:55:23)
-    at async EditorArea.useCallback[handleAIReviewNeeded] (EditorArea.tsx:307:29)
+at Object.reviewContent (screenplay-service.ts:55:23)
+at async EditorArea.useCallback[handleAIReviewNeeded] (EditorArea.tsx:307:29)
 console.error @ cascade-browser-integration.js:2
 lockdown-install.js:1 SES Removing unpermitted intrinsics
-logger.ts:22 [2026-01-23T01:13:00.173Z] [INFO] [MemoryManager] ContextMemoryManager initialized (in-memory). 
-installHook.js:1 [2026-01-23T01:13:00.173Z] [INFO] [MemoryManager] ContextMemoryManager initialized (in-memory). 
+logger.ts:22 [2026-01-23T01:13:00.173Z] [INFO] [MemoryManager] ContextMemoryManager initialized (in-memory).
+installHook.js:1 [2026-01-23T01:13:00.173Z] [INFO] [MemoryManager] ContextMemoryManager initialized (in-memory).
 cascade-browser-integration.js:2 A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used:
 
 - A server/client branch `if (typeof window !== 'undefined')`.
@@ -2482,34 +2509,36 @@ It can also happen if the client has a browser extension installed which messes 
 
 https://react.dev/link/hydration-mismatch
 
-  ...
-    <HTTPAccessFallbackBoundary notFound={<SegmentViewNode>} forbidden={undefined} unauthorized={undefined}>
-      <HTTPAccessFallbackErrorBoundary pathname="/" notFound={<SegmentViewNode>} forbidden={undefined} ...>
-        <RedirectBoundary>
-          <RedirectErrorBoundary router={{...}}>
-            <InnerLayoutRouter url="/" tree={[...]} cacheNode={{lazyData:null, ...}} segmentPath={[...]}>
-              <SegmentViewNode type="page" pagePath="page.tsx">
-                <SegmentTrieNode>
-                <Home>
-                  <ScreenplayEditor>
-                    <div className="min-h-scre..." dir="rtl">
-                      <EditorHeader>
-                      <div className="flex-grow ...">
-                        ...
-                          <div className="relative p...">
-                            <EditorArea ref={{current:null}} ...>
-                              <div className="screenplay..." ref={{current:null}}>
-                                <div className="screenplay...">
-                                  <div>
-                                  <div
-                                    className="screenplay-sheet__body"
-                                    contentEditable={true}
-                                    suppressContentEditableWarning={true}
-                                    onInput={function EditorArea.useCallback[handleInput]}
-                                    onPaste={function EditorArea.useCallback[handlePaste]}
-                                    onKeyDown={function handleKeyDown}
-                                    onKeyUp={function EditorArea.useCallback[handleInput]}
-                                    onMouseUp={function EditorArea.useCallback[handleInput]}
+...
+<HTTPAccessFallbackBoundary notFound={<SegmentViewNode>} forbidden={undefined} unauthorized={undefined}>
+<HTTPAccessFallbackErrorBoundary pathname="/" notFound={<SegmentViewNode>} forbidden={undefined} ...>
+<RedirectBoundary>
+<RedirectErrorBoundary router={{...}}>
+<InnerLayoutRouter url="/" tree={[...]} cacheNode={{lazyData:null, ...}} segmentPath={[...]}>
+<SegmentViewNode type="page" pagePath="page.tsx">
+<SegmentTrieNode>
+<Home>
+<ScreenplayEditor>
+
+<div className="min-h-scre..." dir="rtl">
+<EditorHeader>
+<div className="flex-grow ...">
+...
+<div className="relative p...">
+<EditorArea ref={{current:null}} ...>
+<div className="screenplay..." ref={{current:null}}>
+<div className="screenplay...">
+<div>
+<div
+className="screenplay-sheet\_\_body"
+contentEditable={true}
+suppressContentEditableWarning={true}
+onInput={function EditorArea.useCallback[handleInput]}
+onPaste={function EditorArea.useCallback[handlePaste]}
+onKeyDown={function handleKeyDown}
+onKeyUp={function EditorArea.useCallback[handleInput]}
+onMouseUp={function EditorArea.useCallback[handleInput]}
+
 -                                   data-dashlane-rid="1c6086854af470fe"
                                   >
                                   ...
@@ -2589,287 +2618,286 @@ performWorkOnRootViaSchedulerTask @ react-dom-client.development.js:16815
 performWorkUntilDeadline @ scheduler.development.js:45
 turbopack-hot-reloader-common.ts:43 [Fast Refresh] rebuilding
 report-hmr-latency.ts:26 [Fast Refresh] done in 273ms
-logger.ts:22 [2026-01-23T01:13:16.283Z] [INFO] [Paste] 🚀 بدء عملية اللصق (Session: session-1769130796283) 
-logger.ts:22 [2026-01-23T01:13:16.284Z] [INFO] [Paste] 📋 بدء معالجة 128 سطر 
+logger.ts:22 [2026-01-23T01:13:16.283Z] [INFO] [Paste] 🚀 بدء عملية اللصق (Session: session-1769130796283)
+logger.ts:22 [2026-01-23T01:13:16.284Z] [INFO] [Paste] 📋 بدء معالجة 128 سطر
 logger.ts:22 [2026-01-23T01:13:16.284Z] [INFO] [Paste] أول 3 أسطر: "بسم الله الرحمن الرحيم {
-...", "مشهد 1 									ليل-داخلي 
-...", "منزل نهال – الصالة – الحمام – ..." 
-logger.ts:22 [2026-01-23T01:13:16.284Z] [INFO] [Processing] بدء معالجة 128 سطر... 
-installHook.js:1 [2026-01-23T01:13:16.285Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+...", "مشهد 1 ليل-داخلي
+...", "منزل نهال – الصالة – الحمام – ..."
+logger.ts:22 [2026-01-23T01:13:16.284Z] [INFO] [Processing] بدء معالجة 128 سطر...
+installHook.js:1 [2026-01-23T01:13:16.285Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.287Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.287Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.288Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.288Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.289Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.289Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.289Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.289Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.290Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.290Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.290Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.290Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.291Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.291Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.291Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.291Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.292Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.292Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.292Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.292Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.293Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.293Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.293Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.293Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.293Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.293Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.293Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.293Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.294Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.294Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.294Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.294Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.294Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.294Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.295Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.295Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.295Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.295Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.295Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.295Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.296Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.296Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.296Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.296Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.296Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.296Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.296Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.296Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.296Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.296Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.297Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.297Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.297Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.297Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.297Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.297Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.297Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.297Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.297Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.297Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.298Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.298Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.298Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.298Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.298Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.298Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.298Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.298Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.299Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.299Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.299Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.299Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.299Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.299Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.299Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.299Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.300Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.300Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.300Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.300Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.300Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.300Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.300Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.300Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.300Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.300Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.301Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.301Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.301Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.301Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.301Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.301Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.301Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.301Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.301Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.301Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.302Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.302Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.302Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.302Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.302Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.302Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.302Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.302Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.303Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.303Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.303Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.303Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.303Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.303Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.303Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.303Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.303Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.303Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.303Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.303Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.304Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.304Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.304Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.304Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.304Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.304Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.304Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.304Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.304Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.304Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.305Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.305Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.305Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.305Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.305Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.305Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.305Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.305Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.305Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.305Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.306Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.306Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.306Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.306Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.306Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.306Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.306Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.306Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.306Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.306Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.307Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.307Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.307Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.307Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.307Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.307Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.307Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.307Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.308Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.308Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.308Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.308Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.308Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.308Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.308Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.308Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.309Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.309Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.309Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.309Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.309Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.309Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.309Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.309Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.309Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.309Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.310Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.310Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.310Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.310Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.310Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.310Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.310Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.310Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.311Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.311Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.311Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.311Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.311Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.311Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.311Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.311Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.311Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.311Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.312Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.312Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.312Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.312Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.312Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.312Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.312Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.312Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.313Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.313Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.313Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.313Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.313Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.313Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.313Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.313Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.313Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.313Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.314Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.314Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.314Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.314Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.314Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.314Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.314Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.314Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.314Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.314Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.315Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.315Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.315Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.315Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.315Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.315Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.315Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.315Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.315Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.315Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.315Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.315Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.316Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.316Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.316Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.316Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.316Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.316Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.317Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.317Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.317Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.317Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.317Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.317Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.317Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.317Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.318Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.318Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.318Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.318Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.318Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.318Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.318Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.318Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-installHook.js:1 [2026-01-23T01:13:16.318Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283 
+installHook.js:1 [2026-01-23T01:13:16.318Z] [WARNING] [MemoryManager] No context found for session: session-1769130796283
 overrideMethod @ installHook.js:1
-logger.ts:22 [2026-01-23T01:13:16.327Z] [INFO] [Paste] ✅ تم إكمال عملية اللصق والتنسيق 
-logger.ts:22 [2026-01-23T01:13:16.327Z] [INFO] [Paste] 🤖 AI Review Triggered due to suspicious classifications. 
+logger.ts:22 [2026-01-23T01:13:16.327Z] [INFO] [Paste] ✅ تم إكمال عملية اللصق والتنسيق
+logger.ts:22 [2026-01-23T01:13:16.327Z] [INFO] [Paste] 🤖 AI Review Triggered due to suspicious classifications.
 logger.ts:22 [2026-01-23T01:13:16.327Z] [INFO] [EditorArea] 🧠 AI Correction Triggered Object
 logger.ts:22 [2026-01-23T01:13:16.327Z] [INFO] [AI] Sending content for review... Object
-:8000/v1/chat/completions:1  Failed to load resource: the server responded with a status of 400 (Bad Request)
+:8000/v1/chat/completions:1 Failed to load resource: the server responded with a status of 400 (Bad Request)
 cascade-browser-integration.js:2 [2026-01-23T01:13:16.563Z] [ERROR] [AI] API Error Details: 400 Bad Request {"error":{"message":"As of transformers v4.44, default chat template is no longer allowed, so you must provide a chat template if the tokenizer does not define one. None","type":"BadRequestError","param":null,"code":400}}
 console.error @ cascade-browser-integration.js:2
 cascade-browser-integration.js:2 [2026-01-23T01:13:16.563Z] [ERROR] [AI] Failed to review content Error: AI API Error: Bad Request - {"error":{"message":"As of transformers v4.44, default chat template is no longer allowed, so you must provide a chat template if the tokenizer does not define one. None","type":"BadRequestError","param":null,"code":400}}
-    at Object.reviewContent (screenplay-service.ts:55:23)
-    at async EditorArea.useCallback[handleAIReviewNeeded] (EditorArea.tsx:307:29)
+at Object.reviewContent (screenplay-service.ts:55:23)
+at async EditorArea.useCallback[handleAIReviewNeeded] (EditorArea.tsx:307:29)
 console.error @ cascade-browser-integration.js:2
 
-
-*Edited relevant file*
+_Edited relevant file_
 
 ### User Input
 
-2) تعديل التطبيق: تحويل chat/completions إلى completions
-التعديل المطلوب في screenplay-service.ts (حسب اللوج عندك: screenplay-service.ts:55)
+2. تعديل التطبيق: تحويل chat/completions إلى completions
+   التعديل المطلوب في screenplay-service.ts (حسب اللوج عندك: screenplay-service.ts:55)
 
 بدّل:
 
@@ -2887,36 +2915,36 @@ POST /v1/completions
 // screenplay-service.ts
 
 type CompletionResponse = {
-  choices?: Array<{ text?: string }>;
-  error?: { message?: string };
+choices?: Array<{ text?: string }>;
+error?: { message?: string };
 };
 
 export async function reviewContent(promptText: string) {
-  const res = await fetch("http://127.0.0.1:8000/v1/completions", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: "Bearer local-acegpt",
-    },
-    body: JSON.stringify({
-      model: "acegpt13bchat",
-      prompt: promptText,
-      temperature: 0.2,
-      max_tokens: 600,
-      // اختياري: stop tokens لو محتاج تمنع استرسال النموذج
-      // stop: ["</s>", "###"],
-    }),
-  });
+const res = await fetch("http://127.0.0.1:8000/v1/completions", {
+method: "POST",
+headers: {
+"Content-Type": "application/json",
+Authorization: "Bearer local-acegpt",
+},
+body: JSON.stringify({
+model: "acegpt13bchat",
+prompt: promptText,
+temperature: 0.2,
+max_tokens: 600,
+// اختياري: stop tokens لو محتاج تمنع استرسال النموذج
+// stop: ["</s>", "###"],
+}),
+});
 
-  const data = (await res.json()) as CompletionResponse;
+const data = (await res.json()) as CompletionResponse;
 
-  if (!res.ok) {
-    const msg = data?.error?.message ?? `HTTP ${res.status}`;
-    throw new Error(`AI API Error: ${msg}`);
-  }
+if (!res.ok) {
+const msg = data?.error?.message ?? `HTTP ${res.status}`;
+throw new Error(`AI API Error: ${msg}`);
+}
 
-  const text = data.choices?.[0]?.text ?? "";
-  return text.trim();
+const text = data.choices?.[0]?.text ?? "";
+return text.trim();
 }
 
 بناء promptText بدل messages
@@ -2924,8 +2952,9 @@ export async function reviewContent(promptText: string) {
 بدل ما تبعت “رسائل شات”، كوّن prompt واحد واضح، مثلًا:
 
 const promptText =
-`مهمتك: راجع تصنيفات  الى اخره بي وصحّح الأخطاء فقط.
+`مهمتك: راجع تصنيفات الى اخره بي وصحّح الأخطاء فقط.
 قيود:
+
 - أخرج JSON فقط.
 - لا تشرح.
 
@@ -2934,9 +2963,9 @@ ${fullScreenplayText}
 
 المطلوب (JSON):
 {
-  "fixes": [
-    { "line": 12, "from": "ACTION", "to": "DIALOGUE", "reason": "..." }
-  ]
+"fixes": [
+{ "line": 12, "from": "ACTION", "to": "DIALOGUE", "reason": "..." }
+]
 }`;ة (تحذيرات MemoryManager)
 
 الرسائل المتكررة:
@@ -2954,7 +2983,6 @@ No context found for session: session-...
 قبل أي get(...) تأكد أن set(...) حصل فعلًا لنفس الـ sessionId
 
 أو اجعل الـ MemoryManager Singleton واحد على مستوى التطبيق بدل إعادة تهيئته
-
 
 لازم تطلب من النموذج:
 
@@ -2974,7 +3002,7 @@ max_tokens كفاية (حسب عدد الأسطر)
 
 ويفضل stop لو أنت داعمها في العميل (لو تريد منع أي زيادة بعد JSON).
 
-5) تعديل إعدادات الاستدعاء التي استخدمتها
+5. تعديل إعدادات الاستدعاء التي استخدمتها
 
 أنت استخدمت:
 
@@ -2987,7 +3015,7 @@ temperature: 0
 
 وpresence_penalty: 0 وfrequency_penalty: 0
 
-6) لماذا عندك “No context found for session”؟
+6. لماذا عندك “No context found for session”؟
 
 هذا من سجلّك واضح أنه MemoryManager in-memory وبيبدأ جديد كل مرة/أو session id جديد.
 
@@ -3003,41 +3031,41 @@ temperature: 0
 
 لازم تخزن session context في storage (حتى لو Map عالمي في dev) بدل “in-memory جديد لكل reload”.
 
-*Listed directory [utils](file:///e:/yarab%20we%20elnby/New%20folder/Filmlane/src/utils) *
+_Listed directory [utils](file:///e:/yarab%20we%20elnby/New%20folder/Filmlane/src/utils) _
 
-*Edited relevant file*
+_Edited relevant file_
 
-*Viewed [context-memory-manager.ts](file:///e:/yarab%20we%20elnby/New%20folder/Filmlane/src/utils/context-memory-manager.ts) *
+_Viewed [context-memory-manager.ts](file:///e:/yarab%20we%20elnby/New%20folder/Filmlane/src/utils/context-memory-manager.ts) _
 
-*Viewed [EditorArea.tsx](file:///e:/yarab%20we%20elnby/New%20folder/Filmlane/src/components/editor/EditorArea.tsx) *
+_Viewed [EditorArea.tsx](file:///e:/yarab%20we%20elnby/New%20folder/Filmlane/src/components/editor/EditorArea.tsx) _
 
-*Edited relevant file*
+_Edited relevant file_
 
-*Edited relevant file*
+_Edited relevant file_
 
-*Viewed [paste-classifier.ts](file:///e:/yarab%20we%20elnby/New%20folder/Filmlane/src/utils/paste-classifier.ts) *
+_Viewed [paste-classifier.ts](file:///e:/yarab%20we%20elnby/New%20folder/Filmlane/src/utils/paste-classifier.ts) _
 
-*Edited relevant file*
+_Edited relevant file_
 
-*Viewed [paste-classifier.ts](file:///e:/yarab%20we%20elnby/New%20folder/Filmlane/src/utils/paste-classifier.ts) *
+_Viewed [paste-classifier.ts](file:///e:/yarab%20we%20elnby/New%20folder/Filmlane/src/utils/paste-classifier.ts) _
 
-*Edited relevant file*
+_Edited relevant file_
 
-*Edited relevant file*
+_Edited relevant file_
 
-*Edited relevant file*
+_Edited relevant file_
 
-*Edited relevant file*
+_Edited relevant file_
 
-*Edited relevant file*
+_Edited relevant file_
 
-*Edited relevant file*
+_Edited relevant file_
 
-*Edited relevant file*
+_Edited relevant file_
 
-*Edited relevant file*
+_Edited relevant file_
 
-*Edited relevant file*
+_Edited relevant file_
 
 ### User Input
 
@@ -3046,83 +3074,88 @@ pnpm run dev
 > nextn@0.1.0 dev E:\yarab we elnby\New folder\Filmlane
 > next dev --turbopack -p 9002
 
- ⚠ Invalid next.config.ts options detected: 
- ⚠     Unrecognized key(s) in object: 'allowedDevOrigins' at "experimental"
- ⚠ See more info here: https://nextjs.org/docs/messages/invalid-next-config
-   ▲ Next.js 15.5.9 (Turbopack)
-   - Local:        http://localhost:9002
-   - Network:      http://192.168.1.12:9002
-   - Environments: .env
-   - Experiments (use with caution):
-     · allowedDevOrigins
+⚠ Invalid next.config.ts options detected:
+⚠ Unrecognized key(s) in object: 'allowedDevOrigins' at "experimental"
+⚠ See more info here: https://nextjs.org/docs/messages/invalid-next-config
+▲ Next.js 15.5.9 (Turbopack)
 
- ✓ Starting...
- ✓ Ready in 2.6s
- ⚠ Cross origin request detected from 127.0.0.1 to /_next/* resource. In a future major version of Next.js, you will need to explicitly configure "allowedDevOrigins" in next.config to allow this.
+- Local: http://localhost:9002
+- Network: http://192.168.1.12:9002
+- Environments: .env
+- Experiments (use with caution):
+  · allowedDevOrigins
+
+✓ Starting...
+✓ Ready in 2.6s
+⚠ Cross origin request detected from 127.0.0.1 to /\_next/\* resource. In a future major version of Next.js, you will need to explicitly configure "allowedDevOrigins" in next.config to allow this.
 Read more: https://nextjs.org/docs/app/api-reference/config/next-config-js/allowedDevOrigins
- ○ Compiling / ...
- ✓ Compiled / in 9s
- ⨯ ./src/utils/paste-classifier.ts:19:23
+○ Compiling / ...
+✓ Compiled / in 9s
+⨯ ./src/utils/paste-classifier.ts:19:23
 Parsing ecmascript source code failed
-  17 |       const cssKey = key.replace(
-  18 |         /[A-Z]/g,
-> 19 |         (match) => `-${match.toLowerCase()}`,
+17 | const cssKey = key.replace(
+18 | /[A-Z]/g,
+
+> 19 | (match) => `-${match.toLowerCase()}`,
+
      |                       ^
-  20 |       );
-  21 |       return `${cssKey}: ${String(value)}`;
-  22 |     })
+
+20 | );
+21 | return `${cssKey}: ${String(value)}`;
+22 | })
 
 Expected ';', '}' or <eof>
 
 Import traces:
-  Client Component Browser:
-    ./src/utils/paste-classifier.ts [Client Component Browser]
-    ./src/components/editor/EditorArea.tsx [Client Component Browser]
-    ./src/components/editor/ScreenplayEditor.tsx [Client Component Browser]
-    ./src/components/editor/ScreenplayEditor.tsx [Server Component]
-    ./src/app/page.tsx [Server Component]
+Client Component Browser:
+./src/utils/paste-classifier.ts [Client Component Browser]
+./src/components/editor/EditorArea.tsx [Client Component Browser]
+./src/components/editor/ScreenplayEditor.tsx [Client Component Browser]
+./src/components/editor/ScreenplayEditor.tsx [Server Component]
+./src/app/page.tsx [Server Component]
 
-  Client Component SSR:
-    ./src/utils/paste-classifier.ts [Client Component SSR]
-    ./src/components/editor/EditorArea.tsx [Client Component SSR]
-    ./src/components/editor/ScreenplayEditor.tsx [Client Component SSR]
-    ./src/components/editor/ScreenplayEditor.tsx [Server Component]
-    ./src/app/page.tsx [Server Component]
+Client Component SSR:
+./src/utils/paste-classifier.ts [Client Component SSR]
+./src/components/editor/EditorArea.tsx [Client Component SSR]
+./src/components/editor/ScreenplayEditor.tsx [Client Component SSR]
+./src/components/editor/ScreenplayEditor.tsx [Server Component]
+./src/app/page.tsx [Server Component]
 
+○ Compiling /\_error ...
+✓ Compiled /\_error in 1199ms
+GET / 500 in 10546ms
+✓ Compiled /favicon.ico in 340ms
+GET /favicon.ico 500 in 386ms
 
- ○ Compiling /_error ...
- ✓ Compiled /_error in 1199ms
- GET / 500 in 10546ms
- ✓ Compiled /favicon.ico in 340ms
- GET /favicon.ico 500 in 386ms
+_Viewed [paste-classifier.ts](file:///e:/yarab%20we%20elnby/New%20folder/Filmlane/src/utils/paste-classifier.ts) _
 
-
-*Viewed [paste-classifier.ts](file:///e:/yarab%20we%20elnby/New%20folder/Filmlane/src/utils/paste-classifier.ts) *
-
-*Edited relevant file*
+_Edited relevant file_
 
 ### User Input
 
-وماذا عن 
- ⚠ Invalid next.config.ts options detected: 
- ⚠     Unrecognized key(s) in object: 'allowedDevOrigins' at "experimental"
- ⚠ See more info here: https://nextjs.org/docs/messages/invalid-next-config
-   ▲ Next.js 15.5.9 (Turbopack)
-   - Local:        http://localhost:9002
-   - Network:      http://192.168.1.12:9002
+وماذا عن
+⚠ Invalid next.config.ts options detected:
+⚠ Unrecognized key(s) in object: 'allowedDevOrigins' at "experimental"
+⚠ See more info here: https://nextjs.org/docs/messages/invalid-next-config
+▲ Next.js 15.5.9 (Turbopack)
 
-*Viewed [next.config.ts](file:///e:/yarab%20we%20elnby/New%20folder/Filmlane/next.config.ts) *
+- Local: http://localhost:9002
+- Network: http://192.168.1.12:9002
 
-*Edited relevant file*
+_Viewed [next.config.ts](file:///e:/yarab%20we%20elnby/New%20folder/Filmlane/next.config.ts) _
 
-*Edited relevant file*
+_Edited relevant file_
+
+_Edited relevant file_
 
 ### User Input
 
 ## Error Type
+
 Console Error
 
 ## Error Message
+
 A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used:
 
 - A server/client branch `if (typeof window !== 'undefined')`.
@@ -3135,76 +3168,80 @@ It can also happen if the client has a browser extension installed which messes 
 
 https://react.dev/link/hydration-mismatch
 
-  ...
-    <HotReload assetPrefix="" globalError={[...]}>
-      <AppDevOverlayErrorBoundary globalError={[...]}>
-        <ReplaySsrOnlyErrors>
-        <DevRootHTTPAccessFallbackBoundary>
-          <HTTPAccessFallbackBoundary notFound={<NotAllowedRootHTTPFallbackError>}>
-            <HTTPAccessFallbackErrorBoundary pathname="/" notFound={<NotAllowedRootHTTPFallbackError>} ...>
-              <RedirectBoundary>
-                <RedirectErrorBoundary router={{...}}>
-                  <Head>
-                  <__next_root_layout_boundary__>
-                    <SegmentViewNode type="layout" pagePath="layout.tsx">
-                      <SegmentTrieNode>
-                      <link>
-                      <script>
-                      <script>
-                      <script>
-                      <RootLayout>
-                        <html
-                          lang="ar"
-                          dir="rtl"
+...
+<HotReload assetPrefix="" globalError={[...]}>
+<AppDevOverlayErrorBoundary globalError={[...]}>
+<ReplaySsrOnlyErrors>
+<DevRootHTTPAccessFallbackBoundary>
+<HTTPAccessFallbackBoundary notFound={<NotAllowedRootHTTPFallbackError>}>
+<HTTPAccessFallbackErrorBoundary pathname="/" notFound={<NotAllowedRootHTTPFallbackError>} ...>
+<RedirectBoundary>
+<RedirectErrorBoundary router={{...}}>
+
+<Head>
+<**next_root_layout_boundary**>
+<SegmentViewNode type="layout" pagePath="layout.tsx">
+<SegmentTrieNode>
+<link>
+<script>
+<script>
+<script>
+<RootLayout>
+<html
+lang="ar"
+dir="rtl"
+
 -                         className="dark"
 -                         style={{color-scheme:"dark"}}
                         >
                   ...
 
-
-
-    at createConsoleError (file://E:/yarab we elnby/New folder/Filmlane/.next/static/chunks/abcf9_next_dist_03f9b748._.js:1605:71)
-    at handleConsoleError (file://E:/yarab we elnby/New folder/Filmlane/.next/static/chunks/abcf9_next_dist_03f9b748._.js:2203:54)
-    at console.error (file://E:/yarab we elnby/New folder/Filmlane/.next/static/chunks/abcf9_next_dist_03f9b748._.js:2354:57)
-    at <unknown> (file://E:/yarab we elnby/New folder/Filmlane/.next/static/chunks/abcf9_next_dist_compiled_react-dom_fccf29db._.js:3013:25)
-    at runWithFiberInDEV (file://E:/yarab we elnby/New folder/Filmlane/.next/static/chunks/abcf9_next_dist_compiled_react-dom_fccf29db._.js:886:74)
-    at emitPendingHydrationWarnings (file://E:/yarab we elnby/New folder/Filmlane/.next/static/chunks/abcf9_next_dist_compiled_react-dom_fccf29db._.js:3012:13)
-    at completeWork (file://E:/yarab we elnby/New folder/Filmlane/.next/static/chunks/abcf9_next_dist_compiled_react-dom_fccf29db._.js:6296:102)
-    at runWithFiberInDEV (file://E:/yarab we elnby/New folder/Filmlane/.next/static/chunks/abcf9_next_dist_compiled_react-dom_fccf29db._.js:886:131)
-    at completeUnitOfWork (file://E:/yarab we elnby/New folder/Filmlane/.next/static/chunks/abcf9_next_dist_compiled_react-dom_fccf29db._.js:8363:23)
-    at performUnitOfWork (file://E:/yarab we elnby/New folder/Filmlane/.next/static/chunks/abcf9_next_dist_compiled_react-dom_fccf29db._.js:8300:28)
-    at workLoopConcurrentByScheduler (file://E:/yarab we elnby/New folder/Filmlane/.next/static/chunks/abcf9_next_dist_compiled_react-dom_fccf29db._.js:8294:58)
-    at renderRootConcurrent (file://E:/yarab we elnby/New folder/Filmlane/.next/static/chunks/abcf9_next_dist_compiled_react-dom_fccf29db._.js:8276:71)
-    at performWorkOnRoot (file://E:/yarab we elnby/New folder/Filmlane/.next/static/chunks/abcf9_next_dist_compiled_react-dom_fccf29db._.js:7908:176)
-    at performWorkOnRootViaSchedulerTask (file://E:/yarab we elnby/New folder/Filmlane/.next/static/chunks/abcf9_next_dist_compiled_react-dom_fccf29db._.js:8882:9)
-    at MessagePort.performWorkUntilDeadline (file://E:/yarab we elnby/New folder/Filmlane/.next/static/chunks/abcf9_next_dist_compiled_0fddb1d7._.js:2601:64)
-    at html (<anonymous>:null:null)
-    at RootLayout (src\app\layout.tsx:19:5)
+  at createConsoleError (file://E:/yarab we elnby/New folder/Filmlane/.next/static/chunks/abcf9*next_dist_03f9b748.*.js:1605:71)
+  at handleConsoleError (file://E:/yarab we elnby/New folder/Filmlane/.next/static/chunks/abcf9*next_dist_03f9b748.*.js:2203:54)
+  at console.error (file://E:/yarab we elnby/New folder/Filmlane/.next/static/chunks/abcf9*next_dist_03f9b748.*.js:2354:57)
+  at <unknown> (file://E:/yarab we elnby/New folder/Filmlane/.next/static/chunks/abcf9*next_dist_compiled_react-dom_fccf29db.*.js:3013:25)
+  at runWithFiberInDEV (file://E:/yarab we elnby/New folder/Filmlane/.next/static/chunks/abcf9*next_dist_compiled_react-dom_fccf29db.*.js:886:74)
+  at emitPendingHydrationWarnings (file://E:/yarab we elnby/New folder/Filmlane/.next/static/chunks/abcf9*next_dist_compiled_react-dom_fccf29db.*.js:3012:13)
+  at completeWork (file://E:/yarab we elnby/New folder/Filmlane/.next/static/chunks/abcf9*next_dist_compiled_react-dom_fccf29db.*.js:6296:102)
+  at runWithFiberInDEV (file://E:/yarab we elnby/New folder/Filmlane/.next/static/chunks/abcf9*next_dist_compiled_react-dom_fccf29db.*.js:886:131)
+  at completeUnitOfWork (file://E:/yarab we elnby/New folder/Filmlane/.next/static/chunks/abcf9*next_dist_compiled_react-dom_fccf29db.*.js:8363:23)
+  at performUnitOfWork (file://E:/yarab we elnby/New folder/Filmlane/.next/static/chunks/abcf9*next_dist_compiled_react-dom_fccf29db.*.js:8300:28)
+  at workLoopConcurrentByScheduler (file://E:/yarab we elnby/New folder/Filmlane/.next/static/chunks/abcf9*next_dist_compiled_react-dom_fccf29db.*.js:8294:58)
+  at renderRootConcurrent (file://E:/yarab we elnby/New folder/Filmlane/.next/static/chunks/abcf9*next_dist_compiled_react-dom_fccf29db.*.js:8276:71)
+  at performWorkOnRoot (file://E:/yarab we elnby/New folder/Filmlane/.next/static/chunks/abcf9*next_dist_compiled_react-dom_fccf29db.*.js:7908:176)
+  at performWorkOnRootViaSchedulerTask (file://E:/yarab we elnby/New folder/Filmlane/.next/static/chunks/abcf9*next_dist_compiled_react-dom_fccf29db.*.js:8882:9)
+  at MessagePort.performWorkUntilDeadline (file://E:/yarab we elnby/New folder/Filmlane/.next/static/chunks/abcf9*next_dist_compiled_0fddb1d7.*.js:2601:64)
+  at html (<anonymous>:null:null)
+  at RootLayout (src\app\layout.tsx:19:5)
 
 ## Code Frame
-  17 | }) {
-  18 |   return (
-> 19 |     <html lang="ar" dir="rtl">
+
+17 | }) {
+18 | return (
+
+> 19 | <html lang="ar" dir="rtl">
+
      |     ^
-  20 |       <body className="font-sans antialiased">
-  21 |         <ThemeProvider
-  22 |           attribute="class"
+
+20 | <body className="font-sans antialiased">
+21 | <ThemeProvider
+22 | attribute="class"
 
 Next.js version: 15.5.9 (Turbopack)
 
+_Viewed [layout.tsx](file:///e:/yarab%20we%20elnby/New%20folder/Filmlane/src/app/layout.tsx) _
 
-*Viewed [layout.tsx](file:///e:/yarab%20we%20elnby/New%20folder/Filmlane/src/app/layout.tsx) *
-
-*Edited relevant file*
+_Edited relevant file_
 
 ### User Input
 
 ## Error Type
+
 Console Error
 
 ## Error Message
-[2026-01-23T02:11:35.849Z] [ERROR] [AI] API Error Details: 400 Bad Request "{\"error\":{\"message\":\"This model's maximum context length is 0 tokens. However, your request has 12806 input tokens. Please reduce the length of the input messages. (parameter=input_tokens, value=12806)\",\"type\":\"BadRequestError\",\"param\":\"input_tokens\",\"code\":400}}"
 
+[2026-01-23T02:11:35.849Z] [ERROR] [AI] API Error Details: 400 Bad Request "{\"error\":{\"message\":\"This model's maximum context length is 0 tokens. However, your request has 12806 input tokens. Please reduce the length of the input messages. (parameter=input_tokens, value=12806)\",\"type\":\"BadRequestError\",\"param\":\"input_tokens\",\"code\":400}}"
 
     at createConsoleError (file://E:/yarab we elnby/New folder/Filmlane/.next/static/chunks/abcf9_next_dist_03f9b748._.js:1605:71)
     at handleConsoleError (file://E:/yarab we elnby/New folder/Filmlane/.next/static/chunks/abcf9_next_dist_03f9b748._.js:2203:54)
@@ -3216,18 +3253,17 @@ Console Error
 
 Next.js version: 15.5.9 (Turbopack)
 
+_Viewed [screenplay-service.ts](file:///e:/yarab%20we%20elnby/New%20folder/Filmlane/src/utils/screenplay-service.ts) _
 
-*Viewed [screenplay-service.ts](file:///e:/yarab%20we%20elnby/New%20folder/Filmlane/src/utils/screenplay-service.ts) *
-
-*Edited relevant file*
+_Edited relevant file_
 
 ### User Input
 
 Console Error
 
 ## Error Message
-[2026-01-23T02:16:13.258Z] [ERROR] [AI] API Error Details: 400 Bad Request "{\"error\":{\"message\":\"This model's maximum context length is 0 tokens. However, your request has 5930 input tokens. Please reduce the length of the input messages. (parameter=input_tokens, value=5930)\",\"type\":\"BadRequestError\",\"param\":\"input_tokens\",\"code\":400}}"
 
+[2026-01-23T02:16:13.258Z] [ERROR] [AI] API Error Details: 400 Bad Request "{\"error\":{\"message\":\"This model's maximum context length is 0 tokens. However, your request has 5930 input tokens. Please reduce the length of the input messages. (parameter=input_tokens, value=5930)\",\"type\":\"BadRequestError\",\"param\":\"input_tokens\",\"code\":400}}"
 
     at createConsoleError (file://E:/yarab we elnby/New folder/Filmlane/.next/static/chunks/abcf9_next_dist_03f9b748._.js:1605:71)
     at handleConsoleError (file://E:/yarab we elnby/New folder/Filmlane/.next/static/chunks/abcf9_next_dist_03f9b748._.js:2203:54)
@@ -3298,18 +3334,16 @@ Chunking (تقطيع النص)
 اعرض معلومات الموديل كما يراها السيرفر:
 
 curl -s http://127.0.0.1:8000/v1/models \
-  -H "Authorization: Bearer local-acegpt" | head -n 120
-
+ -H "Authorization: Bearer local-acegpt" | head -n 120
 
 إذا ظهر max_model_len: 2048 (كما رأيته سابقاً) → السيرفر ليس 0، إذن المشكلة في منطق تطبيقك.
 
 جرّب طلب صغير جداً من التطبيق (أو curl) وتأكد أنه لا يرمي “0”:
 
 curl -s http://127.0.0.1:8000/v1/completions \
-  -H "Authorization: Bearer local-acegpt" \
-  -H "Content-Type: application/json" \
-  -d '{"model":"acegpt13bchat","prompt":"اختبار","max_tokens":32}'
-
+ -H "Authorization: Bearer local-acegpt" \
+ -H "Content-Type: application/json" \
+ -d '{"model":"acegpt13bchat","prompt":"اختبار","max_tokens":32}'
 
 لو هذا نجح، فالمشكلة 100% في:
 
@@ -3350,32 +3384,28 @@ curl -s http://127.0.0.1:8000/v1/completions \
 
 هذا يرفع التوكن بسرعة.
 
-*User accepted the command `curl -s http://127.0.0.1:8000/v1/models -H "Authorization: Bearer local-acegpt"`*
+_User accepted the command `curl -s http://127.0.0.1:8000/v1/models -H "Authorization: Bearer local-acegpt"`_
 
-*User accepted the command `curl -s http://127.0.0.1:8000/v1/completions -H "Authorization: Bearer local-acegpt" -H "Content-Type: application/json" -d "{\"model\":\"acegpt13bchat\",\"prompt\":\"test\",\"max_tokens\":10}"`*
+_User accepted the command `curl -s http://127.0.0.1:8000/v1/completions -H "Authorization: Bearer local-acegpt" -H "Content-Type: application/json" -d "{\"model\":\"acegpt13bchat\",\"prompt\":\"test\",\"max_tokens\":10}"`_
 
 ### User Input
 
- curl -s http://127.0.0.1:8000/v1/models -H "Authorization: Bearer local-acegpt"
+curl -s http://127.0.0.1:8000/v1/models -H "Authorization: Bearer local-acegpt"
 {"object":"list","data":[{"id":"acegpt13bchat","object":"model","created":1769135284,"owned_by":"vllm","root":"MohamedRashad/AceGPT-13B-chat-AWQ","parent":null,"max_model_len":2048,"permission":[{"id":"modelperm-946619445e0fa0f0","object":"model_permission","created":1769135284,"allow_create_engine":false,"allow_sampling":true,"allow_logprobs":true,"allow_search_indices":false,"allow_view":true,"allow_fine_tuning":false,"organization":"*","group":null,"is_blocking":false}]}]}mohamed@DESKTOP-FTCRLC9:~$
  curl -s http://127.0.0.1:8000/v1/completions -H "Authorization: Bearer local-acegpt" -H "Content-Type: application/json" -d "{\"model\":\"acegpt13bchat\",\"prompt\":\"test\",\"max_tokens\":10}"
 {"id":"cmpl-b76b9a442a0280bf","object":"text_completion","created":1769135331,"model":"acegpt13bchat","choices":[{"index":0,"text":"\nBridgepoint Education to Receive $6","logprobs":null,"finish_reason":"length","stop_reason":null,"token_ids":null,"prompt_logprobs":null,"prompt_token_ids":null}],"service_tier":null,"system_fingerprint":null,"usage":{"prompt_tokens":2,"total_tokens":12,"completion_tokens":10,"prompt_tokens_details":null},"kv_transfer_params":null}mohamed@DESKTOP-FTCRLC9:~$
 
-
-
-
-
-
-*Edited relevant file*
+_Edited relevant file_
 
 ### User Input
 
 ## Error Type
+
 Console ReferenceError
 
 ## Error Message
-currrentJSON is not defined
 
+currrentJSON is not defined
 
     at Object.reviewContent (file://E:/yarab we elnby/New folder/Filmlane/.next/static/chunks/src_4055f0aa._.js:2326:192)
     at EditorArea.useCallback[handleAIReviewNeeded] (file://E:/yarab we elnby/New folder/Filmlane/.next/static/chunks/src_4055f0aa._.js:2702:204)
@@ -3385,17 +3415,17 @@ currrentJSON is not defined
 Next.js version: 15.5.9 (Turbopack)
 \
 
-*Edited relevant file*
+_Edited relevant file_
 
-*Edited relevant file*
+_Edited relevant file_
 
 ### User Input
 
 cascade-browser-integration.js:2 [2026-01-23T02:33:05.456Z] [ERROR] [AI] Failed to review content ReferenceError: currrentJSON is not defined
-    at Object.reviewContent (screenplay-service.ts:41:60)
-    at EditorArea.useCallback[handleAIReviewNeeded] (EditorArea.tsx:307:60)
-    at handlePaste (paste-classifier.ts:1066:7)
-    at async EditorArea.useCallback[handlePaste] (EditorArea.tsx:327:13)
+at Object.reviewContent (screenplay-service.ts:41:60)
+at EditorArea.useCallback[handleAIReviewNeeded] (EditorArea.tsx:307:60)
+at handlePaste (paste-classifier.ts:1066:7)
+at async EditorArea.useCallback[handlePaste] (EditorArea.tsx:327:13)
 console.error @ cascade-browser-integration.js:2
 This console error indicates that a variable named currrentJSON was used in the reviewContent function within screenplay-service.ts at line 41, but it was not declared or defined before being accessed.
 
@@ -3425,11 +3455,11 @@ ts
 const result = someFunction(currentJSON); // Ensure 'currentJSON' is properly defined and accessible
 
 // Or if it's meant to be declared there:
-// const currrentJSON = /* some value */;
+// const currrentJSON = /_ some value _/;
 // const result = someFunction(currrentJSON);
 
 // Or, if it's a parameter being passed to the function, verify its spelling in the function signature:
-// function reviewContent(currentJSON: SomeType, ...) { /* ... */ }
+// function reviewContent(currentJSON: SomeType, ...) { /_ ... _/ }
 // Ensure the parameter name matches the usage within the function.
 
 Use code snippets with caution
@@ -3441,6 +3471,6 @@ The ReferenceError: currrentJSON is not defined indicates an attempt to access a
 
 Data used to understand this message
 
-*Viewed [screenplay-service.ts](file:///e:/yarab%20we%20elnby/New%20folder/Filmlane/src/utils/screenplay-service.ts) *
+_Viewed [screenplay-service.ts](file:///e:/yarab%20we%20elnby/New%20folder/Filmlane/src/utils/screenplay-service.ts) _
 
-*Edited relevant file*
+_Edited relevant file_

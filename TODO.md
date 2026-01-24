@@ -9,46 +9,46 @@ Claude’s Plan
 التعلم من المستخدم والتغذية الراجعة
 دمج نماذج ML صغيرة (استراتيجية بديلة تدريجية)
 الملفات الحرجة الحالية (يجب فهمها قبل التعديل)
-الملف	الوصف	أهميته
-paste-classifier.ts	نظام التصنيف الأساسي + Regex + AI trigger	⭐⭐⭐⭐⭐
-context-memory-manager.ts	إدارة الذاكرة الحالية (in-memory فقط)	⭐⭐⭐⭐
-ai-reviewer.ts	"Method of Doubt" لـ LLM trigger	⭐⭐⭐⭐
-screenplay-service.ts	خدمة الاتصال بـ vLLM	⭐⭐⭐
-api/ai-proxy/route.ts	Proxy لـ LLM المحلي	⭐⭐⭐
-EditorArea.tsx	واجهة المحرر الرئيسية	⭐⭐⭐
+الملف الوصف أهميته
+paste-classifier.ts نظام التصنيف الأساسي + Regex + AI trigger ⭐⭐⭐⭐⭐
+context-memory-manager.ts إدارة الذاكرة الحالية (in-memory فقط) ⭐⭐⭐⭐
+ai-reviewer.ts "Method of Doubt" لـ LLM trigger ⭐⭐⭐⭐
+screenplay-service.ts خدمة الاتصال بـ vLLM ⭐⭐⭐
+api/ai-proxy/route.ts Proxy لـ LLM المحلي ⭐⭐⭐
+EditorArea.tsx واجهة المحرر الرئيسية ⭐⭐⭐
 المرحلة 1: نظام الثقة والقواعد المحسّنة (Confidence Scoring)
 1.1 إنشاء ملف الثقة (NEW)
 الملف: src/utils/classification/confidence-scorer.ts
 
+/\*\*
 
-/**
- * نظام حساب الثقة للتصنيف
- * يعطي كل تصنيف درجة من 0-10 مع مصادر الثقة
- */
+- نظام حساب الثقة للتصنيف
+- يعطي كل تصنيف درجة من 0-10 مع مصادر الثقة
+  \*/
 
 export interface ConfidenceScore {
-  score: number; // 0-10
-  sources: string[]; // أي قواعد ساهمت
-  metadata: {
-    ruleMatches: Record<string, boolean>;
-    weightedSum: number;
-  };
+score: number; // 0-10
+sources: string[]; // أي قواعد ساهمت
+metadata: {
+ruleMatches: Record<string, boolean>;
+weightedSum: number;
+};
 }
 
 export class ConfidenceScorer {
-  private readonly weights = {
-    exactPattern: 3.0,      // تطابق تام (INT./EXT., بسم الله)
-    contextPattern: 2.0,    // سياق متوقع
-    linguisticPattern: 1.0, // مؤشرات لغوية
-    contextBoost: 1.5,      // تعزيز سياقي
-    memoryBoost: 2.0,       // شخصيات/أماكن معروفة
-  };
+private readonly weights = {
+exactPattern: 3.0, // تطابق تام (INT./EXT., بسم الله)
+contextPattern: 2.0, // سياق متوقع
+linguisticPattern: 1.0, // مؤشرات لغوية
+contextBoost: 1.5, // تعزيز سياقي
+memoryBoost: 2.0, // شخصيات/أماكن معروفة
+};
 
-  // حساب ثقة ترويسة المشهد
-  calculateSceneHeaderConfidence(line: string, ctx: LineContext): ConfidenceScore {
-    let score = 0;
-    const sources: string[] = [];
-    const matches: Record<string, boolean> = {};
+// حساب ثقة ترويسة المشهد
+calculateSceneHeaderConfidence(line: string, ctx: LineContext): ConfidenceScore {
+let score = 0;
+const sources: string[] = [];
+const matches: Record<string, boolean> = {};
 
     // قواعد من file:src/utils/paste-classifier.ts:165-192
     const SCENE_NUMBER_RE = /(?:مشهد|scene)\s*([0-9٠-٩]+)/i;
@@ -80,13 +80,14 @@ export class ConfidenceScorer {
     }
 
     return { score, sources, metadata: { ruleMatches: matches, weightedSum: score } };
-  }
 
-  // حساب ثقة اسم الشخصية (مهم للعربية بدون أحرف كبيرة)
-  calculateCharacterConfidence(line: string, ctx: LineContext): ConfidenceScore {
-    let score = 0;
-    const sources: string[] = [];
-    const matches: Record<string, boolean> = {};
+}
+
+// حساب ثقة اسم الشخصية (مهم للعربية بدون أحرف كبيرة)
+calculateCharacterConfidence(line: string, ctx: LineContext): ConfidenceScore {
+let score = 0;
+const sources: string[] = [];
+const matches: Record<string, boolean> = {};
 
     const trimmed = line.trim();
     const hasColon = trimmed.includes(':') || trimmed.includes('：');
@@ -127,13 +128,14 @@ export class ConfidenceScorer {
     }
 
     return { score, sources, metadata: { ruleMatches: matches, weightedSum: score } };
-  }
 
-  // حساب ثقة الحوار (dialogue)
-  calculateDialogueConfidence(line: string, ctx: LineContext): ConfidenceScore {
-    let score = 0;
-    const sources: string[] = [];
-    const matches: Record<string, boolean> = {};
+}
+
+// حساب ثقة الحوار (dialogue)
+calculateDialogueConfidence(line: string, ctx: LineContext): ConfidenceScore {
+let score = 0;
+const sources: string[] = [];
+const matches: Record<string, boolean> = {};
 
     // قواعد لغوية من file:src/utils/paste-classifier.ts:419-469
     if (/[؟?]/.test(line)) {
@@ -165,13 +167,14 @@ export class ConfidenceScorer {
     }
 
     return { score, sources, metadata: { ruleMatches: matches, weightedSum: score } };
-  }
 
-  // حساب ثقة Action
-  calculateActionConfidence(line: string, ctx: LineContext): ConfidenceScore {
-    let score = 0;
-    const sources: string[] = [];
-    const matches: Record<string, boolean> = {};
+}
+
+// حساب ثقة Action
+calculateActionConfidence(line: string, ctx: LineContext): ConfidenceScore {
+let score = 0;
+const sources: string[] = [];
+const matches: Record<string, boolean> = {};
 
     // استخدام ACTION_VERB_SET من file:src/utils/paste-classifier.ts:224-235
     const firstToken = line.trim().split(/\s+/)[0] || '';
@@ -193,13 +196,14 @@ export class ConfidenceScorer {
     }
 
     return { score, sources, metadata: { ruleMatches: matches, weightedSum: score } };
-  }
 
-  // حساب ثقة Transition
-  calculateTransitionConfidence(line: string): ConfidenceScore {
-    let score = 0;
-    const sources: string[] = [];
-    const matches: Record<string, boolean> = {};
+}
+
+// حساب ثقة Transition
+calculateTransitionConfidence(line: string): ConfidenceScore {
+let score = 0;
+const sources: string[] = [];
+const matches: Record<string, boolean> = {};
 
     // قواعد من file:src/utils/paste-classifier.ts:212-216
     const transitionKeywords = /^(قطع|اختفاء|تحول|انتقال|fade|cut|dissolve|wipe)/i;
@@ -211,44 +215,45 @@ export class ConfidenceScorer {
     }
 
     return { score, sources, metadata: { ruleMatches: matches, weightedSum: score } };
-  }
+
+}
 }
 
 export const confidenceScorer = new ConfidenceScorer();
 1.2 محرك قرار ما قبل LLM (NEW)
 الملف: src/utils/classification/pre-llm-decision.ts
 
+/\*\*
 
-/**
- * محرك القرار قبل استدعاء LLM
- * يقرر ما إذا كان يحتاج LLM أم لا بناءً على الثقة
- */
+- محرك القرار قبل استدعاء LLM
+- يقرر ما إذا كان يحتاج LLM أم لا بناءً على الثقة
+  \*/
 
 import { ConfidenceScore } from './confidence-scorer';
 import { LineContext } from '@/types/screenplay';
 
 export interface PreLLMDecision {
-  shouldUseLLM: boolean;
-  confidence: number;
-  reason: string;
-  fallbackClassification?: string;
+shouldUseLLM: boolean;
+confidence: number;
+reason: string;
+fallbackClassification?: string;
 }
 
 export class PreLLMDecisionEngine {
-  // عتبات الثقة (قابلة للتكوين)
-  private readonly HIGH_CONFIDENCE_THRESHOLD = 7.5;
-  private readonly MEDIUM_CONFIDENCE_THRESHOLD = 5.0;
-  private readonly LOW_CONFIDENCE_THRESHOLD = 3.0;
+// عتبات الثقة (قابلة للتكوين)
+private readonly HIGH_CONFIDENCE_THRESHOLD = 7.5;
+private readonly MEDIUM_CONFIDENCE_THRESHOLD = 5.0;
+private readonly LOW_CONFIDENCE_THRESHOLD = 3.0;
 
-  decide(
-    line: string,
-    scores: Record<string, ConfidenceScore>,
-    ctx: LineContext
-  ): PreLLMDecision {
-    // إيجاد أعلى درجة
-    const entries = Object.entries(scores);
-    const maxScore = Math.max(...entries.map(([_, s]) => s.score));
-    const topType = entries.find(([_, s]) => s.score === maxScore)?.[0];
+decide(
+line: string,
+scores: Record<string, ConfidenceScore>,
+ctx: LineContext
+): PreLLMDecision {
+// إيجاد أعلى درجة
+const entries = Object.entries(scores);
+const maxScore = Math.max(...entries.map(([_, s]) => s.score));
+const topType = entries.find(([_, s]) => s.score === maxScore)?.[0];
 
     // حالة 1: ثقة عالية - لا نحتاج LLM
     if (maxScore >= this.HIGH_CONFIDENCE_THRESHOLD) {
@@ -298,13 +303,14 @@ export class PreLLMDecisionEngine {
       confidence: maxScore,
       reason: 'medium_confidence_default_llm',
     };
-  }
 
-  private hasStrongContext(ctx: LineContext): boolean {
-    return ctx.pattern.isInDialogueBlock ||
-           ctx.pattern.lastCharacterDistance <= 2 ||
-           ctx.pattern.isInSceneHeader;
-  }
+}
+
+private hasStrongContext(ctx: LineContext): boolean {
+return ctx.pattern.isInDialogueBlock ||
+ctx.pattern.lastCharacterDistance <= 2 ||
+ctx.pattern.isInSceneHeader;
+}
 }
 
 export const preLLMDecisionEngine = new PreLLMDecisionEngine();
@@ -323,82 +329,82 @@ import { preLLMDecisionEngine } from './classification/pre-llm-decision';
 // نستخدم نظام الثقة المحسّن
 
 const classifyWithContext = (line: string, ctx: LineContext): { type: string; score: number } => {
-  // ... التحقق من الأنماط الخاصة (basmala, scene headers, transitions)
+// ... التحقق من الأنماط الخاصة (basmala, scene headers, transitions)
 
-  // حساب الثقة لكل نوع محتمل
-  const scores = {
-    'scene-header-top-line': confidenceScorer.calculateSceneHeaderConfidence(line, ctx),
-    'character': confidenceScorer.calculateCharacterConfidence(line, ctx),
-    'dialogue': confidenceScorer.calculateDialogueConfidence(line, ctx),
-    'action': confidenceScorer.calculateActionConfidence(line, ctx),
-    'transition': confidenceScorer.calculateTransitionConfidence(line),
-  };
+// حساب الثقة لكل نوع محتمل
+const scores = {
+'scene-header-top-line': confidenceScorer.calculateSceneHeaderConfidence(line, ctx),
+'character': confidenceScorer.calculateCharacterConfidence(line, ctx),
+'dialogue': confidenceScorer.calculateDialogueConfidence(line, ctx),
+'action': confidenceScorer.calculateActionConfidence(line, ctx),
+'transition': confidenceScorer.calculateTransitionConfidence(line),
+};
 
-  // اختيار أفضل تصنيف
-  let bestType = 'action';
-  let bestScore = 0;
+// اختيار أفضل تصنيف
+let bestType = 'action';
+let bestScore = 0;
 
-  for (const [type, confidence] of Object.entries(scores)) {
-    if (confidence.score > bestScore) {
-      bestScore = confidence.score;
-      bestType = type;
-    }
-  }
+for (const [type, confidence] of Object.entries(scores)) {
+if (confidence.score > bestScore) {
+bestScore = confidence.score;
+bestType = type;
+}
+}
 
-  return { type: bestType, score: bestScore };
+return { type: bestType, score: bestScore };
 };
 المرحلة 2: الذاكرة الموحدة والسياق المتدرج
 2.1 مدير الذاكرة الموحدة (NEW)
 الملف: src/utils/classification/persistent-memory.ts
 
+/\*\*
 
-/**
- * مدير الذاكرة الموحدة - يدعم التخزين المحلي و Firebase
- */
+- مدير الذاكرة الموحدة - يدعم التخزين المحلي و Firebase
+  \*/
 
 import { ContextMemory } from '@/types/screenplay';
 
 // توسيع واجهة الذاكرة
 export interface PersistentMemory extends ContextMemory {
-  userId?: string;
-  projectId?: string;
+userId?: string;
+projectId?: string;
 
-  // ذاكرة موسعة
-  scenes: {
-    known: Array<{ number: string; description: string; firstSeen: number }>;
-    currentScene?: string;
-  };
+// ذاكرة موسعة
+scenes: {
+known: Array<{ number: string; description: string; firstSeen: number }>;
+currentScene?: string;
+};
 
-  // أنماط التعلم
-  patterns: {
-    userCorrections: Array<{
-      original: string;
-      corrected: string;
-      line: string;
-      timestamp: number;
-      confidence: number;
-    }>;
-    commonTransitions: Array<{ pattern: string; count: number }>;
-  };
+// أنماط التعلم
+patterns: {
+userCorrections: Array<{
+original: string;
+corrected: string;
+line: string;
+timestamp: number;
+confidence: number;
+}>;
+commonTransitions: Array<{ pattern: string; count: number }>;
+};
 
-  // إعدادات المستخدم
-  settings: {
-    llmThreshold: number;
-    autoConfirmThreshold: number;
-    learningEnabled: boolean;
-  };
+// إعدادات المستخدم
+settings: {
+llmThreshold: number;
+autoConfirmThreshold: number;
+learningEnabled: boolean;
+};
 }
 
 export class PersistentMemoryManager {
-  private storage: Map<string, PersistentMemory> = new Map();
-  private readonly localStorageKey = 'filmlane_persistent_memory';
+private storage: Map<string, PersistentMemory> = new Map();
+private readonly localStorageKey = 'filmlane_persistent_memory';
 
-  // تحميل الذاكرة (مع fallback لـ localStorage)
-  async load(sessionId: string): Promise<PersistentMemory> {
-    // 1. محاولة التحميل من الذاكرة
-    if (this.storage.has(sessionId)) {
-      return JSON.parse(JSON.stringify(this.storage.get(sessionId)!));
-    }
+// تحميل الذاكرة (مع fallback لـ localStorage)
+async load(sessionId: string): Promise<PersistentMemory> {
+// 1. محاولة التحميل من الذاكرة
+if (this.storage.has(sessionId)) {
+return JSON.parse(JSON.stringify(this.storage.get(sessionId)!));
+}
 
     // 2. محاولة التحميل من localStorage
     try {
@@ -428,12 +434,13 @@ export class PersistentMemoryManager {
         learningEnabled: true,
       },
     };
-  }
 
-  // حفظ الذاكرة
-  async save(sessionId: string, memory: PersistentMemory): Promise<void> {
-    memory.lastModified = Date.now();
-    this.storage.set(sessionId, JSON.parse(JSON.stringify(memory)));
+}
+
+// حفظ الذاكرة
+async save(sessionId: string, memory: PersistentMemory): Promise<void> {
+memory.lastModified = Date.now();
+this.storage.set(sessionId, JSON.parse(JSON.stringify(memory)));
 
     // حفظ في localStorage أيضاً
     try {
@@ -444,31 +451,32 @@ export class PersistentMemoryManager {
     } catch (e) {
       console.warn('Failed to save to localStorage:', e);
     }
-  }
 
-  // تسجيل تصحيح من المستخدم (للتعلم)
-  async recordCorrection(
-    sessionId: string,
-    line: string,
-    originalType: string,
-    correctedType: string,
-    confidence: number
-  ): Promise<void> {
-    const memory = await this.load(sessionId);
-    memory.patterns.userCorrections.push({
-      original: originalType,
-      corrected: correctedType,
-      line,
-      timestamp: Date.now(),
-      confidence,
-    });
-    await this.save(sessionId, memory);
-  }
+}
 
-  // الحصول على اقتراحات من التصحيحات السابقة
-  async getSuggestions(sessionId: string, line: string): Promise<string[]> {
-    const memory = await this.load(sessionId);
-    const suggestions: string[] = [];
+// تسجيل تصحيح من المستخدم (للتعلم)
+async recordCorrection(
+sessionId: string,
+line: string,
+originalType: string,
+correctedType: string,
+confidence: number
+): Promise<void> {
+const memory = await this.load(sessionId);
+memory.patterns.userCorrections.push({
+original: originalType,
+corrected: correctedType,
+line,
+timestamp: Date.now(),
+confidence,
+});
+await this.save(sessionId, memory);
+}
+
+// الحصول على اقتراحات من التصحيحات السابقة
+async getSuggestions(sessionId: string, line: string): Promise<string[]> {
+const memory = await this.load(sessionId);
+const suggestions: string[] = [];
 
     // البحث عن تصحيحات مشابهة
     for (const correction of memory.patterns.userCorrections) {
@@ -478,47 +486,48 @@ export class PersistentMemoryManager {
     }
 
     return suggestions;
-  }
 
-  private isSimilar(line1: string, line2: string): boolean {
-    // تشابه بسيط بناءً على الطول والكلمات
-    const words1 = new Set(line1.split(/\s+/));
-    const words2 = new Set(line2.split(/\s+/));
-    const intersection = new Set([...words1].filter(w => words2.has(w)));
-    return intersection.size > 0;
-  }
+}
+
+private isSimilar(line1: string, line2: string): boolean {
+// تشابه بسيط بناءً على الطول والكلمات
+const words1 = new Set(line1.split(/\s+/));
+const words2 = new Set(line2.split(/\s+/));
+const intersection = new Set([...words1].filter(w => words2.has(w)));
+return intersection.size > 0;
+}
 }
 
 export const persistentMemoryManager = new PersistentMemoryManager();
 2.2 مدير السياق المتدرج (NEW)
 الملف: src/utils/classification/sliding-context.ts
 
+/\*\*
 
-/**
- * مدير السياق المتدرج
- * يعالج السيناريو مشهد بمشهد بدلاً من سطر بسطر
- */
+- مدير السياق المتدرج
+- يعالج السيناريو مشهد بمشهد بدلاً من سطر بسطر
+  \*/
 
 import { LineContext } from '@/types/screenplay';
 
 export interface SceneInfo {
-  startIndex: number;
-  endIndex: number;
-  header: string;
+startIndex: number;
+endIndex: number;
+header: string;
 }
 
 export class SlidingContextManager {
-  private readonly SCENE_HEADER_TYPES = [
-    'scene-header-1',
-    'scene-header-2',
-    'scene-header-3',
-    'scene-header-top-line',
-  ];
+private readonly SCENE_HEADER_TYPES = [
+'scene-header-1',
+'scene-header-2',
+'scene-header-3',
+'scene-header-top-line',
+];
 
-  // تقسيم النص إلى مشاهد
-  findSceneBoundaries(lines: string[], types: string[]): SceneInfo[] {
-    const scenes: SceneInfo[] = [];
-    let currentStart = 0;
+// تقسيم النص إلى مشاهد
+findSceneBoundaries(lines: string[], types: string[]): SceneInfo[] {
+const scenes: SceneInfo[] = [];
+let currentStart = 0;
 
     for (let i = 0; i < types.length; i++) {
       if (this.SCENE_HEADER_TYPES.includes(types[i])) {
@@ -543,19 +552,20 @@ export class SlidingContextManager {
     }
 
     return scenes;
-  }
 
-  // بناء سياق موسع لسطر معين
-  buildExpandedContext(
-    lines: string[],
-    types: string[],
-    index: number
-  ): LineContext {
-    // إيجاد حدود المشهد الحالي
-    const scenes = this.findSceneBoundaries(lines, types);
-    const currentScene = scenes.find(s =>
-      index >= s.startIndex && index <= s.endIndex
-    );
+}
+
+// بناء سياق موسع لسطر معين
+buildExpandedContext(
+lines: string[],
+types: string[],
+index: number
+): LineContext {
+// إيجاد حدود المشهد الحالي
+const scenes = this.findSceneBoundaries(lines, types);
+const currentScene = scenes.find(s =>
+index >= s.startIndex && index <= s.endIndex
+);
 
     // نافذة سياق أكبر داخل المشهد
     const WINDOW_SIZE = 5;
@@ -599,7 +609,8 @@ export class SlidingContextManager {
         lastCharacterDistance: types.slice().reverse().findIndex(t => t === 'character'),
       },
     };
-  }
+
+}
 }
 
 export const slidingContextManager = new SlidingContextManager();
@@ -607,34 +618,34 @@ export const slidingContextManager = new SlidingContextManager();
 3.1 مراجعة LLM بشكل مجمع (MODIFY)
 الملف: src/utils/classification/batch-llm-reviewer.ts (NEW)
 
+/\*\*
 
-/**
- * مراجعة LLM بشكل مجمع
- * يجمع الأسطر غير المؤكدة ويراجعها دفعة واحدة
- */
+- مراجعة LLM بشكل مجمع
+- يجمع الأسطر غير المؤكدة ويراجعها دفعة واحدة
+  \*/
 
 import { AIPayload, AIPatchOp } from '../ai-reviewer';
 import { screenplayContentService } from '../screenplay-service';
 
 interface BatchReviewRequest {
-  lines: Array<{ id: string; text: string; type: string; score: number }>;
-  threshold: number;
+lines: Array<{ id: string; text: string; type: string; score: number }>;
+threshold: number;
 }
 
 interface BatchReviewResult {
-  reviewed: number;
-  skipped: number;
-  patches: AIPatchOp[];
+reviewed: number;
+skipped: number;
+patches: AIPatchOp[];
 }
 
 export class BatchLLMReviewer {
-  private readonly DEFAULT_THRESHOLD = 5.0;
+private readonly DEFAULT_THRESHOLD = 5.0;
 
-  async reviewBatch(request: BatchReviewRequest): Promise<BatchReviewResult> {
-    // تصفية الأسطر غير المؤكدة فقط
-    const uncertainLines = request.lines.filter(
-      line => line.score < request.threshold
-    );
+async reviewBatch(request: BatchReviewRequest): Promise<BatchReviewResult> {
+// تصفية الأسطر غير المؤكدة فقط
+const uncertainLines = request.lines.filter(
+line => line.score < request.threshold
+);
 
     const skippedCount = request.lines.length - uncertainLines.length;
 
@@ -669,7 +680,8 @@ export class BatchLLMReviewer {
       skipped: skippedCount,
       patches,
     };
-  }
+
+}
 }
 
 export const batchLLMReviewer = new BatchLLMReviewer();
@@ -678,122 +690,121 @@ export const batchLLMReviewer = new BatchLLMReviewer();
 
 تعديل دالة shouldTriggerReview (حوالي السطر 41):
 
-
 // إضافة بارامتر threshold
 export const shouldTriggerReview = (
-  line: string,
-  currentType: string,
-  score: number,
-  ctx: LineContext,
-  threshold: number = 5.0 // عتبة قابلة للتكوين
+line: string,
+currentType: string,
+score: number,
+ctx: LineContext,
+threshold: number = 5.0 // عتبة قابلة للتكوين
 ): ReviewTriggerResult => {
-  // القاعدة الأساسية: فقط إذا كانت الثقة أقل من العتبة
-  if (score >= threshold) {
-    return { trigger: false };
-  }
+// القاعدة الأساسية: فقط إذا كانت الثقة أقل من العتبة
+if (score >= threshold) {
+return { trigger: false };
+}
 
-  // بقية القواعد الموجودة...
-  // (نفس الكود الحالي)
+// بقية القواعد الموجودة...
+// (نفس الكود الحالي)
 };
 المرحلة 4: واجهة المستخدم للتغذية الراجعة
 4.1 مكون مؤشر الثقة (NEW)
 الملف: src/components/editor/ConfidenceIndicator.tsx
 
+/\*\*
 
-/**
- * مؤشر الثقة - يظهر عند التمرير على السطر
- */
+- مؤشر الثقة - يظهر عند التمرير على السطر
+  \*/
 
 import React from 'react';
 import { Badge } from '@/components/ui/badge';
 
 interface ConfidenceIndicatorProps {
-  confidence: number;
-  show?: boolean;
+confidence: number;
+show?: boolean;
 }
 
 export const ConfidenceIndicator: React.FC<ConfidenceIndicatorProps> = ({
-  confidence,
-  show = false,
+confidence,
+show = false,
 }) => {
-  if (!show) return null;
+if (!show) return null;
 
-  // تحديد اللون بناءً على الثقة
-  const variant = confidence >= 7 ? 'default' :
-                  confidence >= 5 ? 'secondary' :
-                  'destructive';
+// تحديد اللون بناءً على الثقة
+const variant = confidence >= 7 ? 'default' :
+confidence >= 5 ? 'secondary' :
+'destructive';
 
-  return (
-    <div className="absolute -left-16 top-0 opacity-0 group-hover:opacity-100 transition-opacity">
-      <Badge variant={variant} className="text-xs">
-        {confidence.toFixed(1)}/10
-      </Badge>
-    </div>
-  );
+return (
+
+<div className="absolute -left-16 top-0 opacity-0 group-hover:opacity-100 transition-opacity">
+<Badge variant={variant} className="text-xs">
+{confidence.toFixed(1)}/10
+</Badge>
+</div>
+);
 };
 4.2 مكون طلب التصحيح (NEW)
 الملف: src/components/editor/CorrectionFeedback.tsx
 
+/\*\*
 
-/**
- * طلب تصحيح التصنيف من المستخدم
- */
+- طلب تصحيح التصنيف من المستخدم
+  \*/
 
 import React, { useState } from 'react';
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
+Dialog,
+DialogContent,
+DialogHeader,
+DialogTitle,
+DialogFooter,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 
 interface CorrectionFeedbackProps {
-  lineId: string;
-  lineText: string;
-  currentType: string;
-  confidence: number;
-  onConfirm: (lineId: string) => void;
-  onCorrect: (lineId: string, newType: string) => void;
+lineId: string;
+lineText: string;
+currentType: string;
+confidence: number;
+onConfirm: (lineId: string) => void;
+onCorrect: (lineId: string, newType: string) => void;
 }
 
 export const CorrectionFeedback: React.FC<CorrectionFeedbackProps> = ({
-  lineId,
-  lineText,
-  currentType,
-  confidence,
-  onConfirm,
-  onCorrect,
+lineId,
+lineText,
+currentType,
+confidence,
+onConfirm,
+onCorrect,
 }) => {
-  const [open, setOpen] = useState(false);
-  const [selectedType, setSelectedType] = useState(currentType);
+const [open, setOpen] = useState(false);
+const [selectedType, setSelectedType] = useState(currentType);
 
-  // نظ_formats من ملف الأنواع الموجود
-  const formatTypes = [
-    { id: 'scene-header-1', label: 'ترويسة مشهد' },
-    { id: 'action', label: 'وصف/action' },
-    { id: 'character', label: 'شخصية' },
-    { id: 'dialogue', label: 'حوار' },
-    { id: 'parenthetical', label: 'ملاحظة تمثيل' },
-    { id: 'transition', label: 'انتقال' },
-  ];
+// نظ_formats من ملف الأنواع الموجود
+const formatTypes = [
+{ id: 'scene-header-1', label: 'ترويسة مشهد' },
+{ id: 'action', label: 'وصف/action' },
+{ id: 'character', label: 'شخصية' },
+{ id: 'dialogue', label: 'حوار' },
+{ id: 'parenthetical', label: 'ملاحظة تمثيل' },
+{ id: 'transition', label: 'انتقال' },
+];
 
-  // إظهار فقط للثقة المنخفضة
-  if (confidence > 6) return null;
+// إظهار فقط للثقة المنخفضة
+if (confidence > 6) return null;
 
-  return (
-    <>
-      {/* زر طلب التصحيح */}
-      <button
-        onClick={() => setOpen(true)}
-        className="ml-2 text-yellow-500 hover:text-yellow-600"
-        title="طلب تصحيح التصنيف"
-      >
-        <span className="text-xs">⚠️</span>
-      </button>
+return (
+<>
+{/_ زر طلب التصحيح _/}
+<button
+onClick={() => setOpen(true)}
+className="ml-2 text-yellow-500 hover:text-yellow-600"
+title="طلب تصحيح التصنيف" >
+<span className="text-xs">⚠️</span>
+</button>
 
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="max-w-md">
@@ -838,23 +849,24 @@ export const CorrectionFeedback: React.FC<CorrectionFeedbackProps> = ({
         </DialogContent>
       </Dialog>
     </>
-  );
+
+);
 };
 4.3 مكون الإعدادات (NEW)
 الملف: src/components/editor/ClassificationSettings.tsx
 
+/\*\*
 
-/**
- * إعدادات نظام التصنيف
- */
+- إعدادات نظام التصنيف
+  \*/
 
 import React, { useState } from 'react';
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
+Dialog,
+DialogContent,
+DialogHeader,
+DialogTitle,
+DialogTrigger,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -863,33 +875,34 @@ import { Switch } from '@/components/ui/switch';
 import { Settings } from 'lucide-react';
 
 interface ClassificationSettings {
-  llmThreshold: number;
-  autoConfirmThreshold: number;
-  learningEnabled: boolean;
+llmThreshold: number;
+autoConfirmThreshold: number;
+learningEnabled: boolean;
 }
 
 export const ClassificationSettingsDialog: React.FC = () => {
-  const [open, setOpen] = useState(false);
-  const [settings, setSettings] = useState<ClassificationSettings>({
-    llmThreshold: 5.0,
-    autoConfirmThreshold: 8.0,
-    learningEnabled: true,
-  });
+const [open, setOpen] = useState(false);
+const [settings, setSettings] = useState<ClassificationSettings>({
+llmThreshold: 5.0,
+autoConfirmThreshold: 8.0,
+learningEnabled: true,
+});
 
-  const handleSave = () => {
-    // حفظ في localStorage
-    localStorage.setItem('filmlane_classification_settings', JSON.stringify(settings));
-    setOpen(false);
-  };
+const handleSave = () => {
+// حفظ في localStorage
+localStorage.setItem('filmlane_classification_settings', JSON.stringify(settings));
+setOpen(false);
+};
 
-  return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button variant="outline" size="sm">
-          <Settings className="w-4 h-4 ml-2" />
-          إعدادات التصنيف
-        </Button>
-      </DialogTrigger>
+return (
+
+<Dialog open={open} onOpenChange={setOpen}>
+<DialogTrigger asChild>
+<Button variant="outline" size="sm">
+<Settings className="w-4 h-4 ml-2" />
+إعدادات التصنيف
+</Button>
+</DialogTrigger>
 
       <DialogContent className="max-w-md">
         <DialogHeader>
@@ -943,20 +956,20 @@ export const ClassificationSettingsDialog: React.FC = () => {
         </div>
       </DialogContent>
     </Dialog>
-  );
+
+);
 };
 المرحلة 5: API Routes للتعلم والتصحيح
 5.1 API للتغذية الراجعة (NEW)
 الملف: src/app/api/classification/feedback/route.ts
 
-
 import { NextResponse } from 'next/server';
 import { persistentMemoryManager } from '@/utils/classification/persistent-memory';
 
 export async function POST(request: Request) {
-  try {
-    const { sessionId, lineId, lineText, originalType, correctedType, confidence } =
-      await request.json();
+try {
+const { sessionId, lineId, lineText, originalType, correctedType, confidence } =
+await request.json();
 
     // تسجيل التصحيح للتعلم
     await persistentMemoryManager.recordCorrection(
@@ -968,61 +981,61 @@ export async function POST(request: Request) {
     );
 
     return NextResponse.json({ success: true });
-  } catch (error: any) {
-    return NextResponse.json(
-      { error: error.message },
-      { status: 500 }
-    );
-  }
+
+} catch (error: any) {
+return NextResponse.json(
+{ error: error.message },
+{ status: 500 }
+);
+}
 }
 5.2 API للإعدادات (NEW)
 الملف: src/app/api/classification/settings/route.ts
 
-
 import { NextResponse } from 'next/server';
 
 export async function GET(request: Request) {
-  const { searchParams } = new URL(request.url);
-  const sessionId = searchParams.get('sessionId');
+const { searchParams } = new URL(request.url);
+const sessionId = searchParams.get('sessionId');
 
-  // يمكن ربطها بـ persistentMemoryManager.settings
-  const defaultSettings = {
-    llmThreshold: 5.0,
-    autoConfirmThreshold: 8.0,
-    learningEnabled: true,
-  };
+// يمكن ربطها بـ persistentMemoryManager.settings
+const defaultSettings = {
+llmThreshold: 5.0,
+autoConfirmThreshold: 8.0,
+learningEnabled: true,
+};
 
-  return NextResponse.json(defaultSettings);
+return NextResponse.json(defaultSettings);
 }
 
 export async function POST(request: Request) {
-  try {
-    const settings = await request.json();
-    // حفظ الإعدادات
-    return NextResponse.json({ success: true });
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
-  }
+try {
+const settings = await request.json();
+// حفظ الإعدادات
+return NextResponse.json({ success: true });
+} catch (error: any) {
+return NextResponse.json({ error: error.message }, { status: 500 });
+}
 }
 خلاصة الملفات المراد تعديلها/إنشاؤها
 ملفات جديدة (NEW)
-الملف	الغرض
-src/utils/classification/confidence-scorer.ts	نظام حساب الثقة
-src/utils/classification/pre-llm-decision.ts	محرك قرار ما قبل LLM
-src/utils/classification/persistent-memory.ts	مدير الذاكرة الموحدة
-src/utils/classification/sliding-context.ts	مدير السياق المتدرج
-src/utils/classification/batch-llm-reviewer.ts	مراجعة LLM مجمع
-src/components/editor/ConfidenceIndicator.tsx	مؤشر الثقة
-src/components/editor/CorrectionFeedback.tsx	طلب التصحيح
-src/components/editor/ClassificationSettings.tsx	إعدادات التصنيف
-src/app/api/classification/feedback/route.ts	API التغذية الراجعة
-src/app/api/classification/settings/route.ts	API الإعدادات
+الملف الغرض
+src/utils/classification/confidence-scorer.ts نظام حساب الثقة
+src/utils/classification/pre-llm-decision.ts محرك قرار ما قبل LLM
+src/utils/classification/persistent-memory.ts مدير الذاكرة الموحدة
+src/utils/classification/sliding-context.ts مدير السياق المتدرج
+src/utils/classification/batch-llm-reviewer.ts مراجعة LLM مجمع
+src/components/editor/ConfidenceIndicator.tsx مؤشر الثقة
+src/components/editor/CorrectionFeedback.tsx طلب التصحيح
+src/components/editor/ClassificationSettings.tsx إعدادات التصنيف
+src/app/api/classification/feedback/route.ts API التغذية الراجعة
+src/app/api/classification/settings/route.ts API الإعدادات
 ملفات معدلة (MODIFY)
-الملف	التغييرات
-src/utils/paste-classifier.ts	دمج نظام الثقة
-src/utils/ai-reviewer.ts	إضافة بارامتر threshold
-src/components/editor/EditorArea.tsx	إضافة مؤشر الثقة + طلب التصحيح
-src/types/screenplay.ts	توسيع واجهات البيانات
+الملف التغييرات
+src/utils/paste-classifier.ts دمج نظام الثقة
+src/utils/ai-reviewer.ts إضافة بارامتر threshold
+src/components/editor/EditorArea.tsx إضافة مؤشر الثقة + طلب التصحيح
+src/types/screenplay.ts توسيع واجهات البيانات
 خطة التحقق (Verification)
 اختبار شامل للنظام
 اختبار نظام الثقة:
@@ -1048,16 +1061,18 @@ src/types/screenplay.ts	توسيع واجهات البيانات
 المتغيرات البيئية المطلوبة
 ملف: .env.local
 
-
 # Firebase (للتخزين المستقبلي)
+
 NEXT_PUBLIC_FIREBASE_API_KEY=your_api_key
 NEXT_PUBLIC_FIREBASE_PROJECT_ID=your_project_id
 
 # AI Server (موجود مسبقاً)
+
 NEXT_PUBLIC_AI_SERVER_URL=http://127.0.0.1:8000
 AI_SERVER_API_KEY=local-ai
 
 # إعدادات التصنيف (قيم افتراضية)
+
 NEXT_PUBLIC_DEFAULT_LLM_THRESHOLD=5.0
 NEXT_PUBLIC_DEFAULT_AUTO_CONFIRM_THRESHOLD=8.0
 NEXT_PUBLIC_LEARNING_ENABLED=true

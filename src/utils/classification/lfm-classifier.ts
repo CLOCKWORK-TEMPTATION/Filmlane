@@ -87,8 +87,8 @@ export class LFMClassifier {
       });
 
       return result;
-    } catch (error: any) {
-      if (error.name === 'AbortError') {
+    } catch (error: unknown) {
+      if (error instanceof Error && error.name === 'AbortError') {
         logger.error('LFM', 'Request timeout');
         throw new Error('LFM classification timeout');
       }
@@ -130,8 +130,8 @@ export class LFMClassifier {
       logger.info('LFM', `Batch classified ${lines.length} lines in ${duration}ms`);
 
       return result.results;
-    } catch (error: any) {
-      if (error.name === 'AbortError') {
+    } catch (error: unknown) {
+      if (error instanceof Error && error.name === 'AbortError') {
         logger.error('LFM', 'Batch request timeout');
         throw new Error('LFM batch classification timeout');
       }

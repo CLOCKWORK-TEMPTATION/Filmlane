@@ -16,13 +16,14 @@ const GOOGLE_API_KEY = process.env.GOOGLE_API_KEY || '';
 async function ensureModelInitialized() {
   if (!initialized) {
     try {
-      console.log('📥 Initializing Gemini 2.5 Flash-Lite...');
+      // console.log('📥 Initializing Gemini 2.5 Flash-Lite...');
       await slidingContextManager.initialize(GOOGLE_API_KEY);
       initialized = true;
-      console.log('✅ Gemini initialized successfully!');
-    } catch (error: any) {
-      console.error('❌ Failed to initialize Gemini:', error.message);
-      throw new Error(`Gemini initialization failed: ${error.message}`);
+      // console.log('✅ Gemini initialized successfully!');
+    } catch (error: unknown) {
+      const msg = error instanceof Error ? error.message : String(error);
+      // console.error('❌ Failed to initialize Gemini:', msg);
+      throw new Error(`Gemini initialization failed: ${msg}`);
     }
   }
 }
@@ -47,13 +48,15 @@ export async function POST(request: Request) {
       context,
       modelInfo: slidingContextManager.getModelInfo(),
     });
-  } catch (error: any) {
-    console.error('❌ Context API Error:', error);
+  } catch (error: unknown) {
+    const msg = error instanceof Error ? error.message : String(error);
+    const stack = error instanceof Error ? error.stack : undefined;
+    // console.error('❌ Context API Error:', error);
     return NextResponse.json(
       {
         success: false,
-        error: error.message,
-        details: error.stack,
+        error: msg,
+        details: stack,
       },
       { status: 500 },
     );
@@ -73,13 +76,13 @@ export async function GET() {
 // ✅ Cleanup عند إغلاق الـ server
 if (typeof process !== 'undefined') {
   process.on('SIGTERM', async () => {
-    console.log('📤 Shutting down model...');
+    // console.log('📤 Shutting down model...');
     await slidingContextManager.unload();
     process.exit(0);
   });
 
   process.on('SIGINT', async () => {
-    console.log('📤 Shutting down model...');
+    // console.log('📤 Shutting down model...');
     await slidingContextManager.unload();
     process.exit(0);
   });

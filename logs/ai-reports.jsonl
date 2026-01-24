@@ -1,0 +1,2 @@
+{"timestamp":"2026-01-24T11:45:19.215Z","stats":{"total_lines":649,"triggered_lines":67,"reasons":{"medium_confidence_default_llm":13,"ambiguous_between_2_types":49,"ambiguous_between_3_types":5}},"patchesCount":64}
+{"timestamp":"2026-01-24T11:45:28.078Z","stats":{"total_lines":649,"triggered_lines":67,"reasons":{"medium_confidence_default_llm":13,"ambiguous_between_2_types":49,"ambiguous_between_3_types":5}},"patchesCount":65}

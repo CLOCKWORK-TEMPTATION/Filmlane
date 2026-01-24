@@ -77,20 +77,6 @@ export const ScreenplayEditor = () => {
     });
   };
 
-  const handleLightbulb = () => {
-    toast({
-      title: 'الأفكار',
-      description: 'اقتراحات وأفكار جديدة',
-    });
-  };
-
-  const handleStethoscope = () => {
-    toast({
-      title: 'الفحص',
-      description: 'فحص جودة السيناريو',
-    });
-  };
-
   const handleContentChange = useCallback(() => {
     // Content change logic is mainly handled by EditorArea triggering updates
   }, []);
@@ -227,7 +213,7 @@ export const ScreenplayEditor = () => {
 
         <EditorSidebar
           onMessages={handleMessages}
-          onIdeas={handleGenerateIdeas}
+          onIdeas={() => handleGenerateIdeas('general')}
           onCheck={handleAutoFormat}
           isProcessing={isProcessingAI}
         />

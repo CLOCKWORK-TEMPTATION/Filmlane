@@ -15,9 +15,10 @@ export class ContextMemoryManager {
   }
 
   async loadContext(sessionId: string): Promise<ContextMemory | null> {
-    if (this.storage.has(sessionId)) {
+    const memory = this.storage.get(sessionId);
+    if (memory) {
       logger.info('MemoryManager', `Loading context for session: ${sessionId}`);
-      return JSON.parse(JSON.stringify(this.storage.get(sessionId)!));
+      return JSON.parse(JSON.stringify(memory));
     }
     logger.warning('MemoryManager', `No context found for session: ${sessionId}`);
     return null;

@@ -19,7 +19,8 @@ export async function POST(request: Request) {
       success: true,
       settings: { ...DEFAULT_SETTINGS, ...settings },
     });
-  } catch (error: any) {
-    return NextResponse.json({ error: error?.message || 'خطأ غير متوقع' }, { status: 500 });
+  } catch (error: unknown) {
+    const msg = error instanceof Error ? error.message : 'خطأ غير متوقع';
+    return NextResponse.json({ error: msg }, { status: 500 });
   }
 }

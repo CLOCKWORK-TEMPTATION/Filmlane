@@ -100,16 +100,16 @@ export const EditorArea = forwardRef<EditorHandle, EditorAreaProps>(
       const selection = window.getSelection();
       if (!selection || !selection.rangeCount) return true;
       const range = selection.getRangeAt(0);
-      let currentElement = range.commonAncestorContainer;
+      let currentElement: Node | null = range.commonAncestorContainer;
       while (currentElement && currentElement.nodeType !== Node.ELEMENT_NODE) {
-        currentElement = currentElement.parentNode!;
+        currentElement = currentElement.parentNode;
       }
       while (
         currentElement &&
         (currentElement as HTMLElement).tagName !== 'DIV' &&
         (currentElement as HTMLElement).contentEditable !== 'true'
       ) {
-        currentElement = currentElement.parentNode!;
+        currentElement = currentElement.parentNode;
       }
       if (!currentElement || (currentElement as HTMLElement).contentEditable === 'true')
         return true;
@@ -119,9 +119,9 @@ export const EditorArea = forwardRef<EditorHandle, EditorAreaProps>(
     const getCurrentFormat = () => {
       const selection = window.getSelection();
       if (!selection || selection.rangeCount === 0) return 'action';
-      let node = selection.getRangeAt(0).startContainer;
-      if (node.nodeType === Node.TEXT_NODE) {
-        node = node.parentNode!;
+      let node: Node | null = selection.getRangeAt(0).startContainer;
+      if (node && node.nodeType === Node.TEXT_NODE) {
+        node = node.parentNode;
       }
       while (
         node &&
@@ -131,7 +131,9 @@ export const EditorArea = forwardRef<EditorHandle, EditorAreaProps>(
         node = node.parentNode;
       }
       if (node && node instanceof HTMLElement && node.className) {
-        const format = screenplayFormats.find((f) => node.classList.contains(formatClassMap[f.id]));
+        const format = screenplayFormats.find((f) =>
+          node?.classList.contains(formatClassMap[f.id]),
+        );
         if (format) return format.id;
       }
       return 'action';
@@ -141,16 +143,16 @@ export const EditorArea = forwardRef<EditorHandle, EditorAreaProps>(
       const selection = window.getSelection();
       if (!selection || !selection.rangeCount) return;
       const range = selection.getRangeAt(0);
-      let currentElement = range.commonAncestorContainer;
+      let currentElement: Node | null = range.commonAncestorContainer;
       while (currentElement && currentElement.nodeType !== Node.ELEMENT_NODE) {
-        currentElement = currentElement.parentNode!;
+        currentElement = currentElement.parentNode;
       }
       while (
         currentElement &&
         (currentElement as HTMLElement).tagName !== 'DIV' &&
         (currentElement as HTMLElement).contentEditable !== 'true'
       ) {
-        currentElement = currentElement.parentNode!;
+        currentElement = currentElement.parentNode;
       }
       if (!currentElement || (currentElement as HTMLElement).contentEditable === 'true') {
         document.execCommand('formatBlock', false, 'div');
@@ -158,7 +160,7 @@ export const EditorArea = forwardRef<EditorHandle, EditorAreaProps>(
         if (!newSelection || !newSelection.rangeCount) return;
         currentElement = newSelection.getRangeAt(0).commonAncestorContainer;
         while (currentElement && currentElement.nodeType !== Node.ELEMENT_NODE) {
-          currentElement = currentElement.parentNode!;
+          currentElement = currentElement.parentNode;
         }
       }
 
@@ -317,7 +319,7 @@ export const EditorArea = forwardRef<EditorHandle, EditorAreaProps>(
           // Be careful with setPages causing loops. Only do if diff is significant?
         }
       }
-    }, [CONTENT_HEIGHT_PX, pageMetrics]);
+    }, [pageMetrics]);
 
     // Trigger repaginate on content changes
     const handleInput = useCallback(() => {
@@ -490,7 +492,15 @@ export const EditorArea = forwardRef<EditorHandle, EditorAreaProps>(
           handleAIReviewNeeded,
         );
       },
-      [handleInput, memoryManager, virtualEditorRef, handleAIReviewNeeded, sessionId],
+      [
+        handleInput,
+        memoryManager,
+        virtualEditorRef,
+        handleAIReviewNeeded,
+        sessionId,
+        fixedSize,
+        fixedFont,
+      ],
     );
 
     const handleConfirmClassification = useCallback((lineId: string) => {
@@ -680,7 +690,7 @@ export const EditorArea = forwardRef<EditorHandle, EditorAreaProps>(
           onMouseLeave={handleMouseLeave}
         >
           {pages.map((pageId, index) => (
-            <div key={pageId} className="screenplay-sheet">
+            <div key={pageId} className="screenplay-sheet" suppressHydrationWarning>
               {/* Header */}
               <div className="screenplay-sheet__header">{/* Optional content for header */}</div>
 
@@ -689,6 +699,7 @@ export const EditorArea = forwardRef<EditorHandle, EditorAreaProps>(
                 className="screenplay-sheet__body"
                 contentEditable={true}
                 suppressContentEditableWarning={true}
+                suppressHydrationWarning={true}
                 onInput={handleInput}
                 onPaste={handlePaste}
                 onKeyDown={handleKeyDown}

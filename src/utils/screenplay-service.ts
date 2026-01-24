@@ -117,8 +117,10 @@ ${JSON.stringify(chunk)}
           }
         }
 
-        if (parsedPatches && Array.isArray(parsedPatches.patches)) {
-          allPatches.push(...parsedPatches.patches);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const responseData = parsedPatches as any;
+        if (responseData && Array.isArray(responseData.patches)) {
+          allPatches.push(...responseData.patches);
         }
       } catch (err) {
         console.error(`[AI] Error processing chunk ${i + 1}`, err);

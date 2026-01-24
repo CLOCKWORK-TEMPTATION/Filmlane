@@ -29,8 +29,9 @@ export class PersistentMemoryManager {
   private readonly localStorageKey = 'filmlane_persistent_memory';
 
   async load(sessionId: string): Promise<PersistentMemory> {
-    if (this.storage.has(sessionId)) {
-      return JSON.parse(JSON.stringify(this.storage.get(sessionId)!));
+    const stored = this.storage.get(sessionId);
+    if (stored) {
+      return JSON.parse(JSON.stringify(stored));
     }
 
     if (typeof window !== 'undefined') {

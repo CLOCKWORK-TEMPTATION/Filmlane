@@ -83,9 +83,10 @@ export class SlidingContextManager {
           'Local model paths are not supported. Please provide a Google API key starting with "AIza"',
         );
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       this.isClientInitialized = false;
-      logger.error('SlidingContext', `❌ Initialization failed: ${error.message}`);
+      const msg = error instanceof Error ? error.message : String(error);
+      logger.error('SlidingContext', `❌ Initialization failed: ${msg}`);
       throw error;
     }
   }
@@ -123,8 +124,9 @@ export class SlidingContextManager {
         geminiAnalysis,
         llamaAnalysis: geminiAnalysis, // Same content, different key for compatibility
       };
-    } catch (error: any) {
-      logger.error('SlidingContext', `❌ Analysis failed for line ${index}: ${error.message}`);
+    } catch (error: unknown) {
+      const msg = error instanceof Error ? error.message : String(error);
+      logger.error('SlidingContext', `❌ Analysis failed for line ${index}: ${msg}`);
       return baseContext; // العودة للسياق الأساسي في حال الخطأ
     }
   }
@@ -138,7 +140,7 @@ export class SlidingContextManager {
     const cacheKey = this.buildCacheKey(lines, types, index);
     if (this.contextCache.has(cacheKey)) {
       logger.info('SlidingContext', `📦 Using cached context for line ${index}`);
-      return this.contextCache.get(cacheKey)!;
+      return this.contextCache.get(cacheKey) || {};
     }
 
     // تجميع السياق (استخدام نافذة أوسع لـ Gemini)
@@ -188,8 +190,9 @@ export class SlidingContextManager {
       const analysis = output as GeminiContextAnalysis;
       this.contextCache.set(cacheKey, analysis);
       return analysis;
-    } catch (error: any) {
-      throw new Error(`Gemini Core Error: ${error.message}`);
+    } catch (error: unknown) {
+      const msg = error instanceof Error ? error.message : String(error);
+      throw new Error(`Gemini Core Error: ${msg}`);
     }
   }
 

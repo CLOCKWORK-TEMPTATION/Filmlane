@@ -34,6 +34,7 @@ export const ClassificationSettingsDialog: React.FC = () => {
       const raw = window.localStorage.getItem(SETTINGS_KEY);
       if (raw) {
         const parsed = JSON.parse(raw) as Partial<ClassificationSettings>;
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setSettings((prev) => ({ ...prev, ...parsed }));
       }
     } catch (error) {

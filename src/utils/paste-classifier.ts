@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { logger } from './logger';
 import {
   PersistentMemoryManager,
@@ -8,6 +8,16 @@ import {
 import type { LineContext } from '@/types/screenplay';
 import { confidenceScorer, type ConfidenceScore } from './classification/confidence-scorer';
 import { preLLMDecisionEngine, type PreLLMDecision } from './classification/pre-llm-decision';
+import {
+  ACTION_VERB_LIST,
+  EXTRA_ACTION_VERBS,
+  ACTION_START_PATTERNS,
+  STAGE_DIRECTION_PREFIXES,
+  KNOWN_PLACES,
+  IMPERATIVE_VERBS,
+  CHARACTER_RE,
+} from './classification/constants';
+import { shouldTriggerReview, constructAIRequestPayload, type AIPayload } from './ai-reviewer';
 import { getContextAnalysis } from './classification/server-actions';
 
 /**
@@ -40,7 +50,6 @@ const cssObjectToString = (styles: React.CSSProperties): string => {
  * - parenthetical → يتبع نفس قواعد dialogue
  * - transition → scene-header-1/scene-header-top-line: سطر فارغ
  */
-import { shouldTriggerReview, constructAIRequestPayload, type AIPayload } from './ai-reviewer';
 
 const getSpacingMarginTop = (previousFormat: string, currentFormat: string): string => {
   if (previousFormat === 'basmala') {
@@ -53,8 +62,22 @@ const getSpacingMarginTop = (previousFormat: string, currentFormat: string): str
     }
   }
 
-  if (previousFormat === 'parenthetical' && currentFormat === 'dialogue') {
-    return '0';
+  if (previousFormat === 'parenthetical') {
+    // parenthetical after dialogue usually has 0 margin if it's attached to it?
+    // Rule: "parenthetical (إذا كان داخل بلوك حوار أو بعد اسم شخصية)"
+    // Rule: "parenthetical بعد dialogue بلا هامش"
+    if (currentFormat === 'dialogue') return '0';
+
+    // parenthetical -> character (New speaker) -> 12pt
+    if (
+      currentFormat === 'character' ||
+      currentFormat === 'action' ||
+      currentFormat === 'transition'
+    ) {
+      return '12pt'; // Not explicitly 0, so default to standard separation?
+      // Actually requirements say: "dialogue → character/action/transition بهامش 12pt."
+      // And "parenthetical يتبع نفس قواعد dialogue" usually.
+    }
   }
 
   if (previousFormat === 'scene-header-2' && currentFormat === 'scene-header-3') {
@@ -76,22 +99,15 @@ const getSpacingMarginTop = (previousFormat: string, currentFormat: string): str
   }
 
   if (previousFormat === 'dialogue') {
+    if (currentFormat === 'parenthetical') {
+      return '0'; // Explicit rule
+    }
     if (
       currentFormat === 'character' ||
       currentFormat === 'action' ||
       currentFormat === 'transition'
     ) {
       return '12pt';
-    }
-  }
-
-  if (previousFormat === 'parenthetical') {
-    if (
-      currentFormat === 'character' ||
-      currentFormat === 'action' ||
-      currentFormat === 'transition'
-    ) {
-      return '0';
     }
   }
 
@@ -132,14 +148,14 @@ const buildLineDivHTML = (
 };
 
 const stripLeadingBullets = (input: string): string => {
-  return input.replace(/^[\s\u200E\u200F\u061C\ufeFF]*[•·∙⋅●○◦■□▪▫◆◇–—−‒―‣⁃*+\-]+\s*/, '');
+  return input.replace(/^[\s\u200E\u200F\u061C\ufeFF]*[•·∙⋅●○◦■□▪▫◆◇–—−‒―‣⁃*+-]+\s*/, '');
 };
 
 const normalizeLine = (input: string): string => {
   return input
     .replace(/[\u064B-\u065F\u0670]/g, '')
     .replace(/[\u200f\u200e\ufeff\t]+/g, '')
-    .replace(/^[\s\u200E\u200F\u061C\ufeFF]*[•·∙⋅●○◦■□▪▫◆◇–—−‒―‣⁃*+\-]+/, '')
+    .replace(/^[\s\u200E\u200F\u061C\ufeFF]*[•·∙⋅●○◦■□▪▫◆◇–—−‒―‣⁃*+-]+/, '')
     .trim();
 };
 
@@ -155,7 +171,7 @@ const hasSentencePunctuation = (line: string): boolean => {
 
 const isBasmala = (line: string): boolean => {
   const cleaned = line
-    .replace(/[{}()\[\]]/g, '')
+    .replace(/[{}()[\]]/g, '')
     .replace(/[\u200f\u200e\ufeff]/g, '')
     .trim();
   const normalized = normalizeLine(cleaned);
@@ -182,9 +198,7 @@ const isSceneHeader1 = (line: string): boolean => {
   return SCENE_NUMBER_RE.test(normalized);
 };
 
-const TIME_RE = /(نهار|ليل|صباح|مساء|فجر)/i;
-const LOCATION_RE = /(داخلي|خارجي)/i;
-const TIME_TOKEN_RE = /(?:^|[\s،؛\-–—])(?:نهار|ليل|صباح|مساء|فجر)(?:$|[\s،؛\-–—])/i;
+const TIME_TOKEN_RE = /(?:^|[\s،؛\-–—])(?:نهار|ليل|صباح|مساء|فجر|Day|Night)(?:$|[\s،؛\-–—])/i;
 const LOCATION_LINE_START_RE = /^(?:داخلي|خارجي)[.:]?(?:\s|$)/i;
 
 const isSceneHeader2 = (line: string): boolean => {
@@ -226,12 +240,6 @@ const isTransition = (line: string): boolean => {
  * =========================
  */
 
-const ACTION_VERB_LIST =
-  'يدخل|يخرج|ينظر|يرفع|تبتسم|ترقد|تقف|يبسم|يضع|يقول|تنظر|تربت|تقوم|يشق|تشق|تضرب|يسحب|يلتفت|يقف|يجلس|تجلس|يجري|تجري|يمشي|تمشي|يركض|تركض|يصرخ|اصرخ|يبكي|تبكي|يضحك|تضحك|يغني|تغني|يرقص|ترقص|يأكل|تأكل|يشرب|تشرب|ينام|تنام|يستيقظ|تستيقظ|يكتب|تكتب|يقرأ|تقرأ|يسمع|تسمع|يشم|تشم|يلمس|تلمس|يأخذ|تأخذ|يعطي|تعطي|يفتح|تفتح|يغلق|تغلق|يبدأ|تبدأ|ينتهي|تنتهي|يذهب|تذهب|يعود|تعود|يأتي|تأتي|يموت|تموت|يحيا|تحيا|يقاتل|تقاتل|ينصر|تنتصر|يخسر|تخسر|يرسم|ترسم|يصمم|تصمم|يخطط|تخطط|يقرر|تقرر|يفكر|تفكر|يتذكر|تتذكر|يحاول|تحاول|يستطيع|تستطيع|يريد|تريد|يحتاج|تحتاج|يبحث|تبحث|يجد|تجد|يفقد|تفقد|يحمي|تحمي|يراقب|تراقب|يخفي|تخفي|يكشف|تكشف|يكتشف|تكتشف|يعرف|تعرف|يتعلم|تتعلم|يعلم|تعلم|يوجه|توجه|يسافر|تسافر|يرحل|ترحل|يبقى|تبقى|ينتقل|تنتقل|يتغير|تتغير|ينمو|تنمو|يتطور|تتطور|يواجه|تواجه|يحل|تحل|يفشل|تفشل|ينجح|تنجح|يحقق|تحقق|ينهي|تنهي|يوقف|توقف|يستمر|تستمر|ينقطع|تنقطع|يرتبط|ترتبط|ينفصل|تنفصل|يتزوج|تتزوج|يطلق|تطلق|يولد|تولد|يكبر|تكبر|يشيخ|تشيخ|يمرض|تمرض|يشفي|تشفي|يصاب|تصاب|يتعافى|تتعافى|يقتل|تقتل|يُقتل|تُقتل|يختفي|تختفي|يظهر|تظهر|يختبئ|تختبئ|يطلب|تطلب|يأمر|تأمر|يمنع|تمنع|يسمح|تسمح|يوافق|توافق|يرفض|ترفض|يعتذر|تعتذر|يشكر|تشكر|يحيي|تحيي|يودع|تودع|يجيب|تجيب|يسأل|تسأل|يصيح|صيح|يهمس|همس|يصمت|صمت|يتكلم|تكلم|ينادي|تنادي|يحكي|تحكي|يروي|تروي|يقص|تقص|يتنهد|تتنهد|يئن|تئن|يتوقف|تتوقف|يستدير|تستدير|يحدق|تحدق|يلمح|تلمح';
-
-const EXTRA_ACTION_VERBS =
-  'نرى|نسمع|نلاحظ|نقترب|نبتعد|ننتقل|ترفع|ينهض|تنهض|تقتحم|يقتحم|يتبادل|يبتسم|يبدؤون|تفتح|يفتح|تدخل|يُظهر|يظهر|تظهر|يبدو|تبدو|تتنهد|يتنهد|يصمت|تصمت|يتحدث|تتحدث|يهمس|تهمس|ينصت|تنصت';
-
 const ACTION_VERB_SET = new Set(
   (ACTION_VERB_LIST + '|' + EXTRA_ACTION_VERBS)
     .split('|')
@@ -261,18 +269,7 @@ const isActionVerbStart = (line: string): boolean => {
 
 const matchesActionStartPattern = (line: string): boolean => {
   const normalized = normalizeLine(line);
-
-  const actionStartPatterns = [
-    /^\s*(?:ثم\s+)?(?:و(?:هو|هي)\s+)?[يت][\u0600-\u06FF]{2,}(?:\s+\S|$)/,
-    /^\s*(?:و|ف|ل)?(?:نرى|نسمع|نلاحظ|نقترب|نبتعد|ننتقل)(?:\s+\S|$)/,
-    /^\s*(?:ثم\s+)?(?:و(?:هو|هي)\s+)?[يت][\u0600-\u06FF]{2,}(?:\s+\S|$)/,
-    /^\s*(?:و|ف|ل)?(?:نرى|نسمع|نلاحظ|نقترب|نبتعد|ننتقل)(?:\s+\S|$)/,
-    /^\s*(?:رأينا|سمعنا|لاحظنا|شاهدنا)(?:\s+\S|$)/,
-    // Add imperative check for Action (e.g. ادخل، اخرج) if it starts with Alif
-    /^\s*(?:ادخل|اخرج|انظر|استمع|اقترب|ابتعد|توقف)(?:\s+\S|$)/,
-  ];
-
-  return actionStartPatterns.some((pattern) => pattern.test(normalized));
+  return ACTION_START_PATTERNS.some((pattern) => pattern.test(normalized));
 };
 
 const isLikelyAction = (line: string): boolean => {
@@ -292,24 +289,8 @@ const isLikelyAction = (line: string): boolean => {
  * =========================
  */
 
-const CHARACTER_RE = /^\s*(?:صوت\s+)?[\u0600-\u06FF][\u0600-\u06FF\s0-9٠-٩]{0,30}:?\s*$/;
-
-const STAGE_DIRECTION_PREFIXES = [
-  'بهدوء',
-  'بصمت',
-  'بغضب',
-  'بحزن',
-  'بابتسامة',
-  'بقلق',
-  'بدهشة',
-  'بتردد',
-  'بخجل',
-  'بصوت',
-  'بنبرة',
-];
-
 const isParenthetical = (line: string): boolean => {
-  return /^[\(（].*?[\)）]$/.test(line.trim());
+  return /^[(\uff08].*?[)\uff09]$/.test(line.trim());
 };
 
 const parseInlineCharacterDialogue = (
@@ -420,106 +401,25 @@ const isCharacterLine = (
     }
   }
 
-  return CHARACTER_RE.test(trimmed);
+  return true;
 };
 
-const isLikelyDialogue = (line: string, previousFormat: string): boolean => {
+export const isLikelyDialogue = (line: string, previousFormat: string): boolean => {
+  const hasTimeToken = TIME_TOKEN_RE.test(line);
+  const hasLocationKeyword = /(داخلي|خارجي)/i.test(line);
+  const hasTimeKeyword = /(نهار|ليل|صباح|مساء|فجر)/i.test(line);
+
   if (previousFormat === 'character' || previousFormat === 'parenthetical') {
     if (!isCompleteSceneHeader(line) && !isTransition(line) && !isCharacterLine(line)) {
       return true;
     }
   }
-  return false;
-};
 
-/**
- * دالة ذكية لحساب احتمالية أن يكون السطر حواراً بناءً على محتواه اللغوي
- * Smart Linguistic Heuristic for Dialogue Detection
- */
-const getDialogueProbability = (line: string): number => {
-  let score = 0;
-  const normalized = normalizeLine(line);
-
-  // 1. Punctuation Indicators (علامات الترقيم الحوارية)
-  if (/[؟?]/.test(line)) score += 3; // Question mark is a very strong indicator
-  if (/!/.test(line)) score += 1; // Exclamation can be in action too, but often dialogue
-  if (/\.\./.test(line)) score += 1; // Ellipses often indicate trailing dialogue
-
-  // 2. Vocative Particles (أدوات النداء)
-  // "Ya" followed by a word
-  if (/\bيا\s+[\u0600-\u06FF]+/.test(normalized)) score += 4;
-  if (/يا\s*([أا]خي|[أا]ختي|[يأ]سطى|باشا|بيه|هانم|مدام|أستاذ|ياعم|ياواد|يابنت)/.test(normalized))
-    score += 2; // Specific common vocatives
-
-  // 3. Conversational Start (بدايات حوارية شائعة)
-  const conversationalStarts = [
-    'ليه',
-    'مين',
-    'فين',
-    'إمتى',
-    'ازاي',
-    'كام', // Questions
-    'أنا',
-    'انت',
-    'إنتي',
-    'احنا',
-    'يا', // Pronouns/Vocative
-    'بس',
-    'طب',
-    'ما',
-    'مش',
-    'لا',
-    'أيوه',
-    'أه', // Colloquial particles
-    'طيب',
-    'خلاص',
-    'ياللا',
-    'يلا',
-    'عشان',
-    'علشان', // Colloquial
-    'يبقى',
-    'كده',
-    'هو',
-    'هي',
-    'دي',
-    'ده', // Demonstratives/Aux
-    'بقولك',
-    'بقولك',
-    'بتعمل',
-    'هتعمل',
-    'تعالى',
-    'روح', // Common commands/questions
-    'يلعن',
-    'يخرب',
-    'الله',
-    'والله', // Common expressions
-  ];
-  const firstWord = normalized.split(' ')[0];
-  if (conversationalStarts.includes(firstWord)) score += 2;
-
-  // Check deeper in the sentence for conversational markers
-  if (/\b(ده|دي|كده|عشان|علشان|عايز|عايزة|مش|هو|هي|احنا)\b/.test(normalized)) score += 1;
-
-  // 4. Quotation Marks (علامات التنصيص)
-  if (/["«»]/.test(line)) score += 2;
-
-  // 5. Length Heuristic (الطول)
-  if (normalized.length > 5 && normalized.length < 150) score += 1;
-
-  // Penalties (عقوبات)
-  if (isSceneHeader1(line) || isSceneHeader2(line)) score -= 10;
-
-  // Adjusted Action Penalty: If it starts with action verb BUT has strong dialogue markers, reduce penalty or ignore
-  if (isActionVerbStart(line)) {
-    // If we have strong dialogue indicators (like "Ya" or "?"), the action verb might be part of dialogue (e.g. "Look at me!")
-    // "انظر لي يا محمد" -> "Look" is imperative action verb, but "Ya" makes it dialogue.
-    // So only penalize if score is currently low.
-    if (score < 4) {
-      score -= 3;
-    }
+  if (hasTimeToken && hasLocationKeyword && hasTimeKeyword) {
+    return false;
   }
 
-  return score;
+  return false;
 };
 
 /**
@@ -528,7 +428,7 @@ const getDialogueProbability = (line: string): number => {
  * =========================
  */
 
-const buildContext = (
+export const buildContext = (
   lines: string[],
   currentIndex: number,
   previousTypes: string[],
@@ -625,9 +525,6 @@ const isSceneHeader3 = (line: string, ctx: LineContext): boolean => {
     return true;
   }
 
-  const KNOWN_PLACES =
-    /^(مسجد|بيت|منزل|شارع|حديقة|مدرسة|جامعة|مكتب|محل|مستشفى|مطعم|فندق|سيارة|غرفة|قاعة|ممر|سطح|ساحة|مقبرة|مخبز|مكتبة|نهر|بحر|جبل|غابة|سوق|مصنع|بنك|محكمة|سجن|موقف|محطة|مطار|ميناء|كوبرى|نفق|مبنى|قصر|نادي|ملعب|ملهى|بار|كازينو|متحف|مسرح|سينما|معرض|مزرعة|مختبر|مستودع|مقهى|شركة|كهف|صالة|حمام|مطبخ|شرفة|ميدان|مخزن|مخازن|حرم|باحة|دار|روضة|معهد|مركز|عيادة|ورشة|مصلى|زاوية)/i;
-
   if (KNOWN_PLACES.test(normalizedWithoutColon)) {
     return true;
   }
@@ -643,7 +540,7 @@ const isSceneHeader3 = (line: string, ctx: LineContext): boolean => {
   return false;
 };
 
-const isLikelyCharacter = (line: string, ctx: LineContext): boolean => {
+export const isLikelyCharacter = (line: string, ctx: LineContext): boolean => {
   if (!ctx.stats.isShort || ctx.stats.wordCount > 5) return false;
 
   // Character names generally don't have dialogue punctuation
@@ -658,18 +555,6 @@ const isLikelyCharacter = (line: string, ctx: LineContext): boolean => {
   const namePart = line.split(':')[0].trim();
   const nameNormalized = normalizeLine(namePart);
 
-  // List of verbs that might look like names but are commands
-  const IMPERATIVE_VERBS = new Set([
-    'ادخل',
-    'اخرج',
-    'انظر',
-    'توقف',
-    'اسمع',
-    'تعال',
-    'امش',
-    'اكتب',
-    'اقرأ',
-  ]);
   if (IMPERATIVE_VERBS.has(nameNormalized)) {
     // If the "name" is just a command, treat it as Dialogue (or Action/Parenthetical based on context)
     // The user said: "ادخل:" was treated as character. They want it as Dialogue?
@@ -875,7 +760,8 @@ const classifyWithContextAndMemory = async (
       isLikelyAction(line)
     ) {
       classification = 'action';
-      score = getDialogueProbability(line);
+      const dialogueConf = confidenceScorer.calculateDialogueConfidence(line, ctx);
+      score = dialogueConf.score;
     }
 
     if (

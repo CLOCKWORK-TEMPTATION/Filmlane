@@ -78,15 +78,16 @@ export async function initializeLlamaModel(
   try {
     await slidingContextManager.initialize(modelPath);
     return { success: true };
-  } catch (error: any) {
-    return { success: false, error: error.message };
+  } catch (error: unknown) {
+    const msg = error instanceof Error ? error.message : String(error);
+    return { success: false, error: msg };
   }
 }
 
 /**
  * Server Action: Check if model is ready
  */
-export async function isModelReady(): Promise<{ ready: boolean; info?: any }> {
+export async function isModelReady(): Promise<{ ready: boolean; info?: unknown }> {
   const ready = slidingContextManager.isModelReady();
   const info = slidingContextManager.getModelInfo();
   return { ready, info };

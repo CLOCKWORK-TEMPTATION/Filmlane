@@ -7,6 +7,7 @@ FastAPI server running the LiquidAI/LFM2.5-1.2B-Thinking model for Arabic screen
 1. **Install Python 3.9+**
 
 2. **Install dependencies:**
+
    ```bash
    cd python-llm-server
    pip install -r requirements.txt
@@ -22,9 +23,11 @@ Server will start at: `http://127.0.0.1:8001`
 ## API Endpoints
 
 ### POST `/classify`
+
 Classify a single screenplay line.
 
 **Request:**
+
 ```json
 {
   "line": "يدخل أحمد إلى الغرفة",
@@ -34,6 +37,7 @@ Classify a single screenplay line.
 ```
 
 **Response:**
+
 ```json
 {
   "type": "action",
@@ -43,9 +47,11 @@ Classify a single screenplay line.
 ```
 
 ### POST `/classify/batch`
+
 Classify multiple lines at once.
 
 **Request:**
+
 ```json
 {
   "lines": ["أحمد: مرحباً", "كيف حالك؟"],
@@ -54,11 +60,12 @@ Classify multiple lines at once.
 ```
 
 **Response:**
+
 ```json
 {
   "results": [
-    {"type": "character", "confidence": 9.0},
-    {"type": "dialogue", "confidence": 8.5}
+    { "type": "character", "confidence": 9.0 },
+    { "type": "dialogue", "confidence": 8.5 }
   ]
 }
 ```
@@ -73,14 +80,18 @@ Classify multiple lines at once.
 ## Troubleshooting
 
 ### CUDA Out of Memory
+
 If you get GPU OOM error, the model will automatically fall back to CPU.
 
 ### Port Already in Use
+
 If port 8001 is busy, change it in `server.py`:
+
 ```python
 uvicorn.run(app, host="127.0.0.1", port=8002)
 ```
 
 ### Slow Performance
+
 - **GPU:** ~0.5 second per request
 - **CPU:** ~5 seconds per request

@@ -4,9 +4,9 @@
 
 النظام الآن يدعم **نموذجين LLM**:
 
-| النموذج | المنفذ | الاستخدام |
-|--------|-------|----------|
-| **Qwen2.5-14B** | `localhost:8000` | LLM الأساسي (سريع، 1.2B params) |
+| النموذج             | المنفذ           | الاستخدام                          |
+| ------------------- | ---------------- | ---------------------------------- |
+| **Qwen2.5-14B**     | `localhost:8000` | LLM الأساسي (سريع، 1.2B params)    |
 | **LFM2.5-Thinking** | `localhost:8001` | نموذج thinking (جديد، 1.2B params) |
 
 ---
@@ -28,6 +28,7 @@ python server.py
 ```
 
 **أول مرة سيحمل النموذج (~5-10 دقائق)** - سيظهر:
+
 ```
 🚀 Starting LFM2.5 Classification Server...
 INFO:     Started server process [1234]
@@ -50,6 +51,7 @@ npm run dev
 ## 🧪 اختبار النظام
 
 ### اختبار API مباشرة:
+
 ```bash
 curl -X POST http://127.0.0.1:8001/classify \
   -H "Content-Type: application/json" \
@@ -57,16 +59,17 @@ curl -X POST http://127.0.0.1:8001/classify \
 ```
 
 ### الاستخدام من TypeScript:
+
 ```typescript
 import { lfmClassifier } from '@/utils/classification/lfm-classifier';
 
 const result = await lfmClassifier.classify(
-  "يدخل أحمد إلى الغرفة",
-  "مشهد 1 - منزل",
-  "scene-header"
+  'يدخل أحمد إلى الغرفة',
+  'مشهد 1 - منزل',
+  'scene-header',
 );
 
-console.log(result.type);      // "action"
+console.log(result.type); // "action"
 console.log(result.confidence); // 9.5
 ```
 
@@ -74,12 +77,12 @@ console.log(result.confidence); // 9.5
 
 ## 📁 الملفات الجديدة
 
-| الملف | الوصف |
-|-------|-------|
-| `python-llm-server/server.py` | FastAPI server للنموذج |
-| `python-llm-server/requirements.txt` | مكتبات Python |
-| `src/app/api/lfm-proxy/route.ts` | Next.js API proxy |
-| `src/utils/classification/lfm-classifier.ts` | TypeScript service |
+| الملف                                        | الوصف                  |
+| -------------------------------------------- | ---------------------- |
+| `python-llm-server/server.py`                | FastAPI server للنموذج |
+| `python-llm-server/requirements.txt`         | مكتبات Python          |
+| `src/app/api/lfm-proxy/route.ts`             | Next.js API proxy      |
+| `src/utils/classification/lfm-classifier.ts` | TypeScript service     |
 
 ---
 
@@ -100,13 +103,13 @@ if (decision.shouldUseLLM) {
       const result = await lfmClassifier.classify(
         line,
         ctx.previousLines.join(' | '),
-        ctx.previousTypes.slice(-1)[0]
+        ctx.previousTypes.slice(-1)[0],
       );
 
       return {
         type: result.type,
         score: result.confidence * 10, // Scale to 0-10
-        decision: { shouldUseLLM: false, reason: 'lfm_used' }
+        decision: { shouldUseLLM: false, reason: 'lfm_used' },
       };
     }
   } catch (e) {
@@ -122,6 +125,7 @@ if (decision.shouldUseLLM) {
 ## ⚙️ الإعدادات
 
 ### تفعيل/تعطيل LFM2.5:
+
 ```typescript
 import { lfmClassifier } from '@/utils/classification/lfm-classifier';
 
@@ -133,6 +137,7 @@ lfmClassifier.setEnabled(true);
 ```
 
 ### تغيير timeout:
+
 ```typescript
 lfmClassifier.setTimeout(60000); // 60 seconds
 ```
@@ -141,24 +146,26 @@ lfmClassifier.setTimeout(60000); // 60 seconds
 
 ## ⚡ الأداء
 
-| العمل | الوقت المقدر |
-|-------|--------------|
-| تحميل النموذج (أول مرة) | 5-10 دقائق |
-| تصنيف سطر واحد (GPU) | ~0.5 ثانية |
-| تصنيف سطر واحد (CPU) | ~5 ثوان |
-| تصنيف 10 أسطر (GPU) | ~3 ثوان |
+| العمل                   | الوقت المقدر |
+| ----------------------- | ------------ |
+| تحميل النموذج (أول مرة) | 5-10 دقائق   |
+| تصنيف سطر واحد (GPU)    | ~0.5 ثانية   |
+| تصنيف سطر واحد (CPU)    | ~5 ثوان      |
+| تصنيف 10 أسطر (GPU)     | ~3 ثوان      |
 
 ---
 
 ## 🐛 استكشاف الأخطاء
 
 ### Port 8001 مشغول:
+
 ```python
 # غير البورت في python-llm-server/server.py
 uvicorn.run(app, host="127.0.0.1", port=8002)  # تغيير إلى 8002
 ```
 
 ### CUDA Out of Memory:
+
 ```python
 # النموذج سيتحول تلقائياً إلى CPU
 # لكن يمكنك إجبار استخدام CPU من البداية:
@@ -167,6 +174,7 @@ DEVICE = "cpu"
 ```
 
 ### ImportError: transformers:
+
 ```bash
 pip install --upgrade transformers torch
 ```

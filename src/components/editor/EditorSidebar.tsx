@@ -16,16 +16,19 @@ type EditorSidebarProps = {
   onMessages?: () => void;
   onIdeas?: () => void;
   onCheck?: () => void;
+  isProcessing?: boolean;
 };
 
-export function EditorSidebar({ onMessages, onIdeas, onCheck }: EditorSidebarProps) {
+export function EditorSidebar({ onMessages, onIdeas, onCheck, isProcessing }: EditorSidebarProps) {
   return (
     <div className="no-print sidebar w-64 border-l border-white/10 bg-gradient-to-b from-slate-900/80 to-slate-900/60 backdrop-blur-xl">
       <div className="p-4">
         <div className="grid grid-cols-4 gap-2">
+          {/* ... existing buttons ... */}
           <button
             onClick={onMessages}
-            className="group relative p-2 rounded-xl hover:bg-white/10 transition-all duration-300"
+            disabled={isProcessing}
+            className={`group relative p-2 rounded-xl hover:bg-white/10 transition-all duration-300 ${isProcessing ? 'opacity-50 cursor-not-allowed' : ''}`}
             title="رسائل"
           >
             <div className="absolute inset-0 bg-emerald-500/0 group-hover:bg-emerald-500/10 rounded-xl transition-all duration-300"></div>
@@ -33,7 +36,8 @@ export function EditorSidebar({ onMessages, onIdeas, onCheck }: EditorSidebarPro
           </button>
           <button
             onClick={onIdeas}
-            className="group relative p-2 rounded-xl hover:bg-white/10 transition-all duration-300"
+            disabled={isProcessing}
+            className={`group relative p-2 rounded-xl hover:bg-white/10 transition-all duration-300 ${isProcessing ? 'opacity-50 cursor-not-allowed' : ''}`}
             title="أفكار"
           >
             <div className="absolute inset-0 bg-yellow-500/0 group-hover:bg-yellow-500/10 rounded-xl transition-all duration-300"></div>
@@ -41,7 +45,8 @@ export function EditorSidebar({ onMessages, onIdeas, onCheck }: EditorSidebarPro
           </button>
           <button
             onClick={onCheck}
-            className="group relative p-2 rounded-xl hover:bg-white/10 transition-all duration-300"
+            disabled={isProcessing}
+            className={`group relative p-2 rounded-xl hover:bg-white/10 transition-all duration-300 ${isProcessing ? 'opacity-50 cursor-not-allowed' : ''}`}
             title="فحص"
           >
             <div className="absolute inset-0 bg-rose-500/0 group-hover:bg-rose-500/10 rounded-xl transition-all duration-300"></div>

@@ -10,9 +10,25 @@ type EditorHeaderProps = {
   onInfo?: () => void;
   onUndo?: () => void;
   onRedo?: () => void;
+  onThemeToggle?: () => void;
+  onFontChange?: (font: string) => void;
+  onSizeChange?: (size: string) => void;
 };
 
-export function EditorHeader({ onSave, onDownload, onHistory, onInfo }: EditorHeaderProps) {
+export function EditorHeader({
+  onSave,
+  onDownload,
+  onHistory,
+  onInfo,
+  onThemeToggle,
+  onFontChange,
+  onSizeChange,
+}: EditorHeaderProps) {
+  // To avoid unused variable linter errors if we don't use them yet:
+  void onThemeToggle;
+  void onFontChange;
+  void onSizeChange;
+
   const iconClass = 'w-5 h-5 transition-colors duration-200';
 
   return (

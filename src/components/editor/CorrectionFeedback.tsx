@@ -72,7 +72,7 @@ export const CorrectionFeedback: React.FC<CorrectionFeedbackProps> = ({
 
           <div className="py-4">
             <p className="text-sm text-muted-foreground mb-4">
-              السطر: "{lineText.substring(0, 50)}..."
+              السطر: &quot;{lineText.substring(0, 50)}...&quot;
             </p>
 
             <RadioGroup value={selectedType} onValueChange={setSelectedType}>

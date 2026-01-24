@@ -21,7 +21,7 @@ export async function POST(request: Request) {
       temperature?: number;
     };
 
-    console.log('📤 AI-Proxy: Forwarding to vLLM', { model, tokens: max_tokens });
+    // console.log('📤 AI-Proxy: Forwarding to vLLM', { model, tokens: max_tokens });
 
     // ✅ إصلاح: استخدام API key من البيئة (أو بدون إذا مفعّل)
     const headers: HeadersInit = {
@@ -47,7 +47,7 @@ export async function POST(request: Request) {
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('❌ AI-Proxy: vLLM error', response.status, errorText);
+      // console.error('❌ AI-Proxy: vLLM error', response.status, errorText);
       return NextResponse.json(
         { error: `vLLM error: ${response.status} - ${errorText}` },
         { status: response.status },
@@ -55,11 +55,12 @@ export async function POST(request: Request) {
     }
 
     const data = await response.json();
-    console.log('✅ AI-Proxy: vLLM success');
+    // console.log('✅ AI-Proxy: vLLM success');
 
     return NextResponse.json(data);
-  } catch (error: any) {
-    console.error('❌ AI-Proxy: Request failed', error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (error: unknown) {
+    const msg = error instanceof Error ? error.message : String(error);
+    // console.error('❌ AI-Proxy: Request failed', error);
+    return NextResponse.json({ error: msg }, { status: 500 });
   }
 }

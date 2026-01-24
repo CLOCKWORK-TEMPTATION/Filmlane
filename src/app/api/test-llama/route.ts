@@ -22,7 +22,7 @@ export async function POST(request: Request) {
   try {
     const { modelPath } = await request.json();
 
-    console.log('🧪 Testing node-llama-cpp initialization...');
+    // console.log('🧪 Testing node-llama-cpp initialization...');
 
     await slidingContextManager.initialize(modelPath);
 
@@ -31,12 +31,14 @@ export async function POST(request: Request) {
       message: 'Model loaded successfully!',
       modelInfo: slidingContextManager.getModelInfo(),
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const msg = error instanceof Error ? error.message : String(error);
+    const stack = error instanceof Error ? error.stack : undefined;
     return NextResponse.json(
       {
         success: false,
-        error: error.message,
-        stack: error.stack,
+        error: msg,
+        stack: stack,
       },
       { status: 500 },
     );
