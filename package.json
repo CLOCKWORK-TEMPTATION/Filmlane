@@ -10,7 +10,9 @@
     "build": "NODE_ENV=production next build",
     "start": "next start",
     "lint": "next lint",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "validate": "pnpm typecheck && pnpm lint",
+    "analyze-screenplays": "node tools\\analyze-screenplays.cjs --task both --model mistral24b"
   },
   "dependencies": {
     "@genkit-ai/google-genai": "^1.20.0",

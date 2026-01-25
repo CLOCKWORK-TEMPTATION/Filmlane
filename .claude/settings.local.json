@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "WebSearch",
+      "Bash(\"D:\\\\aanalyze script\\\\venv\\\\Scripts\\\\pip.exe\" install:*)",
+      "Bash(\"D:\\\\aanalyze script\\\\venv\\\\Scripts\\\\python.exe\" -m py_compile:*)"
+    ]
+  }
+}

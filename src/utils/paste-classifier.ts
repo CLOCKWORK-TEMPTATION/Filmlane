@@ -4,7 +4,6 @@ import {
   ContextMemoryManager,
 } from './context-memory-manager';
 import type { ContextMemory, LineContext } from '@/types/screenplay';
-import { getFormatStyles } from './editor-styles';
 
 /**
  * =========================
@@ -247,9 +246,11 @@ const matchesActionStartPattern = (line: string): boolean => {
   const actionStartPatterns = [
     /^\s*(?:ثم\s+)?(?:و(?:هو|هي)\s+)?[يت][\u0600-\u06FF]{2,}(?:\s+\S|$)/,
     /^\s*(?:و|ف|ل)?(?:نرى|نسمع|نلاحظ|نقترب|نبتعد|ننتقل)(?:\s+\S|$)/,
-    /^\s*(?:ثم\s+)?(?:و(?:هو|هي)\s+)?[يت][\u0600-\u06FF]{2,}(?:\s+\S|$)/,
-    /^\s*(?:و|ف|ل)?(?:نرى|نسمع|نلاحظ|نقترب|نبتعد|ننتقل)(?:\s+\S|$)/,
     /^\s*(?:رأينا|سمعنا|لاحظنا|شاهدنا)(?:\s+\S|$)/,
+    /^\s*س(?:نرى|نسمع|نلاحظ|نقترب|نبتعد|ننتقل)(?:\s+\S|$)/,
+    /^\s*(?:في\s+(?:تلك|هذا|هذه|ذلك)\s+(?:اللحظة|الأثناء|الاثناء|الوقت)|خلال|أثناء|اثناء|بينما|عندما|حين|فجأة)\b/i,
+    /^\s*لا\s+[يت][\u0600-\u06FF]{2,}(?:\s+[\u0600-\u06FF]{2,}){1,3}\s*$/,
+    /^\s*ل(?:ي|ت)[\u0600-\u06FF]{2,}(?:\s+\S|$)/,
     // Add imperative check for Action (e.g. ادخل، اخرج) if it starts with Alif
     /^\s*(?:ادخل|اخرج|انظر|استمع|اقترب|ابتعد|توقف)(?:\s+\S|$)/,
   ];
@@ -293,6 +294,51 @@ const parseInlineCharacterDialogue = (
   if (!characterName || !dialogueText) return null;
 
   if (!CHARACTER_RE.test(`${characterName}:`)) return null;
+  return { characterName, dialogueText };
+};
+
+const parseInlineCharacterDialogueWithoutColon = (
+  line: string,
+): { characterName: string; dialogueText: string } | null => {
+  const trimmed = line.trim();
+  if (!trimmed) return null;
+  if (trimmed.includes(':') || trimmed.includes('：')) return null;
+
+  const match = trimmed.match(
+    /^([\u0600-\u06FF]{2,}(?:\s+[\u0600-\u06FF]{2,}){0,2})\s+(.+)$/,
+  );
+  if (!match) return null;
+
+  const characterName = (match[1] || '').trim();
+  const dialogueText = (match[2] || '').trim();
+  if (!characterName || !dialogueText) return null;
+  if (!CHARACTER_RE.test(`${characterName}:`)) return null;
+
+  if (isLikelyAction(trimmed)) return null;
+
+  const normalizedDialogue = normalizeLine(dialogueText);
+  const firstWord = normalizedDialogue.split(/\s+/)[0] ?? '';
+  const strongDialogueStartWords = new Set([
+    'لو',
+    'هل',
+    'لماذا',
+    'ليه',
+    'ليش',
+    'كيف',
+    'متى',
+    'فين',
+    'مين',
+  ]);
+
+  const hasStrongDialogueSignal =
+    (/[؟?]/.test(dialogueText) ||
+      /\bيا\s+[\u0600-\u06FF]+/.test(normalizedDialogue) ||
+      /["«»]/.test(dialogueText) ||
+      strongDialogueStartWords.has(firstWord)) &&
+    !matchesActionStartPattern(normalizedDialogue);
+
+  if (!hasStrongDialogueSignal) return null;
+
   return { characterName, dialogueText };
 };
 
@@ -421,7 +467,7 @@ const getDialogueProbability = (line: string): number => {
   const conversationalStarts = [
     'ليه', 'مين', 'فين', 'إمتى', 'ازاي', 'كام', // Questions
     'أنا', 'انت', 'إنتي', 'احنا', 'يا', // Pronouns/Vocative
-    'بس', 'طب', 'ما', 'مش', 'لا', 'أيوه', 'أه', // Colloquial particles
+    'بس', 'طب', 'ما', 'مش', 'أيوه', 'أه', // Colloquial particles
     'طيب', 'خلاص', 'ياللا', 'يلا', 'عشان', 'علشان', // Colloquial
     'يبقى', 'كده', 'هو', 'هي', 'دي', 'ده', // Demonstratives/Aux
     'بقولك', 'بقولك', 'بتعمل', 'هتعمل', 'تعالى', 'روح', // Common commands/questions
@@ -433,14 +479,21 @@ const getDialogueProbability = (line: string): number => {
   // Check deeper in the sentence for conversational markers
   if (/\b(ده|دي|كده|عشان|علشان|عايز|عايزة|مش|هو|هي|احنا)\b/.test(normalized)) score += 1;
 
+  const colloquialRe = /(?:^|[\s،؛.!?"«»])((?:مفيش|مش|عايز|عايزة|عاوز|لسه|ايوه|أيوه|اه|أه|إزاي|ازاي|إمتى|امتى|فين|مين|بقولك|ياللا|يلا|بت[\u0600-\u06FF]{2,}|هت[\u0600-\u06FF]{2,}))(?=$|[\s،؛.!?"«»])/g;
+  const colloquialCount = Array.from(normalized.matchAll(colloquialRe)).length;
+  if (colloquialCount >= 2) score += 2;
+  else if (colloquialCount === 1) score += 1;
+
   // 4. Quotation Marks (علامات التنصيص)
-  if (/["«»]/.test(line)) score += 2;
+  if (/["«»]/.test(line) && !matchesActionStartPattern(normalized)) score += 1;
 
   // 5. Length Heuristic (الطول)
-  if (normalized.length > 5 && normalized.length < 150) score += 1;
+  if (normalized.length > 5 && normalized.length < 90) score += 1;
 
   // Penalties (عقوبات)
   if (isSceneHeader1(line) || isSceneHeader2(line)) score -= 10;
+
+  if (matchesActionStartPattern(normalized)) score -= 4;
 
   // Adjusted Action Penalty: If it starts with action verb BUT has strong dialogue markers, reduce penalty or ignore
   if (isActionVerbStart(line)) {
@@ -501,11 +554,21 @@ const buildContext = (
   const recentTypes = previousTypes.slice(-10);
   const lastType = previousTypes[previousTypes.length - 1];
 
-  const isInDialogueBlock = recentTypes
-    .slice(-3)
-    .some(
-      (t) => t === 'character' || t === 'dialogue' || t === 'parenthetical',
-    );
+  const isInDialogueBlock = (() => {
+    const lookback = 12;
+    for (
+      let i = previousTypes.length - 1;
+      i >= 0 && i >= previousTypes.length - lookback;
+      i--
+    ) {
+      const t = previousTypes[i];
+      if (!t) continue;
+      if (t === 'character') return true;
+      if (t === 'dialogue' || t === 'parenthetical') continue;
+      return false;
+    }
+    return false;
+  })();
 
   const isInSceneHeader =
     lastType === 'scene-header-top-line' ||
@@ -870,6 +933,33 @@ export const handlePaste = async (
     const inlineParsed = parseInlineCharacterDialogue(strippedLine);
     if (inlineParsed) {
       const { characterName, dialogueText } = inlineParsed;
+
+      const charStyles = getFormatStylesFn('character', '', '');
+      const dialogueStyles = getFormatStylesFn('dialogue', '', '');
+
+      const charMarginTop = getSpacingMarginTop(previousFormatClass, 'character');
+      const charHTML = buildLineDivHTML(
+        'format-character',
+        charStyles,
+        characterName + ':',
+        charMarginTop,
+      );
+      const dialogueHTML = buildLineDivHTML(
+        'format-dialogue',
+        dialogueStyles,
+        dialogueText,
+        '0',
+      );
+
+      formattedHTML += charHTML + dialogueHTML;
+      classifiedTypes.push('character', 'dialogue');
+      previousFormatClass = 'dialogue';
+      continue;
+    }
+
+    const inlineParsedNoColon = parseInlineCharacterDialogueWithoutColon(strippedLine);
+    if (inlineParsedNoColon) {
+      const { characterName, dialogueText } = inlineParsedNoColon;
 
       const charStyles = getFormatStylesFn('character', '', '');
       const dialogueStyles = getFormatStylesFn('dialogue', '', '');
